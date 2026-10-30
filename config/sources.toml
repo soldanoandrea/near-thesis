@@ -1,0 +1,138 @@
+# Keyless data sources and polite-fetch settings for `make refresh`.
+# Every host below answered without an API key on 2026-10-30 (see PIANO.md section 1 and docs/DATA_NOTES.md).
+# No key, token or account is used anywhere in this project.
+
+[http]
+user_agent = "near-thesis/0.1 (+reproducible research; keyless; NEAR HACKATHON 2026)"
+timeout_s = 90
+max_attempts = 7          # tenacity retries on 429 / 5xx / network errors
+backoff_initial_s = 2.0
+backoff_max_s = 120.0
+
+# Minimum seconds between two requests to the same host (PIANO.md section 4: start at 1 req/s,
+# slower where a limit is published).
+[http.min_interval_s]
+"api.nearblocks.io" = 11.0                    # free plan: 6 req/min, 333/day, 10k/month
+"api.llama.fi" = 1.0
+"stablecoins.llama.fi" = 1.0
+"coins.llama.fi" = 1.0
+"api.coingecko.com" = 7.0                     # keyless public API, ~10 req/min is safe
+"archival-rpc.mainnet.fastnear.com" = 1.5      # answered 429 at 1 req/s while tx.main.fastnear.com was also in use
+"archival-rpc.mainnet.near.org" = 4.0         # "severely rate limited": fallback only
+"free.rpc.fastnear.com" = 1.0
+"rpc.mainnet.near.org" = 2.0
+"tx.main.fastnear.com" = 1.0
+"api.fastnear.com" = 1.0
+"explorer.mainnet.aurora.dev" = 1.0
+
+[endpoints]
+nearblocks = "https://api.nearblocks.io/v1"
+llama = "https://api.llama.fi"
+llama_stablecoins = "https://stablecoins.llama.fi"
+llama_coins = "https://coins.llama.fi"
+coingecko = "https://api.coingecko.com/api/v3"
+archival_rpc = "https://archival-rpc.mainnet.fastnear.com"
+archival_rpc_fallback = "https://archival-rpc.mainnet.near.org"
+rpc = "https://free.rpc.fastnear.com"
+rpc_fallback = "https://rpc.mainnet.near.org"
+fastnear_tx = "https://tx.main.fastnear.com"
+fastnear_api = "https://api.fastnear.com/v1"
+aurora_stats = "https://explorer.mainnet.aurora.dev/stats-service/api/v1"
+aurora_api = "https://explorer.mainnet.aurora.dev/api/v2"
+
+# Chains compared in Q7. Base has no native token: usage benchmark only (PIANO.md Q7).
+# llama_tvl / llama_stable: DefiLlama chain name; llama_dex: overview slug; llama_chain_fees: "Chain" protocol slug;
+# llama_coin: coins.llama.fi id; coingecko: CoinGecko coin id ("" = no native token).
+[[chains]]
+chain = "near"
+llama_tvl = "Near"
+llama_stable = "Near"
+llama_dex = "near"
+llama_chain_fees = "near"
+llama_coin = "coingecko:near"
+coingecko = "near"
+
+[[chains]]
+chain = "solana"
+llama_tvl = "Solana"
+llama_stable = "Solana"
+llama_dex = "solana"
+llama_chain_fees = "solana"
+llama_coin = "coingecko:solana"
+coingecko = "solana"
+
+[[chains]]
+chain = "sui"
+llama_tvl = "Sui"
+llama_stable = "Sui"
+llama_dex = "sui"
+llama_chain_fees = "sui"
+llama_coin = "coingecko:sui"
+coingecko = "sui"
+
+[[chains]]
+chain = "aptos"
+llama_tvl = "Aptos"
+llama_stable = "Aptos"
+llama_dex = "aptos"
+llama_chain_fees = "aptos"
+llama_coin = "coingecko:aptos"
+coingecko = "aptos"
+
+[[chains]]
+chain = "base"
+llama_tvl = "Base"
+llama_stable = "Base"
+llama_dex = "base"
+llama_chain_fees = "base"
+llama_coin = ""
+coingecko = ""
+
+[[chains]]
+chain = "ethereum"
+llama_tvl = "Ethereum"
+llama_stable = "Ethereum"
+llama_dex = "ethereum"
+llama_chain_fees = "ethereum"
+llama_coin = "coingecko:ethereum"
+coingecko = "ethereum"
+
+[[chains]]
+chain = "tron"
+llama_tvl = "Tron"
+llama_stable = "Tron"
+llama_dex = "tron"
+llama_chain_fees = "tron"
+llama_coin = "coingecko:tron"
+coingecko = "tron"
+
+[[chains]]
+chain = "aurora"
+llama_tvl = "Aurora"
+llama_stable = ""
+llama_dex = ""
+llama_chain_fees = ""
+llama_coin = ""
+coingecko = ""
+
+# DefiLlama protocol-level series used for NEAR Intents (Q2, Q5).
+[intents]
+llama_slug = "near-intents"
+
+[archival_epochs]
+# One sampled epoch every `step_epochs` epochs (~14 days at ~12 h per epoch), from genesis to the latest final epoch.
+step_epochs = 28
+genesis_height = 9820210
+
+[activity]
+# Stratified random block sample (PIANO.md Q1 / section 3.1), one stratum per calendar month (UTC).
+first_month = "2020-08"
+blocks_per_month = 30
+seed = 20261101
+# Exact monthly transaction counts per contract via the FastNear Transactions API (txs_count with is_real_receiver).
+receivers = ["game.hot.tg", "token.sweat", "aurora", "v1.signer", "intents.near"]
+
+[treasury]
+# Monthly archival balance samples (PIANO.md Q4 / sources #20-#22).
+accounts = ["buybacks.multisignature.near", "fefundsadmin.sputnik-dao.near", "1csfundsadmin.sputnik-dao.near", "treasury.near"]
+first_month = "2024-01"

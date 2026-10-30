@@ -1,0 +1,22 @@
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+# HTTP response cache used by `make refresh` (re-creatable, never committed)
+data/cache/
+
+# Secrets never live in this repo (keys, if ever approved, come from 1Password at runtime)
+.env
+.env.*
+!.env.tpl
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+data/raw/.manifest.lock

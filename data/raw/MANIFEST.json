@@ -1,0 +1,668 @@
+{
+  "schema_version": 1,
+  "description": "Provenance of every committed file under data/raw/. sha256 is of the committed CSV. Regenerate with `make refresh`.",
+  "files": {
+    "aurora/stats_lines_daily.csv": {
+      "source": "aurora",
+      "urls": [
+        "https://explorer.mainnet.aurora.dev/stats-service/api/v1/lines/newTxns?resolution=DAY&from=2020-01-01&to=<fetch date>",
+        "https://explorer.mainnet.aurora.dev/stats-service/api/v1/lines/activeAccounts?resolution=DAY&from=2020-01-01&to=<fetch date>",
+        "https://explorer.mainnet.aurora.dev/stats-service/api/v1/lines/newAccounts?resolution=DAY&from=2020-01-01&to=<fetch date>",
+        "https://explorer.mainnet.aurora.dev/stats-service/api/v1/lines/txnsFee?resolution=DAY&from=2020-01-01&to=<fetch date>"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:49:23Z",
+      "rows": 9980,
+      "columns": [
+        "date",
+        "metric",
+        "value",
+        "is_approximate"
+      ],
+      "sha256": "d4b3080553a29c093f622989f7007d679c85a5ac92f34734f608fc5c5649753c",
+      "bytes": 344231,
+      "http": {
+        "requests": 4,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 616898
+      },
+      "notes": "Blockscout stats-service lines (resolution=DAY). txnsFee is in ETH (Aurora's gas token). Rows flagged is_approximate (the current day) are dropped in processing."
+    },
+    "aurora/stats_snapshot.csv": {
+      "source": "aurora",
+      "urls": [
+        "https://explorer.mainnet.aurora.dev/api/v2/stats"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:49:24Z",
+      "rows": 1,
+      "columns": [
+        "total_addresses",
+        "total_blocks",
+        "total_transactions",
+        "transactions_today",
+        "average_block_time"
+      ],
+      "sha256": "b832debee8e31168ba7e951525fce269941bb007145afd5b11227d2e39abeaca",
+      "bytes": 125,
+      "http": {
+        "requests": 5,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 617464
+      },
+      "notes": "Current Blockscout counters."
+    },
+    "coingecko/market_chart_365d.csv": {
+      "source": "coingecko",
+      "urls": [
+        "https://api.coingecko.com/api/v3/coins/near/market_chart?vs_currency=usd&days=365&interval=daily",
+        "https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=365&interval=daily",
+        "https://api.coingecko.com/api/v3/coins/sui/market_chart?vs_currency=usd&days=365&interval=daily",
+        "https://api.coingecko.com/api/v3/coins/aptos/market_chart?vs_currency=usd&days=365&interval=daily",
+        "https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=365&interval=daily",
+        "https://api.coingecko.com/api/v3/coins/tron/market_chart?vs_currency=usd&days=365&interval=daily"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:49:20Z",
+      "rows": 2196,
+      "columns": [
+        "chain",
+        "coin_id",
+        "timestamp_ms",
+        "date",
+        "price_usd",
+        "market_cap_usd",
+        "volume_usd"
+      ],
+      "sha256": "76aa8ae0d45e66a9dcc7178fcdf56ce159db5372e40d80b0f3bcd48e5ff94a5a",
+      "bytes": 194725,
+      "http": {
+        "requests": 6,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 227487
+      },
+      "notes": "Keyless /coins/<id>/market_chart?days=365&interval=daily. Points are 00:00 UTC except the last one, which is the live price at fetch time (dropped in processing)."
+    },
+    "defillama/chain_fees_daily.csv": {
+      "source": "defillama",
+      "urls": [
+        "https://api.llama.fi/summary/fees/near?dataType=dailyFees",
+        "https://api.llama.fi/summary/fees/near?dataType=dailyRevenue",
+        "https://api.llama.fi/summary/fees/solana?dataType=dailyFees",
+        "https://api.llama.fi/summary/fees/solana?dataType=dailyRevenue",
+        "https://api.llama.fi/summary/fees/sui?dataType=dailyFees",
+        "https://api.llama.fi/summary/fees/sui?dataType=dailyRevenue",
+        "https://api.llama.fi/summary/fees/aptos?dataType=dailyFees",
+        "https://api.llama.fi/summary/fees/aptos?dataType=dailyRevenue",
+        "https://api.llama.fi/summary/fees/base?dataType=dailyFees",
+        "https://api.llama.fi/summary/fees/base?dataType=dailyRevenue",
+        "https://api.llama.fi/summary/fees/ethereum?dataType=dailyFees",
+        "https://api.llama.fi/summary/fees/ethereum?dataType=dailyRevenue",
+        "https://api.llama.fi/summary/fees/tron?dataType=dailyFees",
+        "https://api.llama.fi/summary/fees/tron?dataType=dailyRevenue"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:47:52Z",
+      "rows": 27551,
+      "columns": [
+        "chain",
+        "date",
+        "data_type",
+        "value_usd"
+      ],
+      "sha256": "92c50d26470b0d942d03acf78b4244b4473f3d8668bf88675fda51eefecf17d9",
+      "bytes": 1210082,
+      "http": {
+        "requests": 22,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 2227847
+      },
+      "notes": "summary/fees/<chain> for the chain protocol itself (gas/transaction fees paid to the chain). dailyRevenue = DefiLlama's revenue definition for that chain (e.g. burned fees). NEAR series sourced by DefiLlama from Allium."
+    },
+    "defillama/chain_tvl_daily.csv": {
+      "source": "defillama",
+      "urls": [
+        "https://api.llama.fi/v2/historicalChainTvl/Near",
+        "https://api.llama.fi/v2/historicalChainTvl/Solana",
+        "https://api.llama.fi/v2/historicalChainTvl/Sui",
+        "https://api.llama.fi/v2/historicalChainTvl/Aptos",
+        "https://api.llama.fi/v2/historicalChainTvl/Base",
+        "https://api.llama.fi/v2/historicalChainTvl/Ethereum",
+        "https://api.llama.fi/v2/historicalChainTvl/Tron",
+        "https://api.llama.fi/v2/historicalChainTvl/Aurora"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:47:37Z",
+      "rows": 16006,
+      "columns": [
+        "chain",
+        "date",
+        "timestamp",
+        "tvl_usd"
+      ],
+      "sha256": "2691d095e9a30db4fd9d8b2d1be5090e7ed9eaf8e98fc5ce8ec8906627516a06",
+      "bytes": 756958,
+      "http": {
+        "requests": 8,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 575644
+      },
+      "notes": "historicalChainTvl per chain; DefiLlama default TVL (excludes liquid staking, double counts and borrowed by default)."
+    },
+    "defillama/chains_snapshot.csv": {
+      "source": "defillama",
+      "urls": [
+        "https://api.llama.fi/v2/chains"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:48:45Z",
+      "rows": 420,
+      "columns": [
+        "name",
+        "gecko_id",
+        "token_symbol",
+        "tvl_usd"
+      ],
+      "sha256": "9e17d1727e0684f178cd10a1e5d69fd660a40d7ac0f4a6e32c8204f33f25805a",
+      "bytes": 14267,
+      "http": {
+        "requests": 77,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 8748339
+      },
+      "notes": "Current TVL of every chain tracked by DefiLlama (for rank context)."
+    },
+    "defillama/coin_prices_daily.csv": {
+      "source": "defillama",
+      "urls": [
+        "https://coins.llama.fi/chart/coingecko:near?start=1593561600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:near?start=1628121600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:near?start=1662681600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:near?start=1697241600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:near?start=1731801600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:near?start=1766361600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:solana?start=1593561600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:solana?start=1628121600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:solana?start=1662681600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:solana?start=1697241600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:solana?start=1731801600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:solana?start=1766361600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:sui?start=1593561600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:sui?start=1628121600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:sui?start=1662681600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:sui?start=1697241600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:sui?start=1731801600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:sui?start=1766361600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:aptos?start=1593561600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:aptos?start=1628121600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:aptos?start=1662681600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:aptos?start=1697241600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:aptos?start=1731801600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:aptos?start=1766361600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:ethereum?start=1593561600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:ethereum?start=1628121600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:ethereum?start=1662681600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:ethereum?start=1697241600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:ethereum?start=1731801600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:ethereum?start=1766361600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:tron?start=1593561600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:tron?start=1628121600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:tron?start=1662681600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:tron?start=1697241600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:tron?start=1731801600&span=400&period=1d",
+        "https://coins.llama.fi/chart/coingecko:tron?start=1766361600&span=400&period=1d"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:48:45Z",
+      "rows": 11880,
+      "columns": [
+        "chain",
+        "coin",
+        "timestamp",
+        "date",
+        "price_usd"
+      ],
+      "sha256": "e107b3352734a944fea0bff4c4e1eca6ff5263a166db6a9e797d7e53aab76a5e",
+      "bytes": 667962,
+      "http": {
+        "requests": 76,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 8690400
+      },
+      "notes": "coins.llama.fi/chart, period=1d, paged in 400-day spans. Timestamps are the provider's sample times (not always 00:00 UTC); one or more rows per UTC date."
+    },
+    "defillama/dex_volume_daily.csv": {
+      "source": "defillama",
+      "urls": [
+        "https://api.llama.fi/overview/dexs/near?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=false",
+        "https://api.llama.fi/overview/dexs/solana?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+        "https://api.llama.fi/overview/dexs/sui?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+        "https://api.llama.fi/overview/dexs/aptos?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+        "https://api.llama.fi/overview/dexs/base?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+        "https://api.llama.fi/overview/dexs/ethereum?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+        "https://api.llama.fi/overview/dexs/tron?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:47:59Z",
+      "rows": 12973,
+      "columns": [
+        "chain",
+        "date",
+        "volume_usd"
+      ],
+      "sha256": "a850ef7ccbe85d26dca76e8d2f432bfa86a9649a08f2d99a9d9a8cba924ba125",
+      "bytes": 461249,
+      "http": {
+        "requests": 29,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 3524700
+      },
+      "notes": "overview/dexs/<chain> totalDataChart. For NEAR this INCLUDES NEAR Intents (see dex_volume_near_by_protocol_daily)."
+    },
+    "defillama/dex_volume_near_by_protocol_daily.csv": {
+      "source": "defillama",
+      "urls": [
+        "https://api.llama.fi/overview/dexs/near?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=false"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:47:59Z",
+      "rows": 6512,
+      "columns": [
+        "date",
+        "protocol",
+        "volume_usd"
+      ],
+      "sha256": "7016ea9a504921a9cc2133c621f031c0d7775c87804889e9bb4b8f00b9e6fd7e",
+      "bytes": 246364,
+      "http": {
+        "requests": 29,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 3524700
+      },
+      "notes": "totalDataChartBreakdown of overview/dexs/near: daily volume per protocol on NEAR."
+    },
+    "defillama/near_intents_daily.csv": {
+      "source": "defillama",
+      "urls": [
+        "https://api.llama.fi/summary/dexs/near-intents?dataType=dailyVolume",
+        "https://api.llama.fi/summary/fees/near-intents?dataType=dailyFees",
+        "https://api.llama.fi/summary/fees/near-intents?dataType=dailyRevenue",
+        "https://api.llama.fi/summary/fees/near-intents?dataType=dailyHoldersRevenue"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:48:09Z",
+      "rows": 2303,
+      "columns": [
+        "date",
+        "data_type",
+        "value_usd"
+      ],
+      "sha256": "acc3b900557f3d2a87ea8a56cff84a201aa12fbdc0457ce5199b33ed739a8f12",
+      "bytes": 90872,
+      "http": {
+        "requests": 40,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 8134445
+      },
+      "notes": "NEAR Intents via DefiLlama. Upstream is a NEAR-uploaded Dune dataset (dimension-adapters dexs/near-intents): single-sourced, grade B."
+    },
+    "defillama/stablecoins_daily.csv": {
+      "source": "defillama",
+      "urls": [
+        "https://stablecoins.llama.fi/stablecoincharts/Near",
+        "https://stablecoins.llama.fi/stablecoincharts/Solana",
+        "https://stablecoins.llama.fi/stablecoincharts/Sui",
+        "https://stablecoins.llama.fi/stablecoincharts/Aptos",
+        "https://stablecoins.llama.fi/stablecoincharts/Base",
+        "https://stablecoins.llama.fi/stablecoincharts/Ethereum",
+        "https://stablecoins.llama.fi/stablecoincharts/Tron"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:48:05Z",
+      "rows": 12873,
+      "columns": [
+        "chain",
+        "date",
+        "circulating_usd",
+        "bridged_to_usd"
+      ],
+      "sha256": "4a5e451e532e79188a00778d5b1b73af4ee0471d6368f60c782007daa4285ffc",
+      "bytes": 686888,
+      "http": {
+        "requests": 36,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 7975240
+      },
+      "notes": "stablecoincharts/<chain>: sum over peg types of totalCirculatingUSD."
+    },
+    "fastnear_api/treasury_holdings_current.csv": {
+      "source": "fastnear_api",
+      "urls": [
+        "https://api.fastnear.com/v1/account/<id>/full"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:49:32Z",
+      "rows": 26,
+      "columns": [
+        "account_id",
+        "kind",
+        "contract_id",
+        "balance_raw",
+        "last_update_block_height"
+      ],
+      "sha256": "0ef065fb1f52131793afdcd239803521cdfe26815a078c1999b5658722bea14b",
+      "bytes": 1805,
+      "http": {
+        "requests": 4,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 2750
+      },
+      "notes": "FastNear indexed FT / NFT / staking-pool holdings of tracked wallets. balance_raw is in the token's smallest unit (decimals not resolved)."
+    },
+    "fastnear_tx/receiver_txs_alltime.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/account"
+      ],
+      "params": {
+        "is_real_receiver": true,
+        "limit": 1
+      },
+      "fetched_at_utc": "2026-10-30T19:49:37Z",
+      "rows": 5,
+      "columns": [
+        "account_id",
+        "txs_count"
+      ],
+      "sha256": "a83abf811ae6962fb7f3aef97e124c7b7042d42229590db2a893a358ff9c434a",
+      "bytes": 124,
+      "http": {
+        "requests": 5,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 2618
+      },
+      "notes": "All-time count of transactions whose real receiver is the account (relayers excluded)."
+    },
+    "nearblocks/charts_daily.csv": {
+      "source": "nearblocks",
+      "urls": [
+        "https://api.nearblocks.io/v1/charts"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:47:20Z",
+      "rows": 2292,
+      "columns": [
+        "date",
+        "near_price",
+        "market_cap",
+        "total_supply",
+        "circulating_supply",
+        "blocks",
+        "gas_fee",
+        "gas_used",
+        "txns",
+        "txn_volume",
+        "txn_volume_usd",
+        "txn_fee",
+        "txn_fee_usd",
+        "new_accounts",
+        "active_accounts",
+        "deleted_accounts",
+        "new_contracts",
+        "active_contracts",
+        "unique_contracts",
+        "multichain_txns"
+      ],
+      "sha256": "af38ad7eaf3b8fabf22797e27db2c428e88939ebcb6555580e5114991ddbeeb1",
+      "bytes": 752369,
+      "http": {
+        "requests": 1,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 1534593
+      },
+      "notes": "Verbatim /v1/charts rows (all values kept as strings; supply and fee fields are yoctoNEAR). date truncated to YYYY-MM-DD (UTC day). Data by NearBlocks (attribution required by their free plan)."
+    },
+    "nearblocks/stats_snapshot.csv": {
+      "source": "nearblocks",
+      "urls": [
+        "https://api.nearblocks.io/v1/stats"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:47:30Z",
+      "rows": 1,
+      "columns": [
+        "id",
+        "total_supply",
+        "circulating_supply",
+        "avg_block_time",
+        "gas_price",
+        "nodes_online",
+        "near_price",
+        "near_btc_price",
+        "market_cap",
+        "volume",
+        "high_24h",
+        "high_all",
+        "low_24h",
+        "low_all",
+        "change_24",
+        "total_txns",
+        "tps"
+      ],
+      "sha256": "43a3976a8cd07de4383bf4e759d75a8c7302b82be288aa76324291ad029742ca",
+      "bytes": 405,
+      "http": {
+        "requests": 2,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 1535073
+      },
+      "notes": "Current network snapshot (/v1/stats). Not a time series; changes every refresh."
+    },
+    "rpc/final_block_header.csv": {
+      "source": "rpc",
+      "urls": [
+        "https://free.rpc.fastnear.com block finality=final"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:49:26Z",
+      "rows": 1,
+      "columns": [
+        "height",
+        "hash",
+        "timestamp_ns",
+        "epoch_id",
+        "total_supply_yocto",
+        "gas_price_yocto",
+        "balance_burnt_yocto",
+        "latest_protocol_version"
+      ],
+      "sha256": "b6e12610af85081a92ee8bef2f8686d3e6e357e8fbbfc45ee120c5b53bc1319b",
+      "bytes": 304,
+      "http": {
+        "requests": 3,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 32286
+      },
+      "notes": "Header of the final block at refresh time."
+    },
+    "rpc/genesis_config.csv": {
+      "source": "rpc",
+      "urls": [
+        "https://free.rpc.fastnear.com EXPERIMENTAL_genesis_config"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:49:24Z",
+      "rows": 36,
+      "columns": [
+        "key",
+        "value"
+      ],
+      "sha256": "cb22404b7c21d3ac81474778773eb82ad843d246f30f43833d63bd3942c87417",
+      "bytes": 1155,
+      "http": {
+        "requests": 1,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 1874
+      },
+      "notes": "Scalar fields of the mainnet genesis config."
+    },
+    "rpc/protocol_config_latest.csv": {
+      "source": "rpc",
+      "urls": [
+        "https://free.rpc.fastnear.com EXPERIMENTAL_protocol_config"
+      ],
+      "params": {
+        "block_id": 222316889
+      },
+      "fetched_at_utc": "2026-10-30T19:49:26Z",
+      "rows": 280,
+      "columns": [
+        "key",
+        "value"
+      ],
+      "sha256": "68aafeb2392dc2d9a9487ccc3e63f31662d4a29a8404f592f74a97dd0e7ca719",
+      "bytes": 19126,
+      "http": {
+        "requests": 3,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 32286
+      },
+      "notes": "Scalar fields of the protocol config at the final block of the refresh."
+    },
+    "rpc/sputnik_dao_list.csv": {
+      "source": "rpc",
+      "urls": [
+        "https://free.rpc.fastnear.com call_function sputnik-dao.near get_dao_list"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:49:28Z",
+      "rows": 2043,
+      "columns": [
+        "dao_id",
+        "block_height"
+      ],
+      "sha256": "0b134e9dbf3d9799274403c2c66fa66726d66077789c0bca377cff485c90bb33",
+      "bytes": 79138,
+      "http": {
+        "requests": 5,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 666252
+      },
+      "notes": "All DAOs created by the Sputnik DAO v2 factory."
+    },
+    "rpc/treasury_accounts_current.csv": {
+      "source": "rpc",
+      "urls": [
+        "https://free.rpc.fastnear.com view_account"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:49:32Z",
+      "rows": 4,
+      "columns": [
+        "account_id",
+        "amount_yocto",
+        "locked_yocto",
+        "block_height",
+        "exists"
+      ],
+      "sha256": "87656d3abdb1928c40405cea4c14232f530c4498be2073ee1ea246a770b8c4ef",
+      "bytes": 353,
+      "http": {
+        "requests": 9,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 667403
+      },
+      "notes": "Liquid (amount) and staked-locked balances of tracked wallets."
+    },
+    "rpc/validators_current.csv": {
+      "source": "rpc",
+      "urls": [
+        "https://free.rpc.fastnear.com validators [null]"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T19:49:27Z",
+      "rows": 381,
+      "columns": [
+        "account_id",
+        "stake_yocto",
+        "produced_blocks",
+        "expected_blocks",
+        "produced_chunks",
+        "expected_chunks",
+        "epoch_start_height",
+        "epoch_height"
+      ],
+      "sha256": "30cfbf81c00731d3ded64c05894f58d26f300f7b3a82f2553f98b5c2bf1d05fa",
+      "bytes": 29598,
+      "http": {
+        "requests": 4,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 436708
+      },
+      "notes": "current_validators of the epoch in progress at refresh time."
+    }
+  }
+}
