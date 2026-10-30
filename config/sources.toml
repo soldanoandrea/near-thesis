@@ -32,7 +32,7 @@ backoff_max_s = 120.0
 # Minimum seconds between two requests to any host whose name ends with the key, shared across processes
 # (lock file in data/cache/). FastNear rate-limits across its services (RPC, archival, indexer, API).
 [http.shared_min_interval_s]
-"fastnear.com" = 1.0
+"fastnear.com" = 0.5               # pause after each request ends (requests also start >= 1 s apart per host)
 
 [endpoints]
 nearblocks = "https://api.nearblocks.io/v1"
@@ -166,8 +166,10 @@ first_month = "2024-01"
 extra_first_month = "2025-11"   # months with fewer than ~200 sampled txs: widen the block sample
 extra_blocks_per_month = 60     # added to the 30 base blocks -> 90 blocks per month
 recent_first_month = "2024-11"  # last 24 months get more draws
-draws_recent = 60
+draws_recent = 200              # 60 in the first design; widened after a pilot on two months showed the 1/c account
+                                # estimators far too coarse (one single-transaction signer moved a month by ~370k)
 draws_early = 15
+lifetime_draws = 60             # first appearance / last activity (cohorts) only for the first 60 draws of a month
 detail_draws = 40               # per month, the first `detail_draws` draws also get method / receiver details
 detail_min_txs = 3              # ... if the signer signed at least this many txs that month
 detail_txs = 20                 # most recent txs of the signer in the month whose details are fetched
@@ -201,6 +203,12 @@ repetitive_min_details = 10      # ... with >= 10 detailed txs and >= 30 txs in 
 repetitive_min_txs = 30
 bootstrap = 1000
 seed = 20261101
+# incentivized receivers beyond the phase-1 census list ([activity.groups].incentivized): whole namespaces of the
+# reward programs (SWEAT claims / jars / oracles, KaiChing user sub-accounts) and the tap-to-earn game Harvest Moon,
+# identified in the first two pilot months (2026-09, 2026-10). A signer inside such a namespace that calls itself
+# (app-driven account setup) also counts as incentivized.
+incentivized_extra = ["aa-harvest-moon.near", "wallet.kaiching", "v2.jars.sweat", "claim.sweat"]
+incentivized_suffixes = [".sweat", ".kaiching"]
 # receivers whose transactions are infrastructure relays (settlement, bridges, MPC signing, EVM relay)
 infrastructure = ["aurora", "intents.near", "v1.signer", "omft.near", "omni.bridge.near", "v2_1.omni.hot.tg",
                   "relay.aurora", "factory.bridge.near", "rainbow-bridge.near", "solver-relay.near"]
@@ -218,7 +226,8 @@ take_rate_multipliers = [0.5, 1.0, 2.0]
 buyback_share_of_revenue = 1.0      # since 2026-02-23 captured Intents revenue funds buybacks (DefiLlama adapter text)
 commissions = [0.0, 0.05, 0.10]     # validator commission range (not measured; HSP-029 cites a 5% median)
 staking_ratios = [0.40, 0.45, 0.50]
-adoption_fit_months = 36            # organic series: last 36 complete months
+adoption_fit_months = 36            # organic series: at most the last 36 complete months, and only months with the
+                                    # full draw design (from [signers].recent_first_month), so at most 23 points here
 adoption_min_train = 12
 adoption_backtest_horizons = [3, 6]
 adoption_forecast_horizons = [12, 24, 36]

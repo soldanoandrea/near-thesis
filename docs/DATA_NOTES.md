@@ -215,14 +215,18 @@ signers. A per-signer reconciliation needs per-account histories (phase 2).
 
 - NearBlocks' exact definitions of `active_accounts`, `txn_fee` vs `gas_fee`, and `market_cap` (circulating supply
   source). We cross-check fees and prices against other sources; account counts have no keyless counterpart.
-- DefiLlama's NEAR Intents volume, fees and revenue against on-chain `intents.near` events (phase 2 check).
+- DefiLlama's NEAR Intents volume definition: the on-chain check (phase 2a) brackets it (see
+  `reports/analysis_summary.md`, Q2) but cannot say whether the remainder is confidential volume or a two-sided count.
+  DefiLlama's Intents *revenue* is reproduced from public flows (Q4); its *fees* (gross protocol + affiliate fees)
+  come from NEAR-uploaded Dune tables and were not rebuilt.
 - Completeness of the FastNear Transactions API index before 2021 (only indirect checks: block rows exist from
   genesis; sample-implied vs NearBlocks transaction totals per month).
 - Stake before epoch 545 (archival nodes no longer serve it).
 - Why the `validator_reward_paid_prev_epoch` map does not sum to the minted amount of any adjacent epoch.
-- Whether `buybacks.multisignature.near` balance changes are purchases: the monthly balances are net changes, not a
-  ledger of buy transactions (phase 2: wallet histories).
-- The status of HSP-029 (1.6% issuance) and any change after the 2026-10-30 snapshot.
+- Who controls the implicit accounts that received `treasury.near`'s April-May 2026 outflows: account ids carry no
+  labels; trails stop at five hops or where no outflow is seen (phase 2a ledger).
+- The final HSP-029 vote and its validator adoption: the snapshot (2026-10-31) shows status "Voting".
+- Electric Capital's classification of repositories into ecosystems (taken as published).
 - Market caps older than 365 days for peers (keyless CoinGecko limit).
 
 ## 4. Phase 2a sources and quirks (fetched 2026-10-30/31 UTC)
@@ -234,8 +238,13 @@ what was fetched and how the sources behave.
 - Draw design (`src/nearthesis/sampling.py`): 60 extra uniform block heights per month from 2025-11 (seed stream
   `[seed, yyyymm, 2]`) widen the 30-block phase-1 sample, because recent months held only ~120-180 sampled
   transactions. Transactions are then drawn without replacement from the pooled sampled transactions of each month
-  (60 per month from 2024-11, 15 before; seed stream `[seed, yyyymm, 3]`); the draw is recomputed offline from the
-  committed block samples, so the fetcher and the analysis agree by construction.
+  (200 per month from 2024-11, 15 before; seed stream `[seed, yyyymm, 3]`); the draw is recomputed offline from the
+  committed block samples, so the fetcher and the analysis agree by construction. The design started at 60 draws per
+  month; a pilot on 2026-09/10 showed that the 1/c account estimators were far too coarse at that size (a single
+  signer with one transaction stands for N/n accounts), so the draws were extended to 200. The draw order is a fixed
+  permutation, so the first 60 draws of the extended design are exactly the original ones.
+- Calls per draw: the monthly count + timestamps for every draw; first appearance and last activity only for the first
+  60 draws of a month (cohorts); transaction details only for the first 40.
 - Per drawn signer: `/v0/account {is_real_signer, month range, limit 200, desc: true}` (exact monthly count +
   timestamps), `/v0/account {limit 1, desc: false}` (first appearance in any role), and for signers new in that month
   `/v0/account {is_real_signer, limit 1, desc: true}` (last signed transaction, for retention). Details of up to 20
@@ -267,6 +276,11 @@ what was fetched and how the sources behave.
   sample's ratio of sold legs to fee-implied legs.
 - `https://1click.chaindefuser.com/v0/tokens` answers without the partner JWT (unlike the Explorer API) and gives each
   asset id's decimals, symbol and CoinGecko id. Historical prices come from `coins.llama.fi/prices/historical`.
+- A control sample of every transaction touching `intents.near` in 10 short windows per day found no transaction
+  with a `token_diff` that did not pay the protocol fee, so the fee-paying frame contains all public swaps.
+- The fee collector's balances (archival `mt_batch_balance_of` at the start and end of each day) fall during the day
+  for many tokens: it moves or converts what it collects, so balance changes are not a fee census (kept as a
+  diagnostic only).
 - Not observable: confidential intents and anything that does not pay the protocol fee. DefiLlama's volume comes
   from `dune.near.dataset_near_intents_metrics` (column `volume_amount_usd`), uploaded by the NEAR team; its
   definition is not published.

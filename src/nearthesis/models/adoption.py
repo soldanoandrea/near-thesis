@@ -92,7 +92,8 @@ def forecast_ranges(t: np.ndarray, y: np.ndarray, model: str, horizons=(12, 24, 
     sims = np.empty((n_boot, len(horizons)))
     for b in range(n_boot):
         if model == "naive":
-            steps = rng.choice(np.diff(np.log(y)), size=(int(max(horizons)),), replace=True)
+            d = np.diff(np.log(y))
+            steps = rng.choice(d - d.mean(), size=(int(max(horizons)),), replace=True)  # random walk, no drift
             path = np.log(y[-1]) + np.cumsum(steps)
             sims[b] = path[np.asarray(horizons) - 1]
             continue

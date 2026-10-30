@@ -172,7 +172,8 @@ def build(raw: Path, daily: pl.DataFrame) -> dict[str, pl.DataFrame]:
                      "ratio_gross_sold_to_defillama": n_fee * point["mean_gross"] / dlv if dlv else None})
     days_df = pl.DataFrame(rows, infer_schema_length=None)
     # asset concentration from the sample: USD of sold legs by token symbol (USDC on every chain counts as USDC)
-    lg = legs.join(txs.select("day", "tx_no"), on=["day", "tx_no"]).filter(pl.col("amount").str.starts_with("-"))
+    lg = (legs.join(txs.select("day", "tx_no"), on=["day", "tx_no"]).filter(pl.col("amount").str.starts_with("-"))
+          .sort(["day", "tx_no", "event_index", "account_id", "token_id"]))
     rows_c = []
     for r in lg.iter_rows(named=True):
         meta = tokens.get(r["token_id"])

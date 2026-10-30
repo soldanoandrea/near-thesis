@@ -18,6 +18,8 @@ def fmt(v, unit: str = "") -> str:
         return f"{v * 1e4:.2f} bp"
     if unit == "USD":
         a = abs(v)
+        if a >= 1e12:
+            return f"${v / 1e12:,.2f}T"
         if a >= 1e9:
             return f"${v / 1e9:,.2f}B"
         if a >= 1e6:

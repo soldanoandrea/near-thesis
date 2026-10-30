@@ -25,6 +25,25 @@ def _years_between(a: str, b: str) -> float:
     return (_d(b) - _d(a)).days / 365.0
 
 
+def intents_quarterly(daily: pl.DataFrame, as_of: str) -> pl.DataFrame:
+    """Quarterly NEAR Intents volume, fees, captured revenue and take rates (DefiLlama), complete quarters only."""
+    rows = []
+    d = (daily.filter((pl.col("chain") == "near") & (pl.col("source") == "defillama")
+                      & pl.col("metric").is_in(["intents_volume_usd", "intents_fees_usd", "intents_revenue_usd"]))
+         .pivot(on="metric", index="date", values="value").sort("date")
+         .with_columns((pl.col("date").str.slice(0, 4) + "-Q" + ((pl.col("date").str.slice(5, 2).cast(pl.Int64) - 1)
+                                                                 // 3 + 1).cast(pl.Utf8)).alias("quarter")))
+    q = d.group_by("quarter").agg(pl.len().alias("days"), pl.col("intents_volume_usd").sum().alias("volume"),
+                                  pl.col("intents_fees_usd").sum().alias("fees"),
+                                  pl.col("intents_revenue_usd").sum().alias("revenue")).sort("quarter")
+    q = q.filter(pl.col("days") >= 88).with_columns(
+        (pl.col("fees") / pl.col("volume")).alias("fee_take_rate"),
+        (pl.col("revenue") / pl.col("volume")).alias("revenue_take_rate"),
+        (pl.col("volume") / pl.col("volume").shift(1) - 1).alias("volume_qoq"),
+        (pl.col("revenue") / pl.col("revenue").shift(1) - 1).alias("revenue_qoq"))
+    return q
+
+
 def model_inputs(raw: Path, daily: pl.DataFrame, epochs: pl.DataFrame, as_of: str, led: dict, ic: dict) -> dict:
     end = _d(as_of)
     fb = io.read_csv(raw / "rpc" / "final_block_header.csv")
@@ -120,8 +139,11 @@ def run_adoption(org: dict, daily: pl.DataFrame, as_of: str, mcfg: dict) -> dict
     out_fit, out_bt, out_fc, out_series = [], [], [], []
     series_list = []
     if org:
-        mon = org["monthly"].filter(~pl.col("is_partial_month")).sort("month").tail(int(mcfg["adoption_fit_months"]))
-        series_list += [("organic_monthly_active_signers", mon["month"].to_list(), mon["mas_organic"].to_list()),
+        first = config.load()["signers"]["recent_first_month"]  # months with the full 200-draw design
+        mon = (org["monthly"].filter(~pl.col("is_partial_month") & (pl.col("month") >= first)).sort("month")
+               .tail(int(mcfg["adoption_fit_months"])))
+        series_list += [("organic_daily_active_signers", mon["month"].to_list(), mon["das_organic"].to_list()),
+                        ("organic_monthly_active_signers", mon["month"].to_list(), mon["mas_organic"].to_list()),
                         ("organic_txs_per_day", mon["month"].to_list(), mon["txs_per_day_organic"].to_list())]
     iv = (series(daily, "near", "intents_volume_usd", "defillama")
           .with_columns(pl.col("date").dt.strftime("%Y-%m").alias("month"))
@@ -159,13 +181,20 @@ def run_adoption(org: dict, daily: pl.DataFrame, as_of: str, mcfg: dict) -> dict
     return res
 
 
-def run_yields(epochs: pl.DataFrame, inp: dict, mcfg: dict, as_of: str) -> dict[str, pl.DataFrame]:
+def run_yields(epochs: pl.DataFrame, inp: dict, mcfg: dict, as_of: str, led: dict) -> dict[str, pl.DataFrame]:
     e = epochs.with_columns(pl.col("start_date").str.slice(0, 4).alias("year"))
     per = (e.group_by("year").agg(pl.col("mint_annualized_rate").mean().alias("issuance_rate"),
                                   pl.col("burn_annualized_rate").mean().alias("burn_rate"),
                                   pl.col("staking_ratio").drop_nulls().mean().alias("staking_ratio"),
                                   pl.col("treasury_reward_share").drop_nulls().mean().alias("treasury_share"))
            .rename({"year": "period"}).with_columns(pl.lit(0.0).alias("buyback_rate")).sort("period"))
+    # buybacks started 2026-02-23: the 2026 row uses NEAR captured on-chain in the complete months since then
+    if led and "revenue_reconciliation" in led:
+        rr = led["revenue_reconciliation"].filter((pl.col("month") >= "2026-03") & (pl.col("month") < as_of[:7]))
+        if rr.height:
+            rate = float(rr["near_onchain"].sum()) * 12 / rr.height / inp["supply0"]
+            per = per.with_columns(pl.when(pl.col("period") == "2026").then(rate).otherwise(pl.col("buyback_rate"))
+                                   .alias("buyback_rate"))
     end = _d(as_of)
     last = []
     for days in (365, 90):
@@ -208,11 +237,12 @@ def build(raw: Path, processed: Path, reports: Path, *, daily: pl.DataFrame, epo
         dev["dev_ecosystem_monthly"] = eco
         dev["dev_ecosystem_share_quarterly"] = devactivity.share_trend(eco)
 
+    iq = intents_quarterly(daily, as_of)
     inp = model_inputs(raw, daily, epochs, as_of, led, ic)
     sm = run_supply_models(inp, mcfg)
     mm = run_multiples(daily, peers)
     am = run_adoption(org, daily, as_of, mcfg)
-    ym = run_yields(epochs, inp, mcfg, as_of)
+    ym = run_yields(epochs, inp, mcfg, as_of, led)
     inputs_df = pl.DataFrame([{"parameter": k, "value": (None if v is None or isinstance(v, str) else float(v)),
                                "text": v if isinstance(v, str) else ""} for k, v in inp.items()])
 
@@ -229,13 +259,17 @@ def build(raw: Path, processed: Path, reports: Path, *, daily: pl.DataFrame, epo
         for k, v in group.items():
             w(k, v)
     w("model_inputs", inputs_df)
+    w("intents_quarterly", iq)
 
     T = report2.headline_metrics(org=org, ic=ic, led=led, dev=dev, inp=inp, sm=sm, mm=mm, am=am, ym=ym, fp=fp,
                                  as_of=as_of)
     w("metrics_phase2", T)
     reports.mkdir(parents=True, exist_ok=True)
     pa = reports / "analysis_summary.md"
-    pa.write_text(report2.render_analysis(org=org, ic=ic, led=led, dev=dev, T=T, as_of=as_of))
+    fs = report2.falsifier_status(org=org, ic=ic, led=led, dev=dev, sm=sm, mm=mm, ym=ym, iq=iq, inp=inp,
+                                  census=io.read_csv(raw / "fastnear_tx" / "monthly_receiver_counts.csv"), daily=daily)
+    w("falsifier_status", fs)
+    pa.write_text(report2.render_analysis(org=org, ic=ic, led=led, dev=dev, T=T, as_of=as_of, fs=fs))
     written["analysis_summary.md"] = pa
     pred = preds.build(raw=raw, daily=daily, org=org, led=led, dev=dev, mm=mm, am=am, as_of=as_of)
     w("predictions", pred)

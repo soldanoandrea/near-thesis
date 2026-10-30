@@ -8,6 +8,7 @@ Q4,q4b.near_captured_180d,"NEAR captured into the revenue wallets, last 180 days
 Q4,q4b.near_captured_since_buybacks,NEAR captured into the revenue wallets since 2026-02-23,3107575.38982432,,,NEAR,2026-02-23 to last flow,wallet flows,A,""
 Q4,q4b.treasury_rewards_check,"treasury.near implied reward inflow / expected 10% of mint, median of last 6 months",1.00016025,,,ratio,2026-05 to 2026-10,archival balances + wallet flows + epochs,A,""
 Q4,q4b.treasury_outflows_since_apr,NEAR sent out by treasury.near since 2026-04-01,30171203.00000000,,,NEAR,2026-04-01 to last flow,wallet flows,A,""
+Q4,q4b.trail_into_staking,NEAR moved into staking pools downstream of the 2026 treasury outflows (within 5 hops),20953861.00000000,,,NEAR,April-October 2026,treasury trails,A,"Fungible: amounts moved after receipt, not traced coins."
 Q6,q6.near_mad,"NEAR monthly active developers (Electric Capital), 2026-09",563.00000000,,,count,2026-09-30,opendevdata eco_mads,B,""
 Q6,q6.near_mad_yoy,"NEAR monthly active developers, 2026-09 vs 2025-09",-0.36240091,,,ratio,2025-09 to 2026-09,opendevdata eco_mads,B,""
 Q6,q6.near_share,"NEAR share of all web3 monthly active developers, 2026-09",0.01873482,,,ratio,2026-09,opendevdata eco_mads,B,""

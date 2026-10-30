@@ -133,7 +133,8 @@ def build(raw: Path, daily: pl.DataFrame, epochs: pl.DataFrame) -> dict[str, pl.
     # treasury outflows and trails
     t_out = (flows.filter((pl.col("wallet") == "treasury.near") & (pl.col("direction") == "out")
                           & (pl.col("token") == "NEAR"))
-             .select("date", "tx_hash", "counterparty", "counterparty_class", "amount", "kind", "method").sort("date"))
+             .select("date", "tx_hash", "counterparty", "counterparty_class", "amount", "kind", "method")
+             .sort(["date", "tx_hash", "counterparty", "amount"]))
     hp = raw / "fastnear_tx" / "trail_hops.csv"
     trails = pl.DataFrame()
     if hp.exists():
@@ -155,4 +156,30 @@ def build(raw: Path, daily: pl.DataFrame, epochs: pl.DataFrame) -> dict[str, pl.
            "treasury_reconciliation": treasury_recon, "treasury_outflows": t_out}
     if trails.height:
         out["trails"] = trails
+        # where the followed NEAR was last seen: transfers into terminal classes, and accounts where the trail stops
+        term = (trails.filter(pl.col("out_counterparty_class").is_in(["staking_pool", "lockup", "intents",
+                                                                       "token_or_bridge"]) & pl.col("out_near").is_not_null())
+                .group_by(["out_counterparty_class", "out_counterparty"]).agg(pl.col("out_near").sum().alias("near"),
+                                                                             pl.len().alias("transfers"))
+                .rename({"out_counterparty_class": "endpoint_class", "out_counterparty": "endpoint"})
+                .with_columns(pl.lit("transfer into terminal class").alias("how")))
+        terminal = ["staking_pool", "lockup", "intents", "token_or_bridge"]
+        maxd = int(trails["depth"].max())
+        beyond = (trails.filter((pl.col("depth") == maxd) & pl.col("out_near").is_not_null()
+                                & ~pl.col("out_counterparty_class").is_in(terminal) & (pl.col("out_near") >= 100_000))
+                  .group_by(["out_counterparty_class", "out_counterparty"]).agg(pl.col("out_near").sum().alias("near"),
+                                                                               pl.len().alias("transfers"))
+                  .rename({"out_counterparty_class": "endpoint_class", "out_counterparty": "endpoint"})
+                  .with_columns(pl.lit(f"not followed (beyond {maxd} hops)").alias("how")))
+        held = (trails.filter(pl.col("stop_reason").is_in(["no_outflow_seen", "outflow_beyond_window"])
+                              | pl.col("stop_reason").str.starts_with("busy_account"))
+                .select("account", "account_class", "received_tx", "received_near", "stop_reason").unique()
+                .group_by(["account_class", "account", "stop_reason"]).agg(pl.col("received_near").sum().alias("near"),
+                                                                           pl.len().alias("transfers"))
+                .rename({"account_class": "endpoint_class", "account": "endpoint", "stop_reason": "how"}))
+        stops = pl.concat([beyond.select("endpoint_class", "endpoint", "how", "near", "transfers"),
+                           held.select("endpoint_class", "endpoint", "how", "near", "transfers")])
+        out["trail_endpoints"] = pl.concat([term.select("endpoint_class", "endpoint", "how", "near", "transfers"),
+                                            stops.select("endpoint_class", "endpoint", "how", "near", "transfers")]
+                                           ).sort(["how", "near", "endpoint"], descending=[False, True, False])
     return out

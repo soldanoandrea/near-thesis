@@ -17,6 +17,7 @@ As-of date: 2026-10-29.
 | Q4 | NEAR captured into the revenue wallets since 2026-02-23 | 3.11M NEAR |  | 2026-02-23 to last flow | wallet flows | A |
 | Q4 | treasury.near implied reward inflow / expected 10% of mint, median of last 6 months | 100.02% |  | 2026-05 to 2026-10 | archival balances + wallet flows + epochs | A |
 | Q4 | NEAR sent out by treasury.near since 2026-04-01 | 30.17M NEAR |  | 2026-04-01 to last flow | wallet flows | A |
+| Q4 | NEAR moved into staking pools downstream of the 2026 treasury outflows (within 5 hops) | 20.95M NEAR |  | April-October 2026 | treasury trails | A |
 | Q6 | NEAR monthly active developers (Electric Capital), 2026-09 | 563 |  | 2026-09-30 | opendevdata eco_mads | B |
 | Q6 | NEAR monthly active developers, 2026-09 vs 2025-09 | -36.24% |  | 2025-09 to 2026-09 | opendevdata eco_mads | B |
 | Q6 | NEAR share of all web3 monthly active developers, 2026-09 | 1.87% |  | 2026-09 | opendevdata eco_mads | B |
@@ -29,6 +30,23 @@ As-of date: 2026-10-29.
 - Two-sided equivalent (2x on-chain one-sided) / DefiLlama volume, median of 6 days: What a definition counting both legs of every swap would report.
 - Control-sample transactions with a token_diff that paid no protocol fee: 0 means the fee-paying frame used for the volume sample contains every swap seen.
 - Largest asset's share of sold volume (sample), median of sampled days: From 32.48% to 66.24% across days.
+- NEAR moved into staking pools downstream of the 2026 treasury outflows (within 5 hops): Fungible: amounts moved after receipt, not traced coins.
+
+## Pre-registered falsifiers (PIANO.md section 2): status at this snapshot
+
+Each falsifier was written in PIANO.md before any phase 2a data was fetched. "Met" means the evidence currently counts against the bullish case on that question.
+
+| Q | Falsifier (PIANO.md) | Current reading | Status |
+|---|---|---|---|
+| Q2 | 90-day Intents volume falls for two consecutive quarters | 2026-Q2 -13.04%; 2026-Q3 56.68% | not met |
+| Q2 | The top asset accounts for more than 40% of volume (fragility) | largest asset share above 40% on 5 of 6 sampled days (median 47.93%, asset USDT) | met |
+| Q2 | Reconstructed on-chain volume differs from reported volume by more than 20% on sampled days | one-sided: 6 of 6 days off by more than 20%; two-sided equivalent: 4 of 6 | met (definition-dependent) |
+| Q2 | Price leads usage better than Intents volume does | lead-lag tests not run in phase 2a | not assessed |
+| Q3 | Activity attributable to agents stays below 1% of transactions and does not grow quarter on quarter | proxy = Chain Signatures (v1.signer) transactions: 6.64% of all transactions in 2026-Q3 (4,514,004 vs 4,849,400 in 2026-Q2); agent attribution beyond this proxy not attempted | not met (proxy) |
+| Q4 | Net dilution after buybacks stays above 2%/yr and the net-zero threshold needs more than 10x current volume at the current take rate | float dilution 2.12% per year (status quo, base); threshold 8.072x DefiLlama volume | half met (dilution leg) |
+| Q5 | Take rate shrinks as volume grows: revenue growth below volume growth for 3 or more quarters | 2026-Q1 revenue 67.87% vs volume -2.86%; 2026-Q2 revenue -5.55% vs volume -13.04%; 2026-Q3 revenue 104.81% vs volume 56.68% | not met |
+| Q6 | NEAR's share of developers falls for 4 or more consecutive quarters while peers' shares rise | 2 consecutive quarters of decline to 2026-Q3; 0 of 6 peer chains' shares rose in 2026-Q3 | not met |
+| Q7 | NEAR is rich under every specification (valuation rests on narrative) | NEAR's multiple is above every peer's in 1 of 4 fee/revenue specifications (30d annualized); the cross-sectional regression is not run in phase 2a | not met |
 
 ## Q1. Bot-vs-human decomposition (per-signer activity score)
 
@@ -159,14 +177,14 @@ treasury.near NEAR outflows since 2026-01:
 
 | Date | Recipient | Class | NEAR | Kind |
 |---|---|---|---|---|
+| 2026-04-15 | foundation.near | named_other | 3 NEAR | near_transfer |
 | 2026-04-15 | ecotreasury5.multisignature.near | multisig | 4.90M NEAR | near_transfer |
 | 2026-04-15 | ecotreasury4.multisignature.near | multisig | 4.90M NEAR | near_transfer |
-| 2026-04-15 | foundation.near | named_other | 3 NEAR | near_transfer |
 | 2026-05-13 | dcc79d2cbd9dcfd6159793a987619b5d7b7446d594aba451318a84b6acb40058 | implicit_near | 100 NEAR | near_transfer |
 | 2026-05-13 | dcc79d2cbd9dcfd6159793a987619b5d7b7446d594aba451318a84b6acb40058 | implicit_near | 5.00M NEAR | near_transfer |
-| 2026-05-13 | dcc79d2cbd9dcfd6159793a987619b5d7b7446d594aba451318a84b6acb40058 | implicit_near | 5.00M NEAR | near_transfer |
-| 2026-05-13 | dcc79d2cbd9dcfd6159793a987619b5d7b7446d594aba451318a84b6acb40058 | implicit_near | 5.00M NEAR | near_transfer |
 | 2026-05-13 | dcc79d2cbd9dcfd6159793a987619b5d7b7446d594aba451318a84b6acb40058 | implicit_near | 5.37M NEAR | near_transfer |
+| 2026-05-13 | dcc79d2cbd9dcfd6159793a987619b5d7b7446d594aba451318a84b6acb40058 | implicit_near | 5.00M NEAR | near_transfer |
+| 2026-05-13 | dcc79d2cbd9dcfd6159793a987619b5d7b7446d594aba451318a84b6acb40058 | implicit_near | 5.00M NEAR | near_transfer |
 
 Where the large treasury outflows went next. Per followed account: NEAR received from the previous hop (transfers of at least 100,000 NEAR), its NEAR outflows after receiving (grouped by counterparty), other token outflows, and why the trail stops:
 
@@ -182,7 +200,7 @@ Where the large treasury outflows went next. Per followed account: NEAR received
 | 4 | 8f69aac559670a8223b64f14... | implicit_near | 1.00M NEAR | 1.00M NEAR | f6a3ada5900f61b50894 (implicit_near) 1.00M NEAR |  | followed |
 | 4 | ae1b2d06cee9353fba5ce288... | implicit_near | 20.37M NEAR | 40.85M NEAR | d549d25ebc8dcd705ee1 (implicit_near) 20.48M NEAR in 2 transfers; e672fced9d9e5c3a0d9a (implicit_near) 20.37M NEAR |  | followed |
 | 4 | f15ad0503fb9ac6228494748... | implicit_near | 294,063 NEAR | 582,762 NEAR | p2p-org.poolv1.near (staking_pool) 582,762 NEAR in 2 transfers |  | followed |
-| 4 | nfendowment03.near | named_other | 21.43M NEAR | 29.15M NEAR | d549d25ebc8dcd705ee1 (implicit_near) 25.00M NEAR; fgs.multisignature.n (multisig) 1.18M NEAR in 2 transfers; fg.multisignature.ne (multisig) 1.00M NEAR; 1ea3365769c3058dd014 (implicit_near) 1.00M NEAR; +18 more counterparties | 4 token transfers | followed |
+| 4 | nfendowment03.near | named_other | 21.43M NEAR | 29.15M NEAR | d549d25ebc8dcd705ee1 (implicit_near) 25.00M NEAR; fgs.multisignature.n (multisig) 1.18M NEAR in 2 transfers; 1ea3365769c3058dd014 (implicit_near) 1.00M NEAR; fg.multisignature.ne (multisig) 1.00M NEAR; +18 more counterparties | 4 token transfers | followed |
 | 5 | 1ea3365769c3058dd0140898... | implicit_near | 1.00M NEAR | 1,000,000 NEAR | f2f138d72a5bd478168a (implicit_near) 1,000,000 NEAR |  | depth_limit |
 | 5 | 4003c038f56ea647a0be8aa5... | implicit_near | 299,995 NEAR | 0 |  |  | no_outflow_seen |
 | 5 | d549d25ebc8dcd705ee1aac7... | implicit_near | 20.48M NEAR | 64.17M NEAR | 940ef3f4f1e2d72b2036 (implicit_near) 64.17M NEAR in 4 transfers |  | depth_limit |
@@ -193,6 +211,23 @@ Where the large treasury outflows went next. Per followed account: NEAR received
 | 5 | fgs.multisignature.near | multisig | 1.18M NEAR | 500,000 NEAR | 714c35543a19a59f7bb6 (implicit_near) 500,000 NEAR |  | depth_limit, no_outflow_seen |
 | 5 | nttdatape.near | named_other | 100,000 NEAR | 0 |  |  | no_outflow_seen |
 | 5 | p2p-org.poolv1.near | staking_pool | 294,062 NEAR | 0 |  |  | terminal:staking_pool |
+
+Where the followed NEAR was last seen (amounts are what moved, not proof that the same coins moved):
+
+| Endpoint | Class | How the trail ends | NEAR | Transfers |
+|---|---|---|---|---|
+| f6a3ada5900f61b5089494beb1292fdccd2ba7ec01dade714e556e6717afa9db | implicit_near | no_outflow_seen | 1.00M NEAR | 1 |
+| fgs.multisignature.near | multisig | no_outflow_seen | 675,000 NEAR | 1 |
+| 4003c038f56ea647a0be8aa5b2985f0ab17b455008f4d6375ce388b7f274153b | implicit_near | no_outflow_seen | 299,995 NEAR | 1 |
+| nttdatape.near | named_other | no_outflow_seen | 100,000 NEAR | 1 |
+| 940ef3f4f1e2d72b2036c685e5db7ff38ea0f84cce9b1c538bb1db1bb6678950 | implicit_near | not followed (beyond 5 hops) | 64.17M NEAR | 3 |
+| ae1b2d06cee9353fba5ce28827f4cccbbf6e0dc161dfc3b154f71c5902c3fcca | implicit_near | not followed (beyond 5 hops) | 20.48M NEAR | 1 |
+| f2f138d72a5bd478168a652139d134d73804bbeb18921a6ef11b3a97a2ed14ca | implicit_near | not followed (beyond 5 hops) | 1,000,000 NEAR | 1 |
+| 714c35543a19a59f7bb626d288f951f25ad790c46872984262e9911d52c6752e | implicit_near | not followed (beyond 5 hops) | 500,000 NEAR | 1 |
+| d549d25ebc8dcd705ee1aac7d961fc31b07fa52e8d59ba56ddd788f09d6cec46 | implicit_near | not followed (beyond 5 hops) | 499,999 NEAR | 1 |
+| prod.sadgeaystar.near | named_other | not followed (beyond 5 hops) | 100,000 NEAR | 1 |
+| p2p-org.poolv1.near | staking_pool | transfer into terminal class | 10.77M NEAR | 4 |
+| figment.poolv1.near | staking_pool | transfer into terminal class | 10.19M NEAR | 2 |
 
 NEAR is fungible: a trail shows amounts that left an account after it received the treasury's transfer, not that the same coins moved; "NEAR sent on" can exceed "received" when the account held other funds, and trails can loop back to an account already visited.
 

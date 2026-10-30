@@ -35,8 +35,8 @@ def build(*, raw: Path, daily: pl.DataFrame, org: dict, led: dict, dev: dict, mm
         if q.height:
             lq = q.row(-1, named=True)
             add("P1", "Q1", "Organic (human-like, non-incentivized) usage stops shrinking",
-                "Organic monthly active signers, mean of 2027-07..2027-09 (organic_quarterly.csv, quarter 2027-Q3)",
-                ">=", lq["mas_organic_p05"], "count", LONG, lq["mas_organic"], lq["quarter"],
+                "Organic daily active signers, average day of 2027-07..2027-09 (organic_quarterly.csv, quarter 2027-Q3)",
+                ">=", lq["das_organic_p05"], "count", LONG, lq["das_organic"], lq["quarter"],
                 "make refresh && make build; read organic_quarterly.csv", f"lower bound of the 90% CI of {lq['quarter']}")
     vol = series(daily, "near", "intents_volume_usd", "defillama")
     v90 = full_wsum(vol, end, 90)

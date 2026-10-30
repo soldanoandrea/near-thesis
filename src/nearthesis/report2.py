@@ -122,6 +122,12 @@ def headline_metrics(*, org, ic, led, dev, inp, sm, mm, am, ym, fp, as_of) -> pl
         if to.height:
             T.add("Q4", "q4b.treasury_outflows_since_apr", "NEAR sent out by treasury.near since 2026-04-01",
                   to["amount"].sum(), "NEAR", "2026-04-01 to last flow", "wallet flows", "A")
+        te = led.get("trail_endpoints")
+        if te is not None and te.height:
+            st_ = te.filter(pl.col("endpoint_class") == "staking_pool")
+            T.add("Q4", "q4b.trail_into_staking", "NEAR moved into staking pools downstream of the 2026 treasury outflows "
+                  "(within 5 hops)", st_["near"].sum() if st_.height else 0.0, "NEAR", "April-October 2026",
+                  "treasury trails", "A", notes="Fungible: amounts moved after receipt, not traced coins.")
     if dev:
         eco = dev.get("dev_ecosystem_monthly")
         if eco is not None:
@@ -191,9 +197,9 @@ def headline_metrics(*, org, ic, led, dev, inp, sm, mm, am, ym, fp, as_of) -> pl
                       f"({b['model'][0]})", b["mean_abs_log_error"][0], "ratio", f"{b['forecasts'][0]} forecasts",
                       "model (c)", "model", notes="Mean absolute log error (about a relative error).")
         fits = am["model_adoption_fits"]
-        r = _row(fits, series="organic_monthly_active_signers", model="loglinear")
+        r = _row(fits, series="organic_daily_active_signers", model="loglinear")
         if r:
-            T.add("M", "mc.organic_mas_trend", "Organic monthly active signers, fitted trend per year (log-linear)",
+            T.add("M", "mc.organic_das_trend", "Organic daily active signers, fitted trend per year (log-linear)",
                   (2.718281828 ** (12 * r["growth_per_month"]) - 1), "ratio/yr", f"{r['first_month']} to {r['last_month']}",
                   "model (c)", "model")
     yh = ym["model_yields_history"].filter((pl.col("period") == "last 365 days") & (pl.col("commission_assumed") == 0.05))
@@ -207,7 +213,7 @@ def headline_metrics(*, org, ic, led, dev, inp, sm, mm, am, ym, fp, as_of) -> pl
 
 
 # ------------------------------------------------------------------------------------------------ analysis report
-def render_analysis(*, org, ic, led, dev, T: pl.DataFrame, as_of: str) -> str:
+def render_analysis(*, org, ic, led, dev, T: pl.DataFrame, as_of: str, fs: pl.DataFrame | None = None) -> str:
     L = ["# NEAR thesis: analysis layer (phase 2a)", "", HDR, "", f"As-of date: {as_of}.", ""]
     L += ["## Headline numbers", ""]
     L.append(table(["Q", "Metric", "Value", "90% CI", "Window", "Source", "Grade"],
@@ -216,8 +222,131 @@ def render_analysis(*, org, ic, led, dev, T: pl.DataFrame, as_of: str) -> str:
                      r["window"], r["source"], r["grade"]] for r in T.filter(pl.col("question") != "M").iter_rows(named=True)]))
     notes = [f"- {r['label']}: {r['notes']}" for r in T.filter(pl.col("question") != "M").iter_rows(named=True) if r["notes"]]
     L += [""] + notes + [""]
+    if fs is not None and fs.height:
+        L += ["## Pre-registered falsifiers (PIANO.md section 2): status at this snapshot", "",
+              "Each falsifier was written in PIANO.md before any phase 2a data was fetched. \"Met\" means the evidence "
+              "currently counts against the bullish case on that question.", ""]
+        L.append(table(["Q", "Falsifier (PIANO.md)", "Current reading", "Status"],
+                       [[r["question"], r["falsifier"], r["reading"], r["status"]] for r in fs.iter_rows(named=True)]))
+        L.append("")
     L += _q1(org) + _q2(ic) + _q4(led) + _q6(dev)
     return "\n".join(L) + "\n"
+
+
+def falsifier_status(*, org, ic, led, dev, sm, mm, ym, iq, inp, census, daily) -> pl.DataFrame:
+    """Evaluate the PIANO.md section 2 falsifiers on the current data (wording of the reading is data-driven)."""
+    rows = []
+
+    def add(q, fal, reading, status):
+        rows.append({"question": q, "falsifier": fal, "reading": reading, "status": status})
+
+    # Q1
+    if org:
+        q = org["quarterly"].filter(pl.col("months") == 3).sort("quarter")
+        lq = q.row(-1, named=True) if q.height else None
+        prev = q.filter(pl.col("quarter") == f"{int(lq['quarter'][:4]) - 2}{lq['quarter'][4:]}") if lq else None
+        co = org["cohorts"].filter((pl.col("group") == "all") & (pl.col("horizon_months") == 3)).sort("cohort")
+        if lq is not None and prev is not None and prev.height:
+            p = prev.row(0, named=True)
+            grew = lq["das_organic_p05"] > p["das_organic_p95"]
+            fell = lq["das_organic_p95"] < p["das_organic_p05"]
+            trend = "grew" if grew else ("fell" if fell else "changed by an amount within the sampling noise")
+            last4 = co.tail(4)
+            improving = last4.height >= 2 and last4["retention"][-1] > last4["retention"][0]
+            met = (not grew) and not improving
+            add("Q1", "Organic active accounts show no growth over the last 24 months and month-3 cohort retention does "
+                "not improve",
+                f"organic daily active signers {fmt(p['das_organic'])} ({p['quarter']}) -> {fmt(lq['das_organic'])} "
+                f"({lq['quarter']}): {trend}; month-3 retention {fmt(last4['retention'][0], 'ratio')} "
+                f"({last4['cohort'][0]}) -> {fmt(last4['retention'][-1], 'ratio')} ({last4['cohort'][-1]})"
+                if last4.height else "no cohorts", "met" if met else "not met")
+    # Q2
+    if iq is not None and iq.height >= 3:
+        t = iq.tail(3)
+        two_down = bool((t["volume_qoq"].tail(2) < 0).all())
+        add("Q2", "90-day Intents volume falls for two consecutive quarters",
+            "; ".join(f"{r['quarter']} {fmt(r['volume_qoq'], 'ratio')}" for r in t.tail(2).iter_rows(named=True)),
+            "met" if two_down else "not met")
+    if ic:
+        h = ic["hhi"]
+        over = h.filter(pl.col("top_share") > 0.4).height
+        add("Q2", "The top asset accounts for more than 40% of volume (fragility)",
+            f"largest asset share above 40% on {over} of {h.height} sampled days (median {fmt(h['top_share'].median(), 'ratio')}, "
+            f"asset {h['top_symbol'].mode().sort()[0]})", "met" if over > h.height / 2 else "not met")
+        d = ic["days"]
+        off = d.filter((pl.col("ratio_sample_to_defillama") - 1).abs() > 0.2).height
+        off2 = d.filter((pl.col("ratio_two_sided_to_defillama") - 1).abs() > 0.2).height
+        add("Q2", "Reconstructed on-chain volume differs from reported volume by more than 20% on sampled days",
+            f"one-sided: {off} of {d.height} days off by more than 20%; two-sided equivalent: {off2} of {d.height}",
+            "met (definition-dependent)" if off > d.height / 2 else "not met")
+        add("Q2", "Price leads usage better than Intents volume does", "lead-lag tests not run in phase 2a", "not assessed")
+    # Q3
+    c = census.with_columns(pl.col("txs_count").cast(pl.Int64))
+    nbm = (daily.filter((pl.col("chain") == "near") & (pl.col("source") == "nearblocks") & (pl.col("metric") == "txns"))
+           .with_columns(pl.col("date").str.slice(0, 7).alias("month")).group_by("month").agg(pl.col("value").sum()))
+    vs = c.filter(pl.col("account_id") == "v1.signer").join(nbm, on="month").with_columns(
+        (pl.col("txs_count") / pl.col("value")).alias("share")).sort("month")
+    vs = vs.filter(pl.col("month") < sorted(vs["month"].to_list())[-1])
+    if vs.height >= 6:
+        q = (vs.with_columns((pl.col("month").str.slice(0, 4) + "-Q" + ((pl.col("month").str.slice(5, 2).cast(pl.Int64) - 1)
+                                                                    // 3 + 1).cast(pl.Utf8)).alias("quarter"))
+             .group_by("quarter").agg(pl.col("txs_count").sum(), pl.col("value").sum(), pl.len().alias("m"))
+             .filter(pl.col("m") == 3).sort("quarter").with_columns((pl.col("txs_count") / pl.col("value")).alias("share")))
+        if q.height >= 2:
+            a, b = q.row(-2, named=True), q.row(-1, named=True)
+            met = b["share"] < 0.01 and b["txs_count"] <= a["txs_count"]
+            add("Q3", "Activity attributable to agents stays below 1% of transactions and does not grow quarter on quarter",
+                f"proxy = Chain Signatures (v1.signer) transactions: {fmt(b['share'], 'ratio')} of all transactions in "
+                f"{b['quarter']} ({fmt(b['txs_count'])} vs {fmt(a['txs_count'])} in {a['quarter']}); agent attribution beyond "
+                "this proxy not attempted", "met" if met else "not met (proxy)")
+    # Q4
+    st = sm["model_supply_scenarios"]
+    r1 = _row(st, scenario="status_quo/base", horizon_years=1)
+    g = sm["model_net_zero_grid"]
+    prices, takes = sorted(g["price_usd"].unique().to_list()), sorted(g["take_rate"].unique().to_list())
+    base = _row(g, issuance_rate=sorted(g["issuance_rate"].unique().to_list())[-1], price_usd=prices[len(prices) // 2],
+                take_rate=takes[len(takes) // 2])
+    if r1 and base:
+        a = r1["year_net_float_dilution"] > 0.02
+        b = base["multiple_of_current_volume"] > 10
+        add("Q4", "Net dilution after buybacks stays above 2%/yr and the net-zero threshold needs more than 10x current "
+            "volume at the current take rate",
+            f"float dilution {fmt(r1['year_net_float_dilution'], 'ratio')} per year (status quo, base); threshold "
+            f"{fmt(base['multiple_of_current_volume'])}x DefiLlama volume", "met" if a and b else
+            ("half met (dilution leg)" if a else "half met (threshold leg)" if b else "not met"))
+    # Q5
+    if iq is not None and iq.height >= 4:
+        t = iq.drop_nulls("revenue_qoq").tail(3)
+        lagging = int((t["revenue_qoq"] < t["volume_qoq"]).sum())
+        add("Q5", "Take rate shrinks as volume grows: revenue growth below volume growth for 3 or more quarters",
+            "; ".join(f"{r['quarter']} revenue {fmt(r['revenue_qoq'], 'ratio')} vs volume {fmt(r['volume_qoq'], 'ratio')}"
+                      for r in t.iter_rows(named=True)), "met" if lagging == 3 and t.height == 3 else "not met")
+    # Q6
+    sq = dev.get("dev_ecosystem_share_quarterly") if dev else None
+    if sq is not None:
+        n = sq.filter(pl.col("ecosystem") == "near").sort("quarter").drop_nulls("share_change_qoq")
+        run = 0
+        for v in reversed(n["share_change_qoq"].to_list()):
+            if v < 0:
+                run += 1
+            else:
+                break
+        lastq = n["quarter"][-1]
+        peers_up = sq.filter((pl.col("quarter") == lastq) & (pl.col("ecosystem") != "near")
+                             & (pl.col("share_change_qoq") > 0)).height
+        add("Q6", "NEAR's share of developers falls for 4 or more consecutive quarters while peers' shares rise",
+            f"{run} consecutive quarters of decline to {lastq}; {peers_up} of 6 peer chains' shares rose in {lastq}",
+            "met" if run >= 4 and peers_up >= 3 else "not met")
+    # Q7
+    nv = mm["model_multiples_near_vs_peers"]
+    specs = nv.filter(pl.col("basis") == "30d_annualized")
+    if specs.height:
+        richer_all = specs.filter(pl.col("near_multiple") > pl.col("peer_max")).height
+        add("Q7", "NEAR is rich under every specification (valuation rests on narrative)",
+            f"NEAR's multiple is above every peer's in {richer_all} of {specs.height} fee/revenue specifications "
+            "(30d annualized); the cross-sectional regression is not run in phase 2a",
+            "met" if richer_all == specs.height else "not met")
+    return pl.DataFrame(rows, infer_schema_length=None)
 
 
 def _q1(org) -> list[str]:
@@ -252,6 +381,14 @@ def _q1(org) -> list[str]:
                    [[r["quarter"], fmt(r.get("strict"), "ratio"), fmt(r.get("base"), "ratio"), fmt(r.get("lenient"), "ratio")]
                     for r in s.iter_rows(named=True)]))
     L.append("")
+    tor = org.get("top_organic_receivers")
+    if tor is not None and tor.height:
+        tq = tor.filter(pl.col("quarter").is_in(sorted(tor["quarter"].unique().to_list())[-4:]))
+        L += ["Top receivers of transactions labelled organic (draws; lets a reader judge the label):", ""]
+        L.append(table(["Quarter", "Receiver", "Organic draws", "Share of the quarter's organic draws"],
+                       [[r["quarter"], r["real_receiver_id"], r["organic_draws"], fmt(r["share"], "ratio")]
+                        for r in tq.iter_rows(named=True)]))
+        L.append("")
     co = org["cohorts"]
     if co.height:
         L += ["New-signer cohort retention (rolling: share of accounts first seen in the cohort quarter that really "
@@ -272,21 +409,28 @@ def _q1(org) -> list[str]:
             rows.append(row)
         L.append(table(["Cohort"] + [f"Month +{h}" for h in hs] + ["Organic only, month +3", "New-signer draws"], rows))
         L.append("")
-    L += ["**Method.** Each month, transactions are drawn uniformly (seeded) from the stratified block sample (30 "
-          "blocks per month, 90 from 2025-11); for each draw the FastNear indexer gives the real signer's exact count "
-          "of transactions that month and up to 200 timestamps, its first appearance, and for the first 40 draws of a "
-          "month the receivers and methods of its 20 latest transactions. A rule-based score (volume, round-the-clock "
-          "activity, sub-30-second median gaps, metronome-like regularity, single repeated action) labels accounts "
-          "automated at score >= 2; accounts mostly calling HOT, KaiChing, SWEAT, NEARCrowd or inscriptions are "
-          "incentivized; automated accounts mostly calling settlement, bridge, MPC or EVM-relay contracts are "
-          "infrastructure. Distinct active signers are estimated with 1/c weights (a signer with c transactions in "
-          "the month is drawn c times as often).", "",
+    L += ["**Method.** Each month, transactions are drawn uniformly without replacement (seeded) from the stratified "
+          "block sample (30 blocks per month, 90 from 2025-11): 200 draws per month from 2024-11, 15 before. For each "
+          "draw the FastNear indexer gives the real signer's exact count of transactions that month and up to 200 "
+          "timestamps; for the first 60 draws of a month also its first appearance (cohorts) and, for new accounts, "
+          "its last signed transaction; for the first 40 draws the receivers and methods of its 20 latest "
+          "transactions. A rule-based score (volume, round-the-clock activity, sub-30-second median gaps, "
+          "metronome-like regularity, single repeated action) labels accounts automated at score >= 2; accounts "
+          "mostly calling reward programs (HOT, KaiChing, SWEAT and their namespaces, NEARCrowd, inscriptions, Harvest "
+          "Moon) are incentivized; automated accounts mostly calling settlement, bridge, MPC or EVM-relay contracts are "
+          "infrastructure. Distinct active signers are estimated with 1/c weights (a signer with c transactions in the "
+          "period is drawn c times as often as a signer with one). Monthly active signers are much noisier than daily "
+          "ones: a signer with a single transaction in the month carries the weight of N/n accounts (hundreds of "
+          "thousands in 2024-2025), so read them by quarter; the adoption model and the Q1 prediction use daily "
+          "active signers.", "",
           "**Limits.** (1) The score is rule-based, not trained on labelled data: the sensitivity table shows how much "
           "the organic share moves with the threshold. (2) Timing features see at most the 200 most recent "
           "transactions of a signer-month. (3) A human using an app that batches or automates actions can look "
           "automated; a slow bot looks human. (4) Retention is rolling (any later activity), measured to the fetch "
           "date, and only for cohorts whose horizon has elapsed. (5) Early months (before 2024-11) have 15 draws, so "
-          "their intervals are wide. (6) Monthly totals use NearBlocks transactions; FastNear's index agrees within a "
+          "their intervals are wide. (7) The incentivized namespaces were extended after the first pilot months "
+          "(2026-09/10) showed Harvest Moon and SWEAT / KaiChing sub-accounts among \"organic\" draws; the top "
+          "receivers table above is there to catch what is still missing. (6) Monthly totals use NearBlocks transactions; FastNear's index agrees within a "
           "few percent (phase 1).", ""]
     return L
 
@@ -373,7 +517,7 @@ def _q4(led) -> list[str]:
     mo = led["monthly"].filter((pl.col("flow_type") == "transfer") & (pl.col("asset_group") == "NEAR")
                                & (pl.col("month") >= "2026-01"))
     agg = (mo.group_by(["wallet", "direction", "counterparty_class"]).agg(pl.col("amount").sum(), pl.col("flows").sum())
-           .sort(["wallet", "direction", "amount"], descending=[False, False, True]))
+           .sort(["wallet", "direction", "amount", "counterparty_class"], descending=[False, False, True, False]))
     L += ["NEAR (native + wNEAR) transfers by counterparty class since 2026-01 (custody moves such as wrapping or "
           "depositing into one's own NEAR Intents balance are excluded):", ""]
     L.append(table(["Wallet", "Direction", "Counterparty class", "NEAR", "Flows"],
@@ -413,7 +557,8 @@ def _q4(led) -> list[str]:
         for (depth, acc), g in tl.sort(["depth", "account"]).group_by(["depth", "account"], maintain_order=True):
             recv = g.select("received_tx", "received_near").unique()["received_near"].sum()
             outs = (g.filter(pl.col("out_near").is_not_null()).group_by(["out_counterparty", "out_counterparty_class"])
-                    .agg(pl.col("out_near").sum(), pl.len().alias("n")).sort("out_near", descending=True))
+                    .agg(pl.col("out_near").sum(), pl.len().alias("n"))
+                    .sort(["out_near", "out_counterparty"], descending=[True, False]))
             tokens = g.filter(pl.col("out_asset").is_not_null() & (pl.col("out_asset") != "NEAR") & (pl.col("out_asset") != ""))
             top = "; ".join(f"{r['out_counterparty'][:20]} ({r['out_counterparty_class']}) {fmt(r['out_near'], 'NEAR')}"
                             + (f" in {r['n']} transfers" if r["n"] > 1 else "")
@@ -425,6 +570,13 @@ def _q4(led) -> list[str]:
                          top + more, f"{tokens.height} token transfers" if tokens.height else "", stops])
         L.append(table(["Hop", "Account", "Class", "Received (NEAR)", "NEAR sent on", "Main NEAR counterparties",
                         "Other tokens", "Trail"], rows))
+        L.append("")
+    te = led.get("trail_endpoints")
+    if te is not None and te.height:
+        L += ["Where the followed NEAR was last seen (amounts are what moved, not proof that the same coins moved):", ""]
+        L.append(table(["Endpoint", "Class", "How the trail ends", "NEAR", "Transfers"],
+                       [[r["endpoint"], r["endpoint_class"], r["how"], fmt(r["near"], "NEAR"), r["transfers"]]
+                        for r in te.iter_rows(named=True)]))
         L.append("")
     L += ["NEAR is fungible: a trail shows amounts that left an account after it received the treasury's transfer, not "
           "that the same coins moved; \"NEAR sent on\" can exceed \"received\" when the account held other funds, and "
@@ -549,9 +701,10 @@ def _model_a(inp, sm, mcfg) -> list[str]:
     sq = _row(sm["model_supply_scenarios"], scenario="status_quo/base", horizon_years=1)
     if inp.get("intents_onchain_one_sided_to_defillama"):
         L += ["", f"Volumes in this grid are DefiLlama volumes. The on-chain check (Q2) finds public one-sided volume at "
-              f"{fmt(inp['intents_onchain_one_sided_to_defillama'], 'ratio')} of DefiLlama's figure, so measured on-chain "
-              "the required volume multiples are larger by about the inverse of that ratio, while the revenue multiples "
-              "(which use captured revenue, reconciled on-chain in Q4) are unaffected."]
+              f"{fmt(inp['intents_onchain_one_sided_to_defillama'], 'ratio')} of DefiLlama's figure. That changes the "
+              "absolute volumes (and makes the on-chain take rate higher by the inverse ratio) but not the multiples: at "
+              "a constant take rate, the volume multiple equals the multiple of captured revenue, and captured revenue "
+              "reconciles with on-chain flows (Q4)."]
     L += ["", "**Falsifier of the bullish case** (PIANO.md Q4): net float dilution after buybacks stays above 2% per year "
           "and the net-zero threshold needs more than 10x current volume at the current take rate."]
     if base and sq:
@@ -600,8 +753,8 @@ def _model_b(mm) -> list[str]:
 
 def _model_c(am, mcfg) -> list[str]:
     L = ["## (c) Adoption model on organic activity", "",
-         "**Assumptions.** Series: organic monthly active signers and organic transactions per day from the bot-vs-human "
-         f"decomposition (last {mcfg['adoption_fit_months']} complete months), and NEAR Intents monthly volume "
+         "**Assumptions.** Series: organic daily and monthly active signers and organic transactions per day from the bot-vs-human "
+         "decomposition (complete months with the full 200-draw design, from 2024-11), and NEAR Intents monthly volume "
          "(DefiLlama) as a comparison. Models: log-linear trend, logistic S-curve (K profiled over a grid; r < 0 gives a "
          "declining S-curve), naive random walk. Rolling-origin backtest from "
          f"{mcfg['adoption_min_train']} months of training, horizons {mcfg['adoption_backtest_horizons']} months; error = "
@@ -620,16 +773,23 @@ def _model_c(am, mcfg) -> list[str]:
                      fmt(r["mean_log_error"])] for r in b.iter_rows(named=True)]))
     L.append("")
     fc = am["model_adoption_forecasts"].sort(["series", "model", "horizon_months"])
+    u = lambda sname: "USD" if sname.endswith("_usd") else ""  # noqa: E731
     L.append(table(["Series", "Model", "Months ahead", "Last value", "p05", "p50", "p95"],
-                   [[r["series"], r["model"], r["horizon_months"], fmt(r["last_value"]), fmt(r["p05"]), fmt(r["p50"]),
-                     fmt(r["p95"])] for r in fc.iter_rows(named=True)]))
+                   [[r["series"], r["model"], r["horizon_months"], fmt(r["last_value"], u(r["series"])),
+                     fmt(r["p05"], u(r["series"])), fmt(r["p50"], u(r["series"])), fmt(r["p95"], u(r["series"]))]
+                    for r in fc.iter_rows(named=True)]))
+    L += ["", "Forecast ranges are mechanical extrapolations of each model; only the model with the lowest out-of-sample "
+          "error for a series should be read as a forecast, and an explosive log-linear range for a young series "
+          "(NEAR Intents started in late 2024) mainly shows that the trend model fails the backtest."]
     L += ["", "**Falsifier of the bullish case** (PIANO.md Q1): organic active accounts show no growth over the last 24 "
           "months and month-3 cohort retention does not improve. Model reading: the log-linear trend of organic monthly "
           "active signers and its sign are in the fits table; the cohort trend is in reports/analysis_summary.md."]
-    r = _row(f, series="organic_monthly_active_signers", model="loglinear")
-    if r:
-        L.append(f"Fitted organic MAS trend: {fmt(r['growth_per_month'], 'ratio')} per month "
-                 f"({'decline' if r['growth_per_month'] < 0 else 'growth'}).")
+    for sname, lab in (("organic_daily_active_signers", "daily active signers"),
+                       ("organic_monthly_active_signers", "monthly active signers")):
+        r = _row(f, series=sname, model="loglinear")
+        if r:
+            L.append(f"Fitted log-linear trend of organic {lab}: {fmt(r['growth_per_month'], 'ratio')} per month "
+                     f"({'decline' if r['growth_per_month'] < 0 else 'growth'}) over {r['first_month']} to {r['last_month']}.")
     L.append("")
     return L
 
@@ -656,8 +816,14 @@ def _model_d(inp, ym, mcfg) -> list[str]:
                      fmt(r["float_dilution"], "ratio"), fmt(r["real_staker_yield"], "ratio"),
                      fmt(r["real_non_staker_yield"], "ratio")] for r in g.iter_rows(named=True)]))
     L += ["", "**Falsifier of the bullish case**: the real yield of a non-staker (holder dilution net of burn and buybacks) "
-          "stays below -2% per year; i.e. value accrual does not offset dilution. Current reading: see the last-365-days "
-          "row above.", ""]
+          "stays below -2% per year; i.e. value accrual does not offset dilution."]
+    r = ym["model_yields_history"].filter((pl.col("period") == "last 365 days") & (pl.col("commission_assumed") == 0.05))
+    if r.height:
+        v = r["real_non_staker_yield"][0]
+        L.append(f"Current reading (last 365 days): {fmt(v, 'ratio')} per year, so the falsifier is "
+                 f"{'met at the current 2.5% cap' if v < -0.02 else 'not met'}; under the HSP-029 target with current "
+                 "buybacks the steady-state value is in the scenario table.")
+    L.append("")
     return L
 
 

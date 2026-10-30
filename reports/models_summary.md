@@ -71,7 +71,7 @@ Net-zero threshold: Intents captured revenue (and volume at a take rate) at whic
 | 2.49% | $4.73 | 2.05 bp | $151.73M | 8.072 | $739.92B | 16.145 |
 | 2.49% | $4.73 | 4.10 bp | $151.73M | 8.072 | $369.96B | 8.072 |
 | 2.49% | $4.73 | 8.20 bp | $151.73M | 8.072 | $184.98B | 4.036 |
-| 2.49% | $9.46 | 2.05 bp | $303.47M | 16.145 | $1,479.84B | 32.289 |
+| 2.49% | $9.46 | 2.05 bp | $303.47M | 16.145 | $1.48T | 32.289 |
 | 2.49% | $9.46 | 4.10 bp | $303.47M | 16.145 | $739.92B | 16.145 |
 | 2.49% | $9.46 | 8.20 bp | $303.47M | 16.145 | $369.96B | 8.072 |
 | 1.59% | $2.36 | 2.05 bp | $48.10M | 2.559 | $234.56B | 5.118 |
@@ -84,7 +84,7 @@ Net-zero threshold: Intents captured revenue (and volume at a take rate) at whic
 | 1.59% | $9.46 | 4.10 bp | $192.41M | 10.236 | $469.13B | 10.236 |
 | 1.59% | $9.46 | 8.20 bp | $192.41M | 10.236 | $234.56B | 5.118 |
 
-Volumes in this grid are DefiLlama volumes. The on-chain check (Q2) finds public one-sided volume at 46.04% of DefiLlama's figure, so measured on-chain the required volume multiples are larger by about the inverse of that ratio, while the revenue multiples (which use captured revenue, reconciled on-chain in Q4) are unaffected.
+Volumes in this grid are DefiLlama volumes. The on-chain check (Q2) finds public one-sided volume at 46.04% of DefiLlama's figure. That changes the absolute volumes (and makes the on-chain take rate higher by the inverse ratio) but not the multiples: at a constant take rate, the volume multiple equals the multiple of captured revenue, and captured revenue reconciles with on-chain flows (Q4).
 
 **Falsifier of the bullish case** (PIANO.md Q4): net float dilution after buybacks stays above 2% per year and the net-zero threshold needs more than 10x current volume at the current take rate.
 Current reading: float dilution in year 1 (status quo, base) 2.12% (above 2%); threshold 8.072x current volume (not above 10x). The falsifier is not met (it needs both conditions); the dilution leg holds.
@@ -140,7 +140,7 @@ Current reading (captured revenue incl. Intents, 30d annualized): NEAR 220x vs p
 
 ## (c) Adoption model on organic activity
 
-**Assumptions.** Series: organic monthly active signers and organic transactions per day from the bot-vs-human decomposition (last 36 complete months), and NEAR Intents monthly volume (DefiLlama) as a comparison. Models: log-linear trend, logistic S-curve (K profiled over a grid; r < 0 gives a declining S-curve), naive random walk. Rolling-origin backtest from 12 months of training, horizons [3, 6] months; error = |log forecast - log actual|. Forecast ranges: residual bootstrap (500 draws), 5th-95th percentile.
+**Assumptions.** Series: organic daily and monthly active signers and organic transactions per day from the bot-vs-human decomposition (complete months with the full 200-draw design, from 2024-11), and NEAR Intents monthly volume (DefiLlama) as a comparison. Models: log-linear trend, logistic S-curve (K profiled over a grid; r < 0 gives a declining S-curve), naive random walk. Rolling-origin backtest from 12 months of training, horizons [3, 6] months; error = |log forecast - log actual|. Forecast ranges: residual bootstrap (500 draws), 5th-95th percentile.
 
 | Series | Model | Months | Growth /month (log-linear) | K (logistic) | r (logistic) | Residual sd (log) |
 |---|---|---|---|---|---|---|
@@ -159,15 +159,17 @@ Current reading (captured revenue incl. Intents, 30d annualized): NEAR 220x vs p
 
 | Series | Model | Months ahead | Last value | p05 | p50 | p95 |
 |---|---|---|---|---|---|---|
-| intents_monthly_volume_usd | logistic | 12 | 4,803,094,377 | 2,875,500,279 | 8,419,629,724 | 32,749,039,856 |
-| intents_monthly_volume_usd | logistic | 24 | 4,803,094,377 | 2,773,227,122 | 7,757,046,972 | 28,667,470,966 |
-| intents_monthly_volume_usd | logistic | 36 | 4,803,094,377 | 2,869,384,933 | 7,754,947,439 | 26,875,444,178 |
-| intents_monthly_volume_usd | loglinear | 12 | 4,803,094,377 | 53,897,960,756 | 345,774,290,238 | 2,904,315,211,594 |
-| intents_monthly_volume_usd | loglinear | 24 | 4,803,094,377 | 1,152,499,376,382 | 11,567,884,828,949 | 126,917,829,854,564 |
-| intents_monthly_volume_usd | loglinear | 36 | 4,803,094,377 | 21,566,981,059,110 | 371,024,866,326,916 | 6,630,720,311,135,888 |
-| intents_monthly_volume_usd | naive | 12 | 4,803,094,377 | 23,893,101,595 | 267,062,136,955 | 2,760,673,631,657 |
-| intents_monthly_volume_usd | naive | 24 | 4,803,094,377 | 416,845,215,144 | 17,555,903,737,751 | 374,935,349,938,177 |
-| intents_monthly_volume_usd | naive | 36 | 4,803,094,377 | 11,136,414,235,008 | 686,917,474,783,632 | 32,367,326,212,630,652 |
+| intents_monthly_volume_usd | logistic | 12 | $4.80B | $2.88B | $8.42B | $32.75B |
+| intents_monthly_volume_usd | logistic | 24 | $4.80B | $2.77B | $7.76B | $28.67B |
+| intents_monthly_volume_usd | logistic | 36 | $4.80B | $2.87B | $7.75B | $26.88B |
+| intents_monthly_volume_usd | loglinear | 12 | $4.80B | $53.90B | $345.77B | $2.90T |
+| intents_monthly_volume_usd | loglinear | 24 | $4.80B | $1.15T | $11.57T | $126.92T |
+| intents_monthly_volume_usd | loglinear | 36 | $4.80B | $21.57T | $371.02T | $6,630.72T |
+| intents_monthly_volume_usd | naive | 12 | $4.80B | $450.08M | $5.03B | $52.00B |
+| intents_monthly_volume_usd | naive | 24 | $4.80B | $147.91M | $6.23B | $133.04B |
+| intents_monthly_volume_usd | naive | 36 | $4.80B | $74.44M | $4.59B | $216.35B |
+
+Forecast ranges are mechanical extrapolations of each model; only the model with the lowest out-of-sample error for a series should be read as a forecast, and an explosive log-linear range for a young series (NEAR Intents started in late 2024) mainly shows that the trend model fails the backtest.
 
 **Falsifier of the bullish case** (PIANO.md Q1): organic active accounts show no growth over the last 24 months and month-3 cohort retention does not improve. Model reading: the log-linear trend of organic monthly active signers and its sign are in the fits table; the cohort trend is in reports/analysis_summary.md.
 
@@ -182,7 +184,7 @@ Current reading (captured revenue incl. Intents, 30d annualized): NEAR 220x vs p
 | 2023 | 4.94% | 0.06% | 0.00% | 47.60% | 9.33% | 8.86% | 4.88% | 3.80% | -4.65% |
 | 2024 | 4.94% | 0.11% | 0.00% | 48.94% | 9.06% | 8.61% | 4.83% | 3.61% | -4.60% |
 | 2025 | 4.48% | 0.08% | 0.00% | 46.13% | 8.74% | 8.30% | 4.40% | 3.74% | -4.21% |
-| 2026 | 2.49% | 0.03% | 0.00% | 45.64% | 4.91% | 4.66% | 2.46% | 2.15% | -2.40% |
+| 2026 | 2.49% | 0.03% | 0.33% | 45.64% | 4.91% | 4.66% | 2.13% | 2.48% | -2.09% |
 | last 365 days | 2.49% | 0.04% | 0.35% | 45.68% | 4.90% | 4.66% | 2.10% | 2.51% | -2.06% |
 | last 90 days | 2.48% | 0.03% | 0.35% | 45.40% | 4.92% | 4.67% | 2.11% | 2.51% | -2.06% |
 
@@ -201,5 +203,6 @@ Current reading (captured revenue incl. Intents, 30d annualized): NEAR 220x vs p
 | status_quo_2.5% | 0.35% | 45.00% | 4.98% | 4.73% | 2.10% | 2.58% | -2.06% |
 | status_quo_2.5% | 0.35% | 50.00% | 4.48% | 4.26% | 2.10% | 2.11% | -2.06% |
 
-**Falsifier of the bullish case**: the real yield of a non-staker (holder dilution net of burn and buybacks) stays below -2% per year; i.e. value accrual does not offset dilution. Current reading: see the last-365-days row above.
+**Falsifier of the bullish case**: the real yield of a non-staker (holder dilution net of burn and buybacks) stays below -2% per year; i.e. value accrual does not offset dilution.
+Current reading (last 365 days): -2.06% per year, so the falsifier is met at the current 2.5% cap; under the HSP-029 target with current buybacks the steady-state value is in the scenario table.
 

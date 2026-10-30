@@ -1,0 +1,13 @@
+endpoint_class,endpoint,how,near,transfers
+implicit_near,f6a3ada5900f61b5089494beb1292fdccd2ba7ec01dade714e556e6717afa9db,no_outflow_seen,1000000.00000000,1
+multisig,fgs.multisignature.near,no_outflow_seen,675000.00000000,1
+implicit_near,4003c038f56ea647a0be8aa5b2985f0ab17b455008f4d6375ce388b7f274153b,no_outflow_seen,299995.00000000,1
+named_other,nttdatape.near,no_outflow_seen,100000.00000000,1
+implicit_near,940ef3f4f1e2d72b2036c685e5db7ff38ea0f84cce9b1c538bb1db1bb6678950,not followed (beyond 5 hops),64170499.00000001,3
+implicit_near,ae1b2d06cee9353fba5ce28827f4cccbbf6e0dc161dfc3b154f71c5902c3fcca,not followed (beyond 5 hops),20483019.99195089,1
+implicit_near,f2f138d72a5bd478168a652139d134d73804bbeb18921a6ef11b3a97a2ed14ca,not followed (beyond 5 hops),999999.94995536,1
+implicit_near,714c35543a19a59f7bb626d288f951f25ad790c46872984262e9911d52c6752e,not followed (beyond 5 hops),500000.00000000,1
+implicit_near,d549d25ebc8dcd705ee1aac7d961fc31b07fa52e8d59ba56ddd788f09d6cec46,not followed (beyond 5 hops),499999.00000000,1
+named_other,prod.sadgeaystar.near,not followed (beyond 5 hops),100000.00000000,1
+staking_pool,p2p-org.poolv1.near,transfer into terminal class,10768312.00000000,4
+staking_pool,figment.poolv1.near,transfer into terminal class,10185549.00000000,2

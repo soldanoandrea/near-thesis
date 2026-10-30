@@ -57,8 +57,22 @@ def _add_months(month: str, k: int) -> str:
     return f"{m0 // 12:04d}-{m0 % 12 + 1:02d}"
 
 
+def is_incentivized(acc: str, incentivized: list[str], ocfg: dict) -> bool:
+    return acc in incentivized or any(acc.endswith(x) for x in ocfg.get("incentivized_suffixes", []))
+
+
 def _is_infra(acc: str, ocfg: dict) -> bool:
     return acc in ocfg["infrastructure"] or any(acc.endswith(s) for s in ocfg["infrastructure_suffixes"])
+
+
+def decode_ts(first, gaps: str | None) -> list[int]:
+    """Delta-encoded timestamps (first unix second + space-separated gaps) -> ascending unix seconds."""
+    if first in (None, ""):
+        return []
+    out = [int(first)]
+    for g in (gaps or "").split():
+        out.append(out[-1] + int(g))
+    return out
 
 
 def signer_features(sma: pl.DataFrame, life: pl.DataFrame, det: pl.DataFrame, bounds: dict[str, tuple[int, int]],
@@ -73,7 +87,7 @@ def signer_features(sma: pl.DataFrame, life: pl.DataFrame, det: pl.DataFrame, bo
         s, month = r["signer_id"], r["month"]
         c_raw = int(r["txs_count"])
         c = max(c_raw, 1)
-        ts = sorted(int(x) for x in (r["timestamps_s"] or "").split()) if r["timestamps_s"] else []
+        ts = decode_ts(r["ts_first_s"], r["ts_gaps_s"])
         n_ts = len(ts)
         gaps = np.diff(ts) if n_ts >= 2 else np.array([])
         med_gap = float(np.median(gaps)) if gaps.size else None
@@ -82,7 +96,8 @@ def signer_features(sma: pl.DataFrame, life: pl.DataFrame, det: pl.DataFrame, bo
         d = det_g.get((s, month), [])
         n_det = len(d)
         top_share = Counter(d).most_common(1)[0][1] / n_det if n_det else None
-        inc_share = sum(1 for rc, _ in d if rc in incentivized) / n_det if n_det else None
+        inc_share = (sum(1 for rc, _ in d if is_incentivized(rc, incentivized, ocfg)
+                             or (rc == s and is_incentivized(s, incentivized, ocfg))) / n_det if n_det else None)
         infra_share = sum(1 for rc, _ in d if _is_infra(rc, ocfg)) / n_det if n_det else None
         lf = life_d.get(s, {})
         first_ts = lf.get("first_timestamp_s")
@@ -112,16 +127,21 @@ def signer_features(sma: pl.DataFrame, life: pl.DataFrame, det: pl.DataFrame, bo
 def label_draws(draws: pl.DataFrame, feats: pl.DataFrame, incentivized: list[str], ocfg: dict,
                 threshold: int) -> pl.DataFrame:
     """Attach features to draws; compute c_day, account label and tx label at a given score threshold."""
+    inc = lambda r: is_incentivized(r["real_receiver_id"], incentivized, ocfg) or (  # noqa: E731
+        r["real_receiver_id"] == r["real_signer_id"] and is_incentivized(r["real_signer_id"], incentivized, ocfg))
+    draws = draws.with_columns(pl.struct("real_receiver_id", "real_signer_id").map_elements(
+        inc, return_dtype=pl.Boolean).alias("drawn_incentivized"))
     f = feats.drop("ts_list")
-    d = draws.join(f, left_on=["real_signer_id", "month"], right_on=["signer_id", "month"], how="left")
+    # draws whose signer-month was not fetched cannot be labelled (none in a complete fetch; kept explicit)
+    d = draws.join(f, left_on=["real_signer_id", "month"], right_on=["signer_id", "month"], how="inner")
     ts_map = {(r["signer_id"], r["month"]): r["ts_list"] for r in feats.select("signer_id", "month", "ts_list").iter_rows(named=True)}
     # drawn-receiver majorities per signer-month (used when there are no details)
-    dm = (draws.with_columns(pl.col("real_receiver_id").is_in(incentivized).alias("_inc"),
+    dm = (draws.with_columns(pl.col("drawn_incentivized").alias("_inc"),
                              pl.col("real_receiver_id").map_elements(lambda a: _is_infra(a, ocfg),
                                                                      return_dtype=pl.Boolean).alias("_inf"))
           .group_by(["real_signer_id", "month"]).agg(pl.col("_inc").mean().alias("drawn_inc_share"),
                                                      pl.col("_inf").mean().alias("drawn_infra_share")))
-    d = d.join(dm, on=["real_signer_id", "month"], how="left")
+    d = d.join(dm, on=["real_signer_id", "month"], how="left").sort(["month", "draw_rank"])  # joins may reorder
     out = []
     for r in d.iter_rows(named=True):
         c = r["txs_count"] or 1
@@ -148,7 +168,7 @@ def label_draws(draws: pl.DataFrame, feats: pl.DataFrame, incentivized: list[str
             acct = "automated"
         else:
             acct = "organic"
-        if r["real_receiver_id"] in incentivized:
+        if r["drawn_incentivized"]:
             txl = "incentivized"
         elif acct == "incentivized":
             txl = "automated" if automated else "organic"
@@ -239,11 +259,12 @@ def quarterly_series(monthly: pl.DataFrame, reps: dict, keys: list[str]) -> pl.D
 
 
 def cohort_retention(lab: pl.DataFrame, last_month: str, horizons=(1, 3, 6), boot: int = 1000,
-                     seed: int = 0) -> pl.DataFrame:
+                     seed: int = 0, lifetime_draws: int = 60) -> pl.DataFrame:
     """Rolling retention of new signers by quarterly cohort: share (account-weighted, weight 1/c) of accounts first
     seen in the cohort month that really signed a transaction at or after the start of month m+k. Bootstrap over
     sampled blocks within months. Also split organic vs other account labels."""
-    new = lab.filter(pl.col("is_new") & pl.col("last_signed_timestamp_s").is_not_null()).with_columns(
+    new = lab.filter(pl.col("is_new") & pl.col("last_signed_timestamp_s").is_not_null()
+                     & (pl.col("draw_rank") < lifetime_draws)).with_columns(
         (pl.col("month").str.slice(0, 4) + "-Q" + ((pl.col("month").str.slice(5, 2).cast(pl.Int64) - 1) // 3 + 1)
          .cast(pl.Utf8)).alias("cohort"))
     rows = []
@@ -271,14 +292,17 @@ def cohort_retention(lab: pl.DataFrame, last_month: str, horizons=(1, 3, 6), boo
                              "retention": point, "retention_p05": float(np.quantile(bs, 0.05)),
                              "retention_p95": float(np.quantile(bs, 0.95)),
                              "unweighted_retention": float(ret.mean())})
-    return pl.DataFrame(rows, infer_schema_length=None).sort(["group", "horizon_months", "cohort"])
+    schema = {"group": pl.Utf8, "cohort": pl.Utf8, "horizon_months": pl.Int64, "new_signer_draws": pl.Int64,
+              "retention": pl.Float64, "retention_p05": pl.Float64, "retention_p95": pl.Float64,
+              "unweighted_retention": pl.Float64}
+    return pl.DataFrame(rows, schema=schema).sort(["group", "horizon_months", "cohort"])
 
 
 def build(raw: Path, daily: pl.DataFrame, as_of: str) -> dict[str, pl.DataFrame]:
     cfg = config.load()
     ocfg, scfg = cfg["organic"], cfg["signers"]
     seed = int(cfg["activity"]["seed"])
-    incentivized = list(cfg["activity"]["groups"]["incentivized"]) + ["wallet.kaiching", "v2.jars.sweat"]
+    incentivized = list(cfg["activity"]["groups"]["incentivized"]) + list(ocfg.get("incentivized_extra", []))
     d = raw / "fastnear_tx"
     if not (d / "signer_month_activity.csv").exists():
         return {}
@@ -326,10 +350,17 @@ def build(raw: Path, daily: pl.DataFrame, as_of: str) -> dict[str, pl.DataFrame]
         sens.append(g.with_columns(pl.lit(name).alias("threshold_name"), pl.lit(th).alias("score_threshold")))
     sensitivity = pl.concat(sens).sort(["quarter", "score_threshold"])
     last_month = sorted(monthly["month"].to_list())[-1]
-    cohorts = cohort_retention(lab, last_month, boot=boot, seed=seed)
+    cohorts = cohort_retention(lab, last_month, boot=boot, seed=seed, lifetime_draws=int(scfg["lifetime_draws"]))
+    top = (lab.filter(pl.col("tx_label") == "organic").with_columns(
+        (pl.col("month").str.slice(0, 4) + "-Q" + ((pl.col("month").str.slice(5, 2).cast(pl.Int64) - 1) // 3 + 1)
+         .cast(pl.Utf8)).alias("quarter"))
+        .group_by(["quarter", "real_receiver_id"]).len().rename({"len": "organic_draws"})
+        .with_columns((pl.col("organic_draws") / pl.col("organic_draws").sum().over("quarter")).alias("share"))
+        .sort(["quarter", "organic_draws", "real_receiver_id"], descending=[False, True, False])
+        .group_by("quarter", maintain_order=True).head(5))
     feats_out = feats.drop("ts_list").sort(["month", "signer_id"])
     return {"features": feats_out, "draws": lab.sort(["month", "draw_rank"]), "monthly": monthly,
-            "quarterly": quarterly, "sensitivity": sensitivity, "cohorts": cohorts}
+            "quarterly": quarterly, "sensitivity": sensitivity, "cohorts": cohorts, "top_organic_receivers": top}
 
 
 def _points_only(lab: pl.DataFrame, nb: pl.DataFrame) -> pl.DataFrame:

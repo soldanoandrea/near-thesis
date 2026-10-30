@@ -6,10 +6,11 @@
 3. For each drawn transaction's real signer:
    a. `signer_month_activity.csv`: /v0/account {is_real_signer, month height range, limit 200, desc} -> exact count
       of transactions the account really signed that month (`txs_count`) and the timestamps of up to 200 of them
-      (the most recent), packed as space-separated unix seconds;
-   b. `signer_lifetime.csv`: first appearance in any role (/v0/account desc=false, limit 1: account creation or first
-      funding) and, for signers whose first appearance falls in the drawn month (new accounts), the last transaction
-      they really signed up to the fetch (/v0/account is_real_signer desc, limit 1) for cohort retention;
+      (the most recent), delta-encoded (first unix second + gaps) to keep the snapshot small;
+   b. `signer_lifetime.csv`, for the first `lifetime_draws` draws of a month: first appearance in any role
+      (/v0/account desc=false, limit 1: account creation or first funding) and, for signers whose first appearance
+      falls in the drawn month (new accounts), the last transaction they really signed up to the fetch
+      (/v0/account is_real_signer desc, limit 1) for cohort retention;
    c. `signer_tx_details.csv`: for the first `detail_draws` draws of a month, if the signer signed at least
       `detail_min_txs` transactions, receiver / method / action kinds of its `detail_txs` most recent transactions of
       the month (/v0/transactions, 20 hashes per call).
@@ -141,22 +142,24 @@ def fetch(client: PoliteClient) -> None:
                                      {"account_id": s, "is_real_signer": True, "from_tx_block_height": h0,
                                       "to_tx_block_height": h1 - 1, "limit": 200, "desc": True}, immutable=True)
                 rows = d.get("account_txs") or []
+                ts = sorted(int(x["tx_block_timestamp"]) // 1_000_000_000 for x in rows)
                 month_rows[key] = {
                     "signer_id": s, "month": month, "from_height": h0, "to_height_inclusive": h1 - 1,
                     "txs_count": int(d["txs_count"]), "rows_returned": len(rows),
-                    "timestamps_s": " ".join(str(int(x["tx_block_timestamp"]) // 1_000_000_000) for x in rows),
+                    "ts_first_s": ts[0] if ts else None,
+                    "ts_gaps_s": " ".join(str(b - a) for a, b in zip(ts[:-1], ts[1:])),
                     "recent_hashes": [x["transaction_hash"] for x in rows[: int(cfg["detail_txs"])]],
                 }
-            if s not in first_rows:
+            if s not in first_rows and r["draw_rank"] < int(cfg["lifetime_draws"]):
                 d = client.post_json(f"{base}/v0/account", {"account_id": s, "limit": 1, "desc": False},
                                      immutable=True)
                 rows = d.get("account_txs") or []
                 first_rows[s] = {"signer_id": s, "lifetime_txs_any_role": int(d["txs_count"]),
                                  "first_height": int(rows[0]["tx_block_height"]) if rows else None,
                                  "first_timestamp_s": int(rows[0]["tx_block_timestamp"]) // 1_000_000_000 if rows else None}
-            fr = first_rows[s]
+            fr = first_rows.get(s, {"first_height": None})
             is_new = fr["first_height"] is not None and h0 <= fr["first_height"] < h1
-            if is_new and s not in last_rows:
+            if is_new and s not in last_rows and r["draw_rank"] < int(cfg["lifetime_draws"]):
                 d = client.post_json(f"{base}/v0/account", {"account_id": s, "is_real_signer": True, "limit": 1,
                                                             "desc": True}, max_age_s=FRESH_S)
                 rows = d.get("account_txs") or []
@@ -178,17 +181,19 @@ def fetch(client: PoliteClient) -> None:
 
     stats = client.stats_for(HOST)
     design = {"draws_recent": cfg["draws_recent"], "draws_early": cfg["draws_early"],
+              "lifetime_draws": cfg["lifetime_draws"], "detail_draws": cfg["detail_draws"],
               "recent_first_month": cfg["recent_first_month"], "seed": seed,
               "rng": "numpy.random.default_rng([seed, yyyymm, 3]).permutation(pooled block-sample txs)"}
     mdf = pl.DataFrame([{k: v for k, v in r.items() if k != "recent_hashes"} for r in month_rows.values()],
                        schema={"signer_id": pl.Utf8, "month": pl.Utf8, "from_height": pl.Int64,
                                "to_height_inclusive": pl.Int64, "txs_count": pl.Int64, "rows_returned": pl.Int64,
-                               "timestamps_s": pl.Utf8})
+                               "ts_first_s": pl.Int64, "ts_gaps_s": pl.Utf8})
     manifest.save_table("fastnear_tx", "signer_month_activity", mdf, urls=[f"{base}/v0/account"], params=design,
                         sort_by=["month", "signer_id"],
                         notes="Per drawn (signer, month): exact count of transactions really signed in the month "
-                              "(is_real_signer, relayers unwrapped) and unix-second timestamps of up to 200 of them "
-                              "(most recent first).", http_stats=stats)
+                              "(is_real_signer, relayers unwrapped) and the unix-second timestamps of up to 200 of them "
+                              "(the most recent), delta-encoded: ts_first_s = earliest returned, ts_gaps_s = "
+                              "space-separated gaps in seconds, ascending.", http_stats=stats)
     fdf = pl.DataFrame(list(first_rows.values()), schema={"signer_id": pl.Utf8, "lifetime_txs_any_role": pl.Int64,
                                                           "first_height": pl.Int64, "first_timestamp_s": pl.Int64})
     ldf = pl.DataFrame(list(last_rows.values()), schema={"signer_id": pl.Utf8, "lifetime_txs_real_signer": pl.Int64,
