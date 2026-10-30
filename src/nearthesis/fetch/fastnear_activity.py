@@ -123,22 +123,35 @@ def fetch(client: PoliteClient) -> None:
     bounds_t = starts + [end_of_window]
 
     # 1. month boundaries ---------------------------------------------------------------------------------
-    genesis_h = int(cfg["archival_epochs"]["genesis_height"])
-    lo = api.first_at_or_after(genesis_h)
-    hi = api.latest()
-    boundaries = []
-    for d in bounds_t:
-        h, t = api.height_at(_ns(d), lo, hi)
-        boundaries.append((d.strftime("%Y-%m-%dT%H:%M:%SZ"), h, t))
-        lo = (h, t)  # t < next boundary, so it is a valid lower anchor for the next search
-        print(f"  boundary {d:%Y-%m-%d} -> height {h}", file=sys.stderr, flush=True)
-    bdf = pl.DataFrame(boundaries, schema={"boundary_utc": pl.Utf8, "height": pl.Int64, "block_timestamp_ns": pl.Utf8},
-                       orient="row")
-    manifest.save_table("fastnear_tx", "month_boundaries", bdf, urls=[f"{api.base}/v0/blocks"],
-                        sort_by=["boundary_utc"],
-                        notes="First block whose timestamp is >= the boundary (00:00 UTC on the 1st of each month; "
-                              "the last row is 00:00 UTC of the fetch day and closes the final, partial month).",
-                        http_stats=client.stats_for(HOST))
+    # Boundaries are immutable facts: when the committed file already has exactly the wanted boundaries, reuse it.
+    from .. import io, paths
+
+    wanted = [d.strftime("%Y-%m-%dT%H:%M:%SZ") for d in bounds_t]
+    prev = paths.RAW / "fastnear_tx" / "month_boundaries.csv"
+    if prev.exists() and io.read_csv(prev)["boundary_utc"].to_list() == wanted:
+        old = io.read_csv(prev)
+        boundaries = [(b, int(h), int(t)) for b, h, t in old.iter_rows()]
+        print("  reusing committed month_boundaries.csv (same boundaries)", file=sys.stderr)
+        fresh = False
+    else:
+        genesis_h = int(cfg["archival_epochs"]["genesis_height"])
+        lo = api.first_at_or_after(genesis_h)
+        hi = api.latest()
+        boundaries = []
+        for d in bounds_t:
+            h, t = api.height_at(_ns(d), lo, hi)
+            boundaries.append((d.strftime("%Y-%m-%dT%H:%M:%SZ"), h, t))
+            lo = (h, t)  # t < next boundary, so it is a valid lower anchor for the next search
+            print(f"  boundary {d:%Y-%m-%d} -> height {h}", file=sys.stderr, flush=True)
+        fresh = True
+    bdf = pl.DataFrame([(b, h, str(t)) for b, h, t in boundaries],
+                       schema={"boundary_utc": pl.Utf8, "height": pl.Int64, "block_timestamp_ns": pl.Utf8}, orient="row")
+    if fresh:
+        manifest.save_table("fastnear_tx", "month_boundaries", bdf, urls=[f"{api.base}/v0/blocks"],
+                            sort_by=["boundary_utc"],
+                            notes="First block whose timestamp is >= the boundary (00:00 UTC on the 1st of each month; "
+                                  "the last row is 00:00 UTC of the fetch day and closes the final, partial month).",
+                            http_stats=client.stats_for(HOST))
 
     strata = [(b0[:7], h0, h1) for (b0, h0, _), (_, h1, _) in zip(boundaries[:-1], boundaries[1:])]
 

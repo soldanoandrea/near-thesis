@@ -19,6 +19,11 @@ from .. import io
 
 YOCTO = 10**24
 YEAR_S = 31_536_000
+NUM_BLOCKS_PER_YEAR = 31_536_000  # genesis/protocol config value
+# Observed in the data (not taken from nearcore docs): up to protocol 44 the minted amount matches the block-based
+# formula supply * rate * epoch_length / num_blocks_per_year; from protocol 45 it matches the time-based formula
+# supply * rate * epoch_duration / seconds_per_year. realized_to_cap uses the formula in force.
+TIME_BASED_REWARD_FROM_PROTOCOL = 45
 
 
 def _int(x: str | None) -> int | None:
@@ -49,6 +54,15 @@ def build_epochs(raw: Path) -> pl.DataFrame:
         rew_total, rew_tre = _int(r.get("reward_paid_total_yocto")), _int(r.get("reward_paid_treasury_yocto"))
         mir = _rate(r.get("max_inflation_rate"))
         mint_rate = mint / s_last * YEAR_S / dur_s
+        pv = _int(r.get("protocol_version"))
+        ep_len = _int(r.get("epoch_length")) or 43_200
+        if mint == 0:
+            formula, to_cap = "none", None
+        elif pv is not None and pv < TIME_BASED_REWARD_FROM_PROTOCOL:
+            formula = "blocks"
+            to_cap = (mint / (s_last * mir * ep_len / NUM_BLOCKS_PER_YEAR)) if mir else None
+        else:
+            formula, to_cap = "time", (mint_rate / mir) if mir else None
         rows.append({
             "epoch_id": r["epoch_id"],
             "epoch_height": _int(r.get("epoch_height")),
@@ -57,7 +71,7 @@ def build_epochs(raw: Path) -> pl.DataFrame:
             "start_date": dt.datetime.fromtimestamp(t0 / 1e9, dt.UTC).strftime("%Y-%m-%d"),
             "duration_hours": dur_s / 3600,
             "blocks_in_epoch": int(r["next_start_height"]) - int(r["start_height"]),
-            "protocol_version": _int(r.get("protocol_version")),
+            "protocol_version": pv,
             "max_inflation_rate": mir,
             "supply_start_near": s0 / YOCTO,
             "burn_near": burn / YOCTO,
@@ -68,7 +82,8 @@ def build_epochs(raw: Path) -> pl.DataFrame:
             "mint_annualized_rate": mint_rate,
             "burn_annualized_rate": burn / s0 * YEAR_S / dur_s,
             "net_annualized_rate": (mint - burn) / s0 * YEAR_S / dur_s,
-            "realized_to_cap": (mint_rate / mir) if mir else None,
+            "reward_formula": formula,
+            "realized_to_cap": to_cap,
             "burn_to_mint": burn / mint if mint else None,
             "block_identity_holds": identity,
             "validators_available": r.get("validators_available") == "true",
@@ -79,7 +94,7 @@ def build_epochs(raw: Path) -> pl.DataFrame:
             "treasury_reward_share": (rew_tre / rew_total) if rew_total else None,
             "gas_price_yocto_per_gas": int(r["gas_price_start_yocto"]),
         })
-    return pl.DataFrame(rows).sort("start_height")
+    return pl.DataFrame(rows, infer_schema_length=None).sort("start_height")
 
 
 def build_validator_concentration(raw: Path) -> pl.DataFrame:

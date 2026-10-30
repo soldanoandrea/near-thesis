@@ -1,8 +1,11 @@
 """Q1 first pass: what share of NEAR transactions is HOT / other tracked contracts / relayed / implicit / named.
 
 Two independent inputs:
-* census: exact monthly counts of transactions whose real receiver is a tracked contract (FastNear txs_count),
-  divided by NearBlocks monthly transactions;
+* census: exact monthly counts of transactions in which a tracked contract is a real receiver of some receipt
+  (FastNear txs_count with is_real_receiver: involvement, not only top-level receiver), divided by NearBlocks monthly
+  transactions. Counts of different contracts can overlap inside one transaction, so group totals add only
+  "primary" contracts (config `activity.groups`); `census_vs_sample.csv` compares each count with the top-level
+  share seen in the block sample;
 * sample: every transaction of `blocks_per_month` uniformly drawn blocks per month (stratified by month),
   giving shares for things no census exists for (relayed meta-transactions, implicit vs named signers).
 Sample shares are ratio estimators over blocks (cluster sample); 90% intervals come from a bootstrap that resamples
@@ -55,11 +58,15 @@ def load_sample(raw: Path, tracked: list[str]) -> tuple[pl.DataFrame, pl.DataFra
 
 
 # indicator columns evaluated per transaction; shares are sum(indicator) / sum(txs) over sampled blocks
+GROUPS: dict[str, list[str]] = {}
+
+
 def _indicators(txs: pl.DataFrame) -> pl.DataFrame:
     other = pl.col("receiver_group") == "other"
     named = pl.col("signer_kind").str.starts_with("named")
     return txs.with_columns(
         (pl.col("receiver_group") == "game.hot.tg").alias("hot"),
+        pl.col("receiver_group").is_in(GROUPS.get("incentivized", [])).alias("incentivized"),
         (pl.col("receiver_group") != "other").alias("tracked"),
         pl.col("relayed").alias("relayed"),
         pl.col("signer_kind").str.starts_with("implicit").alias("implicit_signer"),
@@ -70,8 +77,10 @@ def _indicators(txs: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-SHARES = ["hot", "tracked", "relayed", "implicit_signer", "other", "other_relayed", "other_implicit",
+SHARES = ["hot", "incentivized", "tracked", "relayed", "implicit_signer", "other", "other_relayed", "other_implicit",
           "other_direct_named"]
+# ratios with a denominator other than all transactions: name -> (numerator, denominator)
+CONDITIONAL = {"organic_given_other": ("other_direct_named", "other")}
 
 
 def _block_matrix(blocks: pl.DataFrame, txs: pl.DataFrame) -> pl.DataFrame:
@@ -101,8 +110,17 @@ def monthly_sample_shares(blocks: pl.DataFrame, txs: pl.DataFrame) -> pl.DataFra
             row[f"{c}_share"] = point
             row[f"{c}_share_p05"] = float(np.quantile(b, 0.05)) if point is not None and b.size else None
             row[f"{c}_share_p95"] = float(np.quantile(b, 0.95)) if point is not None and b.size else None
+        for name, (num_c, den_c) in CONDITIONAL.items():
+            x, y = g[num_c].to_numpy().astype(float), g[den_c].to_numpy().astype(float)
+            point = x.sum() / y.sum() if y.sum() > 0 else None
+            with np.errstate(invalid="ignore", divide="ignore"):
+                b = x[idx].sum(axis=1) / y[idx].sum(axis=1)
+            b = b[np.isfinite(b)]
+            row[name] = point
+            row[f"{name}_p05"] = float(np.quantile(b, 0.05)) if point is not None and b.size else None
+            row[f"{name}_p95"] = float(np.quantile(b, 0.95)) if point is not None and b.size else None
         rows.append(row)
-    return pl.DataFrame(rows).sort("month")
+    return pl.DataFrame(rows, infer_schema_length=None).sort("month")
 
 
 def quarterly_sample_shares(blocks: pl.DataFrame, txs: pl.DataFrame, weights: dict[str, float]) -> pl.DataFrame:
@@ -136,11 +154,25 @@ def quarterly_sample_shares(blocks: pl.DataFrame, txs: pl.DataFrame, weights: di
             b = b[np.isfinite(b)]
             row[f"{c}_share_p05"] = float(np.quantile(b, 0.05)) if den > 0 and b.size else None
             row[f"{c}_share_p95"] = float(np.quantile(b, 0.95)) if den > 0 and b.size else None
+        for name, (num_c, den_c) in CONDITIONAL.items():
+            num = sum(w * xs[num_c].mean() for w, _, xs in strata)
+            dd = sum(w * xs[den_c].mean() for w, _, xs in strata)
+            row[name] = num / dd if dd > 0 else None
+            with np.errstate(invalid="ignore", divide="ignore"):
+                b = sum(w * bx[num_c] for w, _, bx in boots) / sum(w * bx[den_c] for w, _, bx in boots)
+            b = b[np.isfinite(b)]
+            row[f"{name}_p05"] = float(np.quantile(b, 0.05)) if dd > 0 and b.size else None
+            row[f"{name}_p95"] = float(np.quantile(b, 0.95)) if dd > 0 and b.size else None
         rows.append(row)
-    return pl.DataFrame(rows).sort("quarter")
+    return pl.DataFrame(rows, infer_schema_length=None).sort("quarter")
 
 
-def build_monthly(raw: Path, daily: pl.DataFrame, tracked: list[str], as_of: str) -> dict[str, pl.DataFrame]:
+def build_monthly(raw: Path, daily: pl.DataFrame, tracked: list[str], as_of: str,
+                  groups: dict[str, list[str]] | None = None) -> dict[str, pl.DataFrame]:
+    GROUPS.clear()
+    GROUPS.update(groups or {})
+    # primary accounts: those summed in group totals and excluded from the sample's "other" bucket
+    primary = sorted({a for accs in (groups or {}).values() for a in accs}) or list(tracked)
     # NearBlocks monthly totals (calendar months, UTC)
     nb = (daily.filter((pl.col("chain") == "near") & (pl.col("source") == "nearblocks")
                        & pl.col("metric").is_in(["txns", "active_accounts", "new_accounts", "blocks"]))
@@ -160,14 +192,19 @@ def build_monthly(raw: Path, daily: pl.DataFrame, tracked: list[str], as_of: str
                                            (pl.col("to_height_inclusive").first() + 1).alias("to_height"))
     weights = {m: float(t - f) for m, f, t in heights.select("month", "from_height", "to_height").iter_rows()}
 
-    blocks, txs = load_sample(raw, tracked)
+    blocks, txs = load_sample(raw, primary)
     ms = monthly_sample_shares(blocks, txs)
     qs = quarterly_sample_shares(blocks, txs, weights)
 
     m = (nbm.join(wide, on="month", how="inner").join(heights, on="month", how="left")
          .join(ms, on="month", how="left").sort("month"))
     census_cols = [v for v in rename.values() if v in m.columns]
-    m = m.with_columns(pl.sum_horizontal(census_cols).alias("census_tracked_total"))
+    primary_cols = [rename[a] for a in primary if rename.get(a) in m.columns]
+    m = m.with_columns(pl.sum_horizontal(primary_cols).alias("census_tracked_total"))
+    for gname, accs in (groups or {}).items():
+        cols = [rename[a] for a in accs if rename.get(a) in m.columns]
+        m = m.with_columns(pl.sum_horizontal(cols).alias(f"census_{gname}_total"),
+                           (pl.sum_horizontal(cols) / pl.col("nb_txns")).alias(f"share_{gname}_total"))
     m = m.with_columns(
         *[(pl.col(c) / pl.col("nb_txns")).alias(c.replace("census_", "share_")) for c in census_cols],
         (pl.col("census_tracked_total") / pl.col("nb_txns")).alias("share_tracked_total"),
@@ -176,17 +213,33 @@ def build_monthly(raw: Path, daily: pl.DataFrame, tracked: list[str], as_of: str
         (pl.col("sample_tx_per_block") * (pl.col("to_height") - pl.col("from_height")) / pl.col("nb_txns"))
         .alias("sample_vs_nearblocks_txns"),
     )
-    # organic proxy: transactions to non-tracked receivers, not relayed, signed by named accounts
-    frac = pl.col("other_direct_named_share") / pl.col("other_share")
-    frac_lo = pl.col("other_direct_named_share_p05") / pl.col("other_share")
-    frac_hi = pl.col("other_direct_named_share_p95") / pl.col("other_share")
-    m = m.with_columns((pl.col("other_txns") * frac).alias("organic_proxy_txns"),
-                       (pl.col("other_txns") * frac_lo).alias("organic_proxy_txns_p05"),
-                       (pl.col("other_txns") * frac_hi).alias("organic_proxy_txns_p95"),
+    # organic proxy: census "other" transactions (not to a tracked contract) x the sampled share of them that are
+    # direct (not relayed) and signed by a named account; the 90% CI is the bootstrap CI of that conditional share
+    m = m.with_columns((pl.col("other_txns") * pl.col("organic_given_other")).alias("organic_proxy_txns"),
+                       (pl.col("other_txns") * pl.col("organic_given_other_p05")).alias("organic_proxy_txns_p05"),
+                       (pl.col("other_txns") * pl.col("organic_given_other_p95")).alias("organic_proxy_txns_p95"),
                        (pl.col("month") == as_of[:7]).alias("is_partial_month"))
     # sample vs census validation for HOT
     m = m.with_columns(((pl.col("share_game_hot_tg") >= pl.col("hot_share_p05"))
                         & (pl.col("share_game_hot_tg") <= pl.col("hot_share_p95"))).alias("hot_census_in_sample_ci"))
+    # census (involvement) vs sample (top-level receiver) per tracked contract, pooled over months with activity:
+    # sample-implied txs = sum over months of NearBlocks txs x sampled top-level share of the contract
+    top = (txs.group_by(["month", "real_receiver_id"]).len().rename({"len": "n"})
+           .join(txs.group_by("month").len().rename({"len": "tot"}), on="month"))
+    cvs = []
+    for a in tracked:
+        col = rename.get(a)
+        if col not in m.columns:
+            continue
+        sh = top.filter(pl.col("real_receiver_id") == a).select("month", (pl.col("n") / pl.col("tot")).alias("s"))
+        j = m.select("month", "nb_txns", pl.col(col).alias("census")).join(sh, on="month", how="left").with_columns(
+            pl.col("s").fill_null(0.0)).filter((pl.col("census") > 0) & ~pl.col("month").eq(as_of[:7]))
+        implied = float((j["nb_txns"] * j["s"]).sum()) if j.height else 0.0
+        cvs.append((a, "primary" if a in primary else "secondary", j.height, float(j["census"].sum()) if j.height else 0.0,
+                    implied, (float(j["census"].sum()) / implied) if implied > 0 else None))
+    census_vs_sample = pl.DataFrame(cvs, schema={"account_id": pl.Utf8, "role": pl.Utf8, "months": pl.Int64,
+                                                 "census_txs": pl.Float64, "sample_implied_top_level_txs": pl.Float64,
+                                                 "census_to_sample": pl.Float64}, orient="row")
     signer_mix = (txs.group_by(["month", "signer_kind"]).len()
                   .with_columns((pl.col("len") / pl.col("len").sum().over("month")).alias("share"))
                   .rename({"len": "sample_txs"}).sort(["month", "signer_kind"]))
@@ -194,4 +247,5 @@ def build_monthly(raw: Path, daily: pl.DataFrame, tracked: list[str], as_of: str
                      .with_columns((pl.col("len") / pl.col("len").sum().over("month")).alias("share"))
                      .sort(["month", "len", "real_receiver_id"], descending=[False, True, False])
                      .group_by("month", maintain_order=True).head(3).rename({"len": "sample_txs"}))
-    return {"monthly": m, "quarterly": qs, "signer_mix": signer_mix, "top_receivers": top_receivers}
+    return {"monthly": m, "quarterly": qs, "signer_mix": signer_mix, "top_receivers": top_receivers,
+            "census_vs_sample": census_vs_sample}

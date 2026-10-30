@@ -374,7 +374,7 @@
         "https://api.fastnear.com/v1/account/<id>/full"
       ],
       "params": null,
-      "fetched_at_utc": "2026-10-30T19:49:32Z",
+      "fetched_at_utc": "2026-10-30T21:39:03Z",
       "rows": 26,
       "columns": [
         "account_id",
@@ -395,6 +395,152 @@
       },
       "notes": "FastNear indexed FT / NFT / staking-pool holdings of tracked wallets. balance_raw is in the token's smallest unit (decimals not resolved)."
     },
+    "fastnear_tx/block_sample_blocks.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/block"
+      ],
+      "params": {
+        "blocks_per_month": 30,
+        "seed": 20261101,
+        "rng": "numpy.random.default_rng([seed, yyyymm]).integers(h0, h1)",
+        "skipped_height_rule": "next existing height"
+      },
+      "fetched_at_utc": "2026-10-30T21:23:18Z",
+      "rows": 2250,
+      "columns": [
+        "month",
+        "draw",
+        "sampled_height",
+        "block_height",
+        "block_timestamp_ns",
+        "num_transactions",
+        "num_receipts",
+        "gas_burnt",
+        "tokens_burnt_yocto",
+        "total_supply_yocto",
+        "protocol_version",
+        "chunks_included"
+      ],
+      "sha256": "36bf07cb4d6e6bba39d8789bdd46975a315d8917a602acec4bde158182e89047",
+      "bytes": 294515,
+      "http": {
+        "requests": 301,
+        "cache_hits": 2629,
+        "retries": 1,
+        "rate_limited": 1,
+        "errors": 0,
+        "bytes": 80935
+      },
+      "notes": "One row per sampled block (including empty blocks)."
+    },
+    "fastnear_tx/block_sample_txs.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/block"
+      ],
+      "params": {
+        "blocks_per_month": 30,
+        "seed": 20261101,
+        "rng": "numpy.random.default_rng([seed, yyyymm]).integers(h0, h1)",
+        "skipped_height_rule": "next existing height"
+      },
+      "fetched_at_utc": "2026-10-30T21:23:18Z",
+      "rows": 68081,
+      "columns": [
+        "month",
+        "draw",
+        "block_height",
+        "tx_index",
+        "shard_id",
+        "signer_id",
+        "receiver_id",
+        "real_signer_id",
+        "real_receiver_id",
+        "is_relayed",
+        "is_success",
+        "gas_burnt",
+        "tokens_burnt_yocto",
+        "transaction_hash"
+      ],
+      "sha256": "769175dc23aacf883089ff4b5aea7c81e4dbc95cd4fffaab89e96adceab968d4",
+      "bytes": 13600432,
+      "http": {
+        "requests": 301,
+        "cache_hits": 2629,
+        "retries": 1,
+        "rate_limited": 1,
+        "errors": 0,
+        "bytes": 80935
+      },
+      "notes": "Every transaction of every sampled block. Public on-chain account IDs."
+    },
+    "fastnear_tx/month_boundaries.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/blocks"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T20:00:54Z",
+      "rows": 76,
+      "columns": [
+        "boundary_utc",
+        "height",
+        "block_timestamp_ns"
+      ],
+      "sha256": "5a91755cca7ad1f22fa8103b3b151ccd6b43469182b5abc1131419855999c73f",
+      "bytes": 3878,
+      "http": {
+        "requests": 658,
+        "cache_hits": 0,
+        "retries": 5,
+        "rate_limited": 5,
+        "errors": 0,
+        "bytes": 916604
+      },
+      "notes": "First block whose timestamp is >= the boundary (00:00 UTC on the 1st of each month; the last row is 00:00 UTC of the fetch day and closes the final, partial month)."
+    },
+    "fastnear_tx/monthly_receiver_counts.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/account"
+      ],
+      "params": {
+        "is_real_receiver": true,
+        "limit": 1,
+        "accounts": [
+          "game.hot.tg",
+          "earn.kaiching",
+          "wallet.kaiching",
+          "token.sweat",
+          "app.nearcrowd.near",
+          "inscription.near",
+          "aurora",
+          "v1.signer",
+          "intents.near"
+        ]
+      },
+      "fetched_at_utc": "2026-10-30T21:23:14Z",
+      "rows": 675,
+      "columns": [
+        "month",
+        "account_id",
+        "from_height",
+        "to_height_inclusive",
+        "txs_count"
+      ],
+      "sha256": "eac40bb12dc1373a6bc15d26138f7240e3261ae89602c862db625edfa5eac3d4",
+      "bytes": 30598,
+      "http": {
+        "requests": 301,
+        "cache_hits": 375,
+        "retries": 1,
+        "rate_limited": 1,
+        "errors": 0,
+        "bytes": 80935
+      },
+      "notes": "txs_count = number of transactions in the month whose real receiver (relayer unwrapped) is the account. Exact count from the FastNear ClickHouse index."
+    },
     "fastnear_tx/receiver_txs_alltime.csv": {
       "source": "fastnear_tx",
       "urls": [
@@ -404,21 +550,21 @@
         "is_real_receiver": true,
         "limit": 1
       },
-      "fetched_at_utc": "2026-10-30T19:49:37Z",
-      "rows": 5,
+      "fetched_at_utc": "2026-10-30T21:39:11Z",
+      "rows": 9,
       "columns": [
         "account_id",
         "txs_count"
       ],
-      "sha256": "a83abf811ae6962fb7f3aef97e124c7b7042d42229590db2a893a358ff9c434a",
-      "bytes": 124,
+      "sha256": "f6f790ce41007b09eed58ed87353686b9b9b4b9571e5f6845f079c083274dcae",
+      "bytes": 231,
       "http": {
-        "requests": 5,
+        "requests": 9,
         "cache_hits": 0,
         "retries": 0,
         "rate_limited": 0,
         "errors": 0,
-        "bytes": 2618
+        "bytes": 4734
       },
       "notes": "All-time count of transactions whose real receiver is the account (relayers excluded)."
     },
@@ -509,7 +655,7 @@
         "https://free.rpc.fastnear.com block finality=final"
       ],
       "params": null,
-      "fetched_at_utc": "2026-10-30T19:49:26Z",
+      "fetched_at_utc": "2026-10-30T21:38:56Z",
       "rows": 1,
       "columns": [
         "height",
@@ -521,7 +667,7 @@
         "balance_burnt_yocto",
         "latest_protocol_version"
       ],
-      "sha256": "b6e12610af85081a92ee8bef2f8686d3e6e357e8fbbfc45ee120c5b53bc1319b",
+      "sha256": "d031e1f29717f0bdfc069e821951825fa34f67f679df43d6bbd2eb7a03912f74",
       "bytes": 304,
       "http": {
         "requests": 3,
@@ -529,7 +675,7 @@
         "retries": 0,
         "rate_limited": 0,
         "errors": 0,
-        "bytes": 32286
+        "bytes": 30582
       },
       "notes": "Header of the final block at refresh time."
     },
@@ -539,7 +685,7 @@
         "https://free.rpc.fastnear.com EXPERIMENTAL_genesis_config"
       ],
       "params": null,
-      "fetched_at_utc": "2026-10-30T19:49:24Z",
+      "fetched_at_utc": "2026-10-30T21:38:55Z",
       "rows": 36,
       "columns": [
         "key",
@@ -563,9 +709,9 @@
         "https://free.rpc.fastnear.com EXPERIMENTAL_protocol_config"
       ],
       "params": {
-        "block_id": 222316889
+        "block_id": 222328393
       },
-      "fetched_at_utc": "2026-10-30T19:49:26Z",
+      "fetched_at_utc": "2026-10-30T21:38:56Z",
       "rows": 280,
       "columns": [
         "key",
@@ -579,7 +725,7 @@
         "retries": 0,
         "rate_limited": 0,
         "errors": 0,
-        "bytes": 32286
+        "bytes": 30582
       },
       "notes": "Scalar fields of the protocol config at the final block of the refresh."
     },
@@ -589,13 +735,13 @@
         "https://free.rpc.fastnear.com call_function sputnik-dao.near get_dao_list"
       ],
       "params": null,
-      "fetched_at_utc": "2026-10-30T19:49:28Z",
+      "fetched_at_utc": "2026-10-30T21:38:59Z",
       "rows": 2043,
       "columns": [
         "dao_id",
         "block_height"
       ],
-      "sha256": "0b134e9dbf3d9799274403c2c66fa66726d66077789c0bca377cff485c90bb33",
+      "sha256": "98b689b4c03b8a24c3e6c48575b436bd3942b1c7987982f9de13947e38209894",
       "bytes": 79138,
       "http": {
         "requests": 5,
@@ -603,7 +749,7 @@
         "retries": 0,
         "rate_limited": 0,
         "errors": 0,
-        "bytes": 666252
+        "bytes": 639020
       },
       "notes": "All DAOs created by the Sputnik DAO v2 factory."
     },
@@ -613,7 +759,7 @@
         "https://free.rpc.fastnear.com view_account"
       ],
       "params": null,
-      "fetched_at_utc": "2026-10-30T19:49:32Z",
+      "fetched_at_utc": "2026-10-30T21:39:03Z",
       "rows": 4,
       "columns": [
         "account_id",
@@ -622,7 +768,7 @@
         "block_height",
         "exists"
       ],
-      "sha256": "87656d3abdb1928c40405cea4c14232f530c4498be2073ee1ea246a770b8c4ef",
+      "sha256": "51cb919dc4dc846ed22ddab0115bddb7fca7ba83e9547c889e3b67a07e076805",
       "bytes": 353,
       "http": {
         "requests": 9,
@@ -630,7 +776,7 @@
         "retries": 0,
         "rate_limited": 0,
         "errors": 0,
-        "bytes": 667403
+        "bytes": 640171
       },
       "notes": "Liquid (amount) and staked-locked balances of tracked wallets."
     },
@@ -640,8 +786,8 @@
         "https://free.rpc.fastnear.com validators [null]"
       ],
       "params": null,
-      "fetched_at_utc": "2026-10-30T19:49:27Z",
-      "rows": 381,
+      "fetched_at_utc": "2026-10-30T21:38:58Z",
+      "rows": 379,
       "columns": [
         "account_id",
         "stake_yocto",
@@ -652,17 +798,142 @@
         "epoch_start_height",
         "epoch_height"
       ],
-      "sha256": "30cfbf81c00731d3ded64c05894f58d26f300f7b3a82f2553f98b5c2bf1d05fa",
-      "bytes": 29598,
+      "sha256": "931102a549d8316633639fa4902acab0153980bb6893d396dd601ef4f133c8a7",
+      "bytes": 29176,
       "http": {
         "requests": 4,
         "cache_hits": 0,
         "retries": 0,
         "rate_limited": 0,
         "errors": 0,
-        "bytes": 436708
+        "bytes": 409476
       },
       "notes": "current_validators of the epoch in progress at refresh time."
+    },
+    "rpc_archival/epoch_validator_stakes.csv": {
+      "source": "rpc_archival",
+      "urls": [
+        "https://archival-rpc.mainnet.fastnear.com validators {epoch_id}"
+      ],
+      "params": {
+        "step_epochs": 28,
+        "genesis_height": 9820210,
+        "head_height_at_fetch": 222322814,
+        "targets": 176
+      },
+      "fetched_at_utc": "2026-10-30T21:38:46Z",
+      "rows": 33567,
+      "columns": [
+        "epoch_height",
+        "start_height",
+        "account_id",
+        "stake_yocto"
+      ],
+      "sha256": "5eca6a7b5846930c9f2c1eb00dfa20200cce7413b771ee4be77a050754292afe",
+      "bytes": 2263797,
+      "http": {
+        "requests": 1383,
+        "cache_hits": 990,
+        "retries": 2,
+        "rate_limited": 2,
+        "errors": 5,
+        "bytes": 75472350
+      },
+      "notes": "current_validators stake of every sampled epoch (raw validators responses are ~0.4 MB each and are not committed; this table keeps account_id and stake only)."
+    },
+    "rpc_archival/epochs_sampled.csv": {
+      "source": "rpc_archival",
+      "urls": [
+        "https://archival-rpc.mainnet.fastnear.com block / validators / EXPERIMENTAL_protocol_config"
+      ],
+      "params": {
+        "step_epochs": 28,
+        "genesis_height": 9820210,
+        "head_height_at_fetch": 222322814,
+        "targets": 176
+      },
+      "fetched_at_utc": "2026-10-30T21:38:45Z",
+      "rows": 176,
+      "columns": [
+        "epoch_height",
+        "epoch_id",
+        "validators_available",
+        "start_height",
+        "start_timestamp_ns",
+        "last_height",
+        "last_timestamp_ns",
+        "next_start_height",
+        "next_start_timestamp_ns",
+        "supply_start_yocto",
+        "supply_last_yocto",
+        "supply_next_start_yocto",
+        "burnt_start_block_yocto",
+        "burnt_next_start_block_yocto",
+        "gas_price_start_yocto",
+        "check_height",
+        "check_prev_hash_is_start",
+        "check_supply_yocto",
+        "check_burnt_yocto",
+        "protocol_version",
+        "epoch_length",
+        "max_inflation_rate",
+        "protocol_reward_rate",
+        "num_validators",
+        "total_stake_yocto",
+        "nakamoto_coefficient",
+        "next_num_validators",
+        "next_total_stake_yocto",
+        "reward_recipients",
+        "reward_paid_total_yocto",
+        "reward_paid_treasury_yocto"
+      ],
+      "sha256": "b1f755adab002d6213e546190fb4604533e2c0f96b658a85b7b21a72b524e133",
+      "bytes": 88741,
+      "http": {
+        "requests": 1383,
+        "cache_hits": 990,
+        "retries": 2,
+        "rate_limited": 2,
+        "errors": 5,
+        "bytes": 75472350
+      },
+      "notes": "One fully characterized epoch per sample (see module docstring for the identities). yoctoNEAR integers stored as strings. validators_available=false: archival nodes answer UNKNOWN_EPOCH before epoch 545 (~2021-03), so epoch boundaries were found by bisection on block-header epoch_id and stake fields are empty. Fallback host: archival-rpc.mainnet.near.org."
+    },
+    "rpc_archival/treasury_monthly.csv": {
+      "source": "rpc_archival",
+      "urls": [
+        "https://archival-rpc.mainnet.fastnear.com query view_account"
+      ],
+      "params": {
+        "accounts": [
+          "buybacks.multisignature.near",
+          "fefundsadmin.sputnik-dao.near",
+          "1csfundsadmin.sputnik-dao.near",
+          "treasury.near"
+        ],
+        "first_month": "2024-01"
+      },
+      "fetched_at_utc": "2026-10-30T21:44:05Z",
+      "rows": 140,
+      "columns": [
+        "boundary_utc",
+        "block_height",
+        "account_id",
+        "amount_yocto",
+        "locked_yocto",
+        "exists"
+      ],
+      "sha256": "8afa8e5139f0f0e8ca975a832060acbf752934cfcba0dc662ca090ca89fd760b",
+      "bytes": 11303,
+      "http": {
+        "requests": 142,
+        "cache_hits": 0,
+        "retries": 2,
+        "rate_limited": 2,
+        "errors": 0,
+        "bytes": 45830
+      },
+      "notes": "Balances at the first block of each month (from fastnear_tx/month_boundaries.csv). exists=false: account not yet created at that height."
     }
   }
 }

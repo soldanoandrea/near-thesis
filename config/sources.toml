@@ -130,7 +130,19 @@ first_month = "2020-08"
 blocks_per_month = 30
 seed = 20261101
 # Exact monthly transaction counts per contract via the FastNear Transactions API (txs_count with is_real_receiver).
-receivers = ["game.hot.tg", "token.sweat", "aurora", "v1.signer", "intents.near"]
+# Chosen from PIANO.md (HOT, Chain Signatures, Intents, Aurora) plus the contracts that dominate the block sample in some
+# year (see docs/DATA_NOTES.md): KaiChing, SWEAT, NEARCrowd, NEAR inscriptions.
+receivers = ["game.hot.tg", "earn.kaiching", "wallet.kaiching", "token.sweat", "app.nearcrowd.near",
+             "inscription.near", "aurora", "v1.signer", "intents.near"]
+
+[activity.groups]
+# Only "primary" accounts are summed. txs_count counts a transaction for every account that receives a receipt in it
+# (involvement, not top-level receiver), so wallet.kaiching, which is mostly reached by internal receipts of
+# earn.kaiching transactions, is reported but not added (it would double count). See docs/DATA_NOTES.md.
+# incentivized: tap-to-earn / move-to-earn / task-reward / inscription-minting contracts (activity paid for by rewards)
+incentivized = ["game.hot.tg", "earn.kaiching", "token.sweat", "app.nearcrowd.near", "inscription.near"]
+# infrastructure: EVM relay (Aurora), MPC signing (Chain Signatures), intent settlement (NEAR Intents)
+infrastructure = ["aurora", "v1.signer", "intents.near"]
 
 [treasury]
 # Monthly archival balance samples (PIANO.md Q4 / sources #20-#22).

@@ -1,0 +1,2 @@
+from_rate,to_rate,last_sample_before_utc,first_sample_after_utc,height_before,height_after
+0.05000000,0.02500000,2025-10-23T15:42:18Z,2025-11-01T06:53:13Z,169530717,170740319

@@ -136,7 +136,9 @@ def fetch(client: PoliteClient) -> None:
                    arc.epoch_start(e_id, b["header"]["height"], genesis_h,
                                    hint=(prev_start_e + step * EPOCH_LEN) if prev_start_e else None))
         prev_start_e = start_e
-        first_e = arc.block(start_e)
+        # validators' epoch_start_height can be a skipped height: the first block is the next existing one
+        first_e = arc.block_at_or_after(start_e)
+        assert first_e["header"]["epoch_id"] == e_id, f"first block of {e_id} not found at {start_e}"
         last_p = arc.block(first_e["header"]["prev_hash"])
         p_id = last_p["header"]["epoch_id"]
         if p_id in seen:
@@ -145,7 +147,8 @@ def fetch(client: PoliteClient) -> None:
         v_p = arc.validators(p_id)
         start_p = (int(v_p["epoch_start_height"]) if v_p
                    else arc.epoch_start(p_id, last_p["header"]["height"], genesis_h, hint=start_e - EPOCH_LEN))
-        first_p = arc.block(start_p)
+        first_p = arc.block_at_or_after(start_p)
+        assert first_p["header"]["epoch_id"] == p_id, f"first block of {p_id} not found at {start_p}"
         check = arc.block_at_or_after(start_p + 1)  # non-boundary block: supply(check) = supply(prev) - burnt(check)
         try:
             pc = arc.call("EXPERIMENTAL_protocol_config", {"block_id": first_p["header"]["height"]})

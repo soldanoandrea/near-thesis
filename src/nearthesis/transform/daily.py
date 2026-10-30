@@ -86,9 +86,13 @@ def defillama(raw: Path) -> list[pl.DataFrame]:
         if f.height:
             out.append(_frame(f, "near", metric, "defillama", pl.col("value_usd"), "USD"))
 
-    # coins.llama.fi: keep the earliest sample of each UTC day (closest to 00:00, like the other providers)
+    # coins.llama.fi samples sit near 00:00 UTC but on either side (00:09:05, 23:59:56): assign each sample to the
+    # nearest midnight and keep the one closest to it, matching the 00:00 convention of NearBlocks and CoinGecko
     px = (io.read_csv(d / "coin_prices_daily.csv").with_columns(pl.col("timestamp").cast(pl.Int64))
-          .sort(["chain", "timestamp"]).group_by(["chain", "date"], maintain_order=True).first())
+          .with_columns(((pl.col("timestamp") + 43_200) // 86_400 * 86_400).alias("midnight"))
+          .with_columns((pl.col("timestamp") - pl.col("midnight")).abs().alias("dist"),
+                        pl.from_epoch("midnight").dt.strftime("%Y-%m-%d").alias("date"))
+          .sort(["chain", "date", "dist", "timestamp"]).group_by(["chain", "date"], maintain_order=True).first())
     out.append(_frame(px, pl.col("chain"), "price_usd", "defillama", pl.col("price_usd"), "USD"))
     return out
 

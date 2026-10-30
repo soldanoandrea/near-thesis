@@ -1,6 +1,6 @@
 """Command line: `python -m nearthesis refresh|build|verify`.
 
-refresh  re-downloads every keyless source into data/raw/ (+ MANIFEST.json). Network. ~1-1.5 h, rate limited.
+refresh  re-downloads every keyless source into data/raw/ (+ MANIFEST.json). Network. About 2 h, rate limited.
 build    rebuilds data/processed/ and reports/metrics_summary.md from data/raw/ only. Offline, seconds.
 verify   checks data/raw/ against MANIFEST.json (sha256, row counts).
 """

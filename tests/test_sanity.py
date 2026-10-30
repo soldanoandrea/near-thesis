@@ -19,9 +19,12 @@ def test_supply_ranges(processed):
     e = processed("epochs.csv")
     assert e["supply_start_near"].is_between(999_000_000, 1_500_000_000).all()
     assert (e["burn_near"] >= 0).all() and (e["mint_next_near"] >= 0).all()
-    infl = e.filter(pl.col("max_inflation_rate") > 0)
-    assert infl["realized_to_cap"].is_between(0.80, 1.01).all(), infl.filter(
-        ~pl.col("realized_to_cap").is_between(0.80, 1.01)).select("start_date", "realized_to_cap")
+    minting = e.filter(pl.col("reward_formula") != "none")
+    assert minting["realized_to_cap"].is_between(0.80, 1.01).all(), minting.filter(
+        ~pl.col("realized_to_cap").is_between(0.80, 1.01)).select("start_date", "reward_formula", "realized_to_cap")
+    # no minting only at the very start (before inflation was switched on in late 2020)
+    first_mint = minting["start_height"].min()
+    assert (e.filter(pl.col("start_height") > first_mint)["reward_formula"] != "none").all()
     s = e.drop_nulls("staking_ratio")
     assert s["staking_ratio"].is_between(0.2, 0.8).all()
     assert s["num_validators"].is_between(20, 1000).all()

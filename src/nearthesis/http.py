@@ -127,6 +127,16 @@ class PoliteClient:
                 raise TransientError(f"HTTP {r.status_code} on {full_url}: {r.text[:200]}")
             if r.status_code >= 400:
                 st.errors += 1
+                # some RPC nodes return JSON-RPC errors (e.g. UNKNOWN_BLOCK for a skipped height) with HTTP 4xx
+                try:
+                    body_json = r.json()
+                except ValueError:
+                    body_json = None
+                if isinstance(body_json, dict) and isinstance(body_json.get("error"), dict):
+                    err = RpcError(body_json["error"])
+                    if err.cause in TRANSIENT_RPC_CAUSES:
+                        raise TransientError(str(err))
+                    raise err
                 raise httpx.HTTPStatusError(f"HTTP {r.status_code} on {full_url}: {r.text[:300]}",
                                             request=r.request, response=r)
             st.bytes += len(r.content)

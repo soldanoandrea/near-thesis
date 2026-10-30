@@ -52,7 +52,8 @@ def console_table(fp: pl.DataFrame) -> str:
 
 
 def render(*, m: dict, as_of: str, as_of_peers: str, fp: pl.DataFrame, epochs: pl.DataFrame, act: dict,
-           peers: pl.DataFrame, cov: pl.DataFrame, events: pl.DataFrame, bvf: pl.DataFrame, conc: pl.DataFrame) -> str:
+           peers: pl.DataFrame, cov: pl.DataFrame, events: pl.DataFrame, bvf: pl.DataFrame, conc: pl.DataFrame,
+           inv: pl.DataFrame) -> str:
     files = m["files"]
     fetched = sorted(v["fetched_at_utc"] for v in files.values())
     rows_total = sum(v["rows"] for v in files.values())
@@ -106,11 +107,15 @@ def render(*, m: dict, as_of: str, as_of_peers: str, fp: pl.DataFrame, epochs: p
               pl.col("block_identity_holds").drop_nulls().mean().alias("ident"))
          .sort("year"))
     L.append(table(["Year", "Epochs sampled", "Cap (end of year)", "Issuance /yr", "Burn /yr", "Net /yr",
-                    "Burn / mint", "Staking ratio", "Validators", "Nakamoto", "Identity holds"],
+                    "Burn / mint", "Staking ratio", "Validators (mean)", "Nakamoto (mean)", "Identity holds"],
                    [[r["year"], r["n"], fmt(r["cap"], "ratio"), fmt(r["mint"], "ratio"), fmt(r["burn"], "ratio"),
                      fmt(r["net"], "ratio"), fmt(r["burn_to_mint"], "ratio"), fmt(r["staking"], "ratio"),
-                     fmt(r["vals"]), fmt(r["nak"]), fmt(r["ident"], "ratio")] for r in y.iter_rows(named=True)]))
+                     "n/a" if r["vals"] is None else f"{r['vals']:.1f}", "n/a" if r["nak"] is None else f"{r['nak']:.1f}",
+                     fmt(r["ident"], "ratio")] for r in y.iter_rows(named=True)]))
     L.append("")
+    L.append("Realized/cap compares the mint with the formula in force: block-based (epoch_length / num_blocks_per_year) "
+             "up to protocol 44, time-based (epoch duration / 365 days) from protocol 45, as observed in the data. "
+             "Epochs before the first mint (late 2020) have no ratio. ")
     L.append("Issuance = NEAR minted on the first block of the next epoch, annualized with nearcore's 365-day year; "
              "burn = supply decrease inside the epoch. Staking ratio = stake of the epoch's validator set / total "
              "supply (empty before epoch 545, where archival nodes no longer serve `validators`).")
@@ -128,23 +133,37 @@ def render(*, m: dict, as_of: str, as_of_peers: str, fp: pl.DataFrame, epochs: p
         (pl.col("month").str.slice(0, 4) + "-Q" + ((pl.col("month").str.slice(5, 2).cast(pl.Int64) - 1) // 3 + 1)
          .cast(pl.Utf8)).alias("quarter"))
     qc = (mon.group_by("quarter").agg(pl.col("nb_txns").sum(), pl.col("nb_days").sum(),
-                                      pl.col("census_game_hot_tg").sum(), pl.col("census_tracked_total").sum(),
+                                      pl.col("census_game_hot_tg").sum(), pl.col("census_incentivized_total").sum(),
+                                      pl.col("census_infrastructure_total").sum(),
                                       pl.col("organic_proxy_txns").sum(), pl.col("is_partial_month").any())
           .join(act["quarterly"], on="quarter", how="left").sort("quarter").tail(8))
-    L.append(table(["Quarter", "Txs/day (NearBlocks)", "HOT share (census)", "5 tracked contracts (census)",
+    L.append(table(["Quarter", "Txs/day (NearBlocks)", "HOT (census)", "Incentivized (census)", "Infrastructure (census)",
                     "Relayed (sample, 90% CI)", "Implicit signers (sample, 90% CI)", "Organic proxy txs/day"],
                    [[r["quarter"] + (" (partial)" if r["is_partial_month"] else ""),
                      fmt(r["nb_txns"] / r["nb_days"]), fmt(r["census_game_hot_tg"] / r["nb_txns"], "ratio"),
-                     fmt(r["census_tracked_total"] / r["nb_txns"], "ratio"),
+                     fmt(r["census_incentivized_total"] / r["nb_txns"], "ratio"),
+                     fmt(r["census_infrastructure_total"] / r["nb_txns"], "ratio"),
                      f"{fmt(r['relayed_share'], 'ratio')} ({fmt(r['relayed_share_p05'], 'ratio')} to {fmt(r['relayed_share_p95'], 'ratio')})",
                      f"{fmt(r['implicit_signer_share'], 'ratio')} ({fmt(r['implicit_signer_share_p05'], 'ratio')} to {fmt(r['implicit_signer_share_p95'], 'ratio')})",
                      fmt(r["organic_proxy_txns"] / r["nb_days"]) if r["organic_proxy_txns"] is not None else "n/a"]
                     for r in qc.iter_rows(named=True)]))
     L.append("")
-    L.append("Census = exact FastNear counts of transactions whose real receiver is the contract, divided by NearBlocks "
-             "transactions. Sample = all transactions of 30 random blocks per month. Organic proxy = transactions to "
-             "non-tracked contracts that are neither relayed nor signed by implicit accounts. It is a structural "
-             "proxy, not a bot score; the per-signer bot score is phase 2.")
+    L.append("Census = exact FastNear counts of transactions in which the contract receives a receipt (involvement), "
+             "divided by NearBlocks transactions. Incentivized = HOT (game.hot.tg), KaiChing (earn.kaiching), SWEAT "
+             "(token.sweat), NEARCrowd (app.nearcrowd.near), inscription.near. Infrastructure = aurora, v1.signer, "
+             "intents.near. Sample = all transactions of 30 random blocks per month. Organic proxy = transactions to "
+             "untracked contracts that are neither relayed nor signed by implicit accounts. It is a structural proxy, "
+             "not a bot score; the per-signer bot score is phase 2.")
+    L.append("")
+
+    cvs = act["census_vs_sample"]
+    L.append("Census (involvement) vs block sample (top-level receiver), pooled over months with activity. A ratio near "
+             "1 means the contract is almost always the transaction's own receiver; a high ratio means it is mostly "
+             "reached by internal receipts, so its census count overlaps with other contracts.")
+    L.append("")
+    L.append(table(["Contract", "Role", "Months", "Census txs", "Sample-implied top-level txs", "Census / sample"],
+                   [[r["account_id"], r["role"], r["months"], fmt(r["census_txs"]), fmt(r["sample_implied_top_level_txs"]),
+                     fmt(r["census_to_sample"])] for r in cvs.iter_rows(named=True)]))
     L.append("")
 
     # peers
@@ -188,6 +207,12 @@ def render(*, m: dict, as_of: str, as_of_peers: str, fp: pl.DataFrame, epochs: p
                        [[r["chain"], r["metric"], r["source"], r["first_date"], r["last_date"], r["missing_days"],
                          r["null_values"], r["longest_gap_days"]] for r in gaps.iter_rows(named=True)]))
         L.append("")
+    L.append("## Raw snapshot inventory")
+    L.append("")
+    L.append(table(["File", "Rows", "First", "Last", "Fetched (UTC)", "sha256 (12)"],
+                   [[f"`{r['file']}`", f"{r['rows']:,}", r["first"], r["last"], r["fetched_at_utc"], r["sha256_12"]]
+                    for r in inv.iter_rows(named=True)]))
+    L.append("")
     L.append("Validator concentration per sampled epoch is in `data/processed/validator_concentration.csv`; "
              "exact burn vs prorated NearBlocks fees per epoch in `data/processed/burn_vs_fees_epochs.csv`.")
     L.append("")
