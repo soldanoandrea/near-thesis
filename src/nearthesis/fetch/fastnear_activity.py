@@ -31,16 +31,12 @@ class TxApi:
     def __init__(self, client: PoliteClient):
         self.c = client
         self.base = config.load()["endpoints"]["fastnear_tx"]
-        self.probes: list[tuple[int, int]] = []
 
     def blocks(self, frm: int, to: int, limit: int) -> list[dict]:
         d = self.c.post_json(f"{self.base}/v0/blocks",
                              {"from_block_height": frm, "to_block_height": to, "limit": limit, "desc": False},
                              immutable=True)
-        out = d.get("blocks") or []
-        for b in out:
-            self.probes.append((int(b["block_height"]), int(b["block_timestamp"])))
-        return out
+        return d.get("blocks") or []
 
     def first_at_or_after(self, h: int, window: int = 5000) -> tuple[int, int] | None:
         b = self.blocks(h, h + window, 1)
