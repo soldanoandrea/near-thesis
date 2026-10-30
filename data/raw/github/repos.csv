@@ -1,0 +1,11 @@
+repo,resolved_full_name,group,created_at,pushed_at,stars,forks,open_issues,archived,default_branch,language
+near/intents,near/intents,intents,2024-05-02T12:38:40Z,2026-10-29T09:53:34Z,61,55,22,false,main,Rust
+near/near-api-js,near/near-api-js,core,2019-05-04T06:33:50Z,2026-10-26T04:29:46Z,429,267,24,false,master,TypeScript
+near/near-cli-rs,near/near-cli-rs,core,2021-03-02T18:37:25Z,2026-10-22T21:43:38Z,150,80,43,false,main,Rust
+near/near-sdk-js,near/near-sdk-js,core,2021-12-15T02:05:40Z,2026-10-30T16:22:37Z,198,72,0,true,develop,TypeScript
+near/near-sdk-rs,near/near-sdk-rs,core,2019-06-07T22:08:29Z,2026-10-30T17:20:21Z,515,280,113,false,master,Rust
+near/nearcore,near/nearcore,core,2018-10-02T22:30:39Z,2026-10-30T20:34:29Z,2621,803,570,false,master,Rust
+nearai/cloud-api,nearai/cloud-api,nearai,2025-09-16T18:01:35Z,2026-10-30T21:50:51Z,15,9,195,false,main,Rust
+nearai/ironclaw,nearai/ironclaw,nearai,2026-02-03T06:57:10Z,2026-10-30T06:42:48Z,12699,1488,1569,false,main,Rust
+nearai/official-agents,nearai/official-agents,nearai,2024-11-01T18:46:30Z,2026-01-23T12:06:14Z,12,2,10,false,main,Python
+nearai/putnambench-deepseek,nearai/putnambench-deepseek,nearai,2026-08-17T03:14:25Z,2026-08-27T03:15:15Z,46,4,1,false,main,Python

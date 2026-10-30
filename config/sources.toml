@@ -24,6 +24,15 @@ backoff_max_s = 120.0
 "tx.main.fastnear.com" = 1.0
 "api.fastnear.com" = 1.0
 "explorer.mainnet.aurora.dev" = 1.0
+"api.github.com" = 5.0                        # keyless: 60 requests/hour; the fetcher also stops at 5 remaining
+"raw.githubusercontent.com" = 1.0
+"1click.chaindefuser.com" = 2.0
+"gov.near.org" = 2.0
+
+# Minimum seconds between two requests to any host whose name ends with the key, shared across processes
+# (lock file in data/cache/). FastNear rate-limits across its services (RPC, archival, indexer, API).
+[http.shared_min_interval_s]
+"fastnear.com" = 1.0
 
 [endpoints]
 nearblocks = "https://api.nearblocks.io/v1"
@@ -148,3 +157,67 @@ infrastructure = ["aurora", "v1.signer", "intents.near"]
 # Monthly archival balance samples (PIANO.md Q4 / sources #20-#22).
 accounts = ["buybacks.multisignature.near", "fefundsadmin.sputnik-dao.near", "1csfundsadmin.sputnik-dao.near", "treasury.near"]
 first_month = "2024-01"
+
+# ------------------------------------------------------------------------------------------------ phase 2a
+# Per-signer histories for the bot-vs-human decomposition (src/nearthesis/fetch/signers.py,
+# src/nearthesis/transform/organic.py). Draws are transactions drawn uniformly (seeded) from the pooled block sample of
+# each month, so each draw is an equal-probability draw of the month's transactions.
+[signers]
+extra_first_month = "2025-11"   # months with fewer than ~200 sampled txs: widen the block sample
+extra_blocks_per_month = 60     # added to the 30 base blocks -> 90 blocks per month
+recent_first_month = "2024-11"  # last 24 months get more draws
+draws_recent = 60
+draws_early = 15
+detail_draws = 40               # per month, the first `detail_draws` draws also get method / receiver details
+detail_min_txs = 3              # ... if the signer signed at least this many txs that month
+detail_txs = 20                 # most recent txs of the signer in the month whose details are fetched
+
+# NEAR Intents settlement cross-check (src/nearthesis/fetch/intents_check.py).
+[intents_check]
+days = 6                         # sampled UTC days, one per 2-month stratum of the last 12 complete months
+first_day = "2025-11-01"
+last_day = "2026-10-28"
+target_txs_per_window = 20       # window length chosen so a window holds ~this many fee-paying txs
+windows_per_day = 40
+verifier = "intents.near"
+
+# Bot score and classes (src/nearthesis/transform/organic.py). Set before looking at the per-signer data; the
+# sensitivity table reports the organic share under the strict and lenient thresholds as well.
+[organic]
+score_threshold = 2              # automated if score >= 2 (base); strict = 1, lenient = 3
+strict_threshold = 1
+lenient_threshold = 3
+high_volume_txs = 300            # I1: >= 300 really-signed txs in the month (~10/day)
+very_high_volume_txs = 3000      # I2: >= 3000 (~100/day), an extra point
+round_the_clock_hours = 18       # I3: active in >= 18 distinct UTC hours of the month (needs >= 50 timestamps)
+round_the_clock_min_ts = 50
+fast_median_gap_s = 30           # I4: median gap between txs < 30 s (needs >= 20 timestamps)
+regular_gap_cv = 0.5             # I5: coefficient of variation of gaps < 0.5 (metronome-like; >= 20 timestamps)
+min_ts_for_timing = 20
+repetitive_share = 0.9           # I6: >= 90% of detailed txs are the same (receiver, method) pair ...
+repetitive_min_details = 10      # ... with >= 10 detailed txs and >= 30 txs in the month
+repetitive_min_txs = 30
+bootstrap = 1000
+seed = 20261101
+# receivers whose transactions are infrastructure relays (settlement, bridges, MPC signing, EVM relay)
+infrastructure = ["aurora", "intents.near", "v1.signer", "omft.near", "omni.bridge.near", "v2_1.omni.hot.tg",
+                  "relay.aurora", "factory.bridge.near", "rainbow-bridge.near", "solver-relay.near"]
+infrastructure_suffixes = [".omft.near", ".bridge.near", ".aurora"]
+
+# Model parameters (src/nearthesis/phase2.py). Base values that come from data are computed, not typed; the numbers
+# here are the scenario ranges and assumptions, stated before the models were run.
+[models]
+horizons_years = [1, 2, 3, 4, 5]
+hsp029_activation_months = [3, 9]   # one full quarter after ratification (HSP-029 text); 9 = slower validator adoption
+fee_growth = {low = 0.8, base = 1.0, high = 1.5}          # yearly multiplier on the fee burn
+revenue_growth = {low = 0.7, base = 1.0, high = 1.6}      # yearly multiplier on Intents revenue (in NEAR terms)
+price_multipliers = [0.5, 1.0, 2.0]                      # for the net-zero threshold grid
+take_rate_multipliers = [0.5, 1.0, 2.0]
+buyback_share_of_revenue = 1.0      # since 2026-02-23 captured Intents revenue funds buybacks (DefiLlama adapter text)
+commissions = [0.0, 0.05, 0.10]     # validator commission range (not measured; HSP-029 cites a 5% median)
+staking_ratios = [0.40, 0.45, 0.50]
+adoption_fit_months = 36            # organic series: last 36 complete months
+adoption_min_train = 12
+adoption_backtest_horizons = [3, 6]
+adoption_forecast_horizons = [12, 24, 36]
+adoption_bootstrap = 500

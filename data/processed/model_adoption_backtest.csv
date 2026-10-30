@@ -1,0 +1,7 @@
+series,model,horizon,forecasts,mean_abs_log_error,mean_log_error
+intents_monthly_volume_usd,naive,3,7,0.27019561,-0.11643842
+intents_monthly_volume_usd,logistic,3,7,0.56973669,0.48794149
+intents_monthly_volume_usd,loglinear,3,7,2.30276746,2.30276746
+intents_monthly_volume_usd,naive,6,4,0.34045594,-0.23481441
+intents_monthly_volume_usd,logistic,6,4,0.59655528,0.46732211
+intents_monthly_volume_usd,loglinear,6,4,3.67767078,3.67767078

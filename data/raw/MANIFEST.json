@@ -568,6 +568,320 @@
       },
       "notes": "All-time count of transactions whose real receiver is the account (relayers excluded)."
     },
+    "fastnear_tx/trail_hops.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/account",
+        "https://tx.main.fastnear.com/v0/transactions"
+      ],
+      "params": {
+        "from_wallet": "treasury.near",
+        "trail_from": "2026-04-01",
+        "min_near": 100000,
+        "max_depth": 5,
+        "busy_account_txs": 20000,
+        "max_txs_per_account": 400
+      },
+      "fetched_at_utc": "2026-10-30T23:14:43Z",
+      "rows": 163,
+      "columns": [
+        "depth",
+        "source",
+        "account",
+        "account_class",
+        "received_tx",
+        "received_height",
+        "received_near_yocto",
+        "out_tx",
+        "out_height",
+        "out_timestamp_ns",
+        "out_kind",
+        "out_method",
+        "out_counterparty",
+        "out_counterparty_class",
+        "out_asset",
+        "out_amount_raw",
+        "account_txs_after_receipt",
+        "stop_reason"
+      ],
+      "sha256": "38409007a68ea846832c6ffc5e14ba14c76b673f9e86aeb83e9b5170a4cd93df",
+      "bytes": 59300,
+      "http": {
+        "requests": 34,
+        "cache_hits": 383,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 1043014
+      },
+      "notes": "Outflows of accounts that received >= min_near NEAR from treasury.near since trail_from, followed hop by hop; stop_reason says where and why a trail ends."
+    },
+    "fastnear_tx/wallet_flows.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/account",
+        "https://tx.main.fastnear.com/v0/transactions"
+      ],
+      "params": {
+        "wallets": [
+          "treasury.near",
+          "buybacks.multisignature.near",
+          "fefundsadmin.sputnik-dao.near",
+          "1csfundsadmin.sputnik-dao.near"
+        ],
+        "txs_count_at_fetch": {
+          "treasury.near": 100,
+          "buybacks.multisignature.near": 3076,
+          "fefundsadmin.sputnik-dao.near": 2798,
+          "1csfundsadmin.sputnik-dao.near": 535
+        }
+      },
+      "fetched_at_utc": "2026-10-30T23:13:26Z",
+      "rows": 6368,
+      "columns": [
+        "wallet",
+        "tx_hash",
+        "receipt_id",
+        "block_height",
+        "block_timestamp_ns",
+        "kind",
+        "direction",
+        "counterparty",
+        "asset",
+        "amount_raw",
+        "method",
+        "tx_signer",
+        "tx_receiver"
+      ],
+      "sha256": "de4fd299e6886a76566b563cdb08d23dd1a48fbceea6d7d4f79242b3c8bdd948",
+      "bytes": 1602606,
+      "http": {
+        "requests": 0,
+        "cache_hits": 360,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 0
+      },
+      "notes": "One row per value movement touching a tracked wallet (NEAR deposits of successful action receipts excluding gas refunds; NEP-141, NEP-245 and DIP-4 token_diff events). amount_raw in the asset's smallest unit (NEAR: yocto)."
+    },
+    "github/contributor_weeks.csv": {
+      "source": "github",
+      "urls": [
+        "https://api.github.com/repos/<owner>/<repo>/stats/contributors"
+      ],
+      "params": {
+        "repos": [
+          "near/nearcore",
+          "near/near-sdk-rs",
+          "near/near-sdk-js",
+          "near/near-api-js",
+          "near/near-cli-rs",
+          "near/intents",
+          "nearai/ironclaw",
+          "nearai/putnambench-deepseek",
+          "nearai/cloud-api",
+          "nearai/official-agents"
+        ],
+        "nearai_top": 4
+      },
+      "fetched_at_utc": "2026-10-30T22:57:54Z",
+      "rows": 6717,
+      "columns": [
+        "repo",
+        "author",
+        "week_start",
+        "commits"
+      ],
+      "sha256": "ffbe0ff6fb44abfecdd652ab1dd9204162a3436cc569926eb79f86e610fd1bc1",
+      "bytes": 260601,
+      "http": {
+        "requests": 46
+      },
+      "notes": "Weekly commits (default branch) of the top 100 contributors per repo, weeks with >0 commits only. Public GitHub logins."
+    },
+    "github/fetch_log.csv": {
+      "source": "github",
+      "urls": [
+        "https://api.github.com"
+      ],
+      "params": {
+        "repos": [
+          "near/nearcore",
+          "near/near-sdk-rs",
+          "near/near-sdk-js",
+          "near/near-api-js",
+          "near/near-cli-rs",
+          "near/intents",
+          "nearai/ironclaw",
+          "nearai/putnambench-deepseek",
+          "nearai/cloud-api",
+          "nearai/official-agents"
+        ],
+        "nearai_top": 4
+      },
+      "fetched_at_utc": "2026-10-30T22:57:54Z",
+      "rows": 44,
+      "columns": [
+        "url",
+        "status",
+        "from_cache"
+      ],
+      "sha256": "58479c99208199d37c9535202b8f7456b01a1d4216dee5dfe75a74f257a9c8ac",
+      "bytes": 3251,
+      "http": {
+        "requests": 46
+      },
+      "notes": "Every GitHub URL requested and its final HTTP status (202 = statistics still being computed by GitHub; such tables are missing for that repo)."
+    },
+    "github/participation.csv": {
+      "source": "github",
+      "urls": [
+        "https://api.github.com/repos/<owner>/<repo>/stats/participation"
+      ],
+      "params": {
+        "repos": [
+          "near/nearcore",
+          "near/near-sdk-rs",
+          "near/near-sdk-js",
+          "near/near-api-js",
+          "near/near-cli-rs",
+          "near/intents",
+          "nearai/ironclaw",
+          "nearai/putnambench-deepseek",
+          "nearai/cloud-api",
+          "nearai/official-agents"
+        ],
+        "nearai_top": 4
+      },
+      "fetched_at_utc": "2026-10-30T22:57:54Z",
+      "rows": 520,
+      "columns": [
+        "repo",
+        "weeks_ago",
+        "approx_week_start",
+        "commits_all",
+        "commits_owner"
+      ],
+      "sha256": "889e0510160740440005f09211fb02d10c34003ddc37feec3cbb84957b726ffc",
+      "bytes": 18772,
+      "http": {
+        "requests": 46
+      },
+      "notes": "Weekly commit counts of all contributors, last 52 weeks (bucket 0 = most recent)."
+    },
+    "github/releases.csv": {
+      "source": "github",
+      "urls": [
+        "https://api.github.com/repos/<owner>/<repo>/releases"
+      ],
+      "params": {
+        "repos": [
+          "near/nearcore",
+          "near/near-sdk-rs",
+          "near/near-sdk-js",
+          "near/near-api-js",
+          "near/near-cli-rs",
+          "near/intents",
+          "nearai/ironclaw",
+          "nearai/putnambench-deepseek",
+          "nearai/cloud-api",
+          "nearai/official-agents"
+        ],
+        "nearai_top": 4
+      },
+      "fetched_at_utc": "2026-10-30T22:57:54Z",
+      "rows": 855,
+      "columns": [
+        "repo",
+        "tag",
+        "published_at",
+        "prerelease",
+        "draft"
+      ],
+      "sha256": "a8f39db44ebc83f21b3aa595363f74ee8bbf63370716d2e7d523f7d5be7a1347",
+      "bytes": 56661,
+      "http": {
+        "requests": 46
+      },
+      "notes": "Up to 200 most recent releases per repo."
+    },
+    "github/repos.csv": {
+      "source": "github",
+      "urls": [
+        "https://api.github.com/repos/<owner>/<repo>",
+        "https://api.github.com/orgs/nearai/repos"
+      ],
+      "params": {
+        "repos": [
+          "near/nearcore",
+          "near/near-sdk-rs",
+          "near/near-sdk-js",
+          "near/near-api-js",
+          "near/near-cli-rs",
+          "near/intents",
+          "nearai/ironclaw",
+          "nearai/putnambench-deepseek",
+          "nearai/cloud-api",
+          "nearai/official-agents"
+        ],
+        "nearai_top": 4
+      },
+      "fetched_at_utc": "2026-10-30T22:57:54Z",
+      "rows": 10,
+      "columns": [
+        "repo",
+        "resolved_full_name",
+        "group",
+        "created_at",
+        "pushed_at",
+        "stars",
+        "forks",
+        "open_issues",
+        "archived",
+        "default_branch",
+        "language"
+      ],
+      "sha256": "f3b933854a84bb87261cda6eaddc3744cc3e035144a1adf666f4387f21f08f9f",
+      "bytes": 1235,
+      "http": {
+        "requests": 46
+      },
+      "notes": "Repository metadata at fetch time. nearai repos = most-starred non-fork, non-archived repos pushed in the last 365 days."
+    },
+    "governance/hsp029_status.csv": {
+      "source": "governance",
+      "urls": [
+        "https://gov.near.org/t/42644.json"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T22:59:35Z",
+      "rows": 1,
+      "columns": [
+        "topic_url",
+        "title",
+        "created_at",
+        "last_posted_at",
+        "posts_count",
+        "hsp",
+        "status",
+        "decision_type",
+        "discussions_to",
+        "spec_cap_formula",
+        "activation"
+      ],
+      "sha256": "924ee8bc829581f17e40f4b7f637710b1d39c00c01884d31fbf99082743b1fec",
+      "bytes": 522,
+      "http": {
+        "requests": 1,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 171221
+      },
+      "notes": "HSP-029 proposal metadata from the NEAR governance forum at fetch time (status field of the proposal frontmatter, cap formula, activation rule)."
+    },
     "nearblocks/charts_daily.csv": {
       "source": "nearblocks",
       "urls": [
@@ -648,6 +962,53 @@
         "bytes": 1535073
       },
       "notes": "Current network snapshot (/v1/stats). Not a time series; changes every refresh."
+    },
+    "opendevdata/eco_mads_monthly.csv": {
+      "source": "opendevdata",
+      "urls": [
+        "https://data.opendevdata.org/snapshots/20261030T130732/eco_mads.parquet",
+        "https://data.opendevdata.org/manifest.json"
+      ],
+      "params": {
+        "version": "20261030T130732",
+        "ecosystem_ids": {
+          "2817": "near",
+          "391": "solana",
+          "9547": "sui",
+          "9601": "aptos",
+          "13317": "base",
+          "2": "ethereum",
+          "10": "tron",
+          "7164": "all_web3"
+        },
+        "license": "CC BY 4.0"
+      },
+      "fetched_at_utc": "2026-10-30T23:02:51Z",
+      "rows": 916,
+      "columns": [
+        "ecosystem",
+        "ecosystem_id",
+        "month",
+        "day",
+        "all_devs",
+        "exclusive_devs",
+        "multichain_devs",
+        "full_time_devs",
+        "part_time_devs",
+        "one_time_devs",
+        "devs_0_1y",
+        "devs_1_2y",
+        "devs_2y_plus",
+        "num_commits",
+        "num_commits_month_sum",
+        "days_in_data"
+      ],
+      "sha256": "44f5fe977e8e055de75ebc2722057cfeed4dc93566bfbdc2962346a2d592ee41",
+      "bytes": 73677,
+      "http": {
+        "rows_read": 27501
+      },
+      "notes": "Electric Capital Open Dev Data eco_mads: last available day of each month per ecosystem (all_devs etc. are 28-day rolling Monthly Active Developer counts), plus the sum of the daily num_commits column over the month. Read with HTTP range requests (no full download)."
     },
     "rpc/final_block_header.csv": {
       "source": "rpc",

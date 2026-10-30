@@ -1,0 +1,29 @@
+chain,variant,variant_label,basis,annual_flow_usd,market_cap_usd,multiple,as_of
+near,chain_fees,chain fees (gas),30d_annualized,2462046.66666667,6195376790.56777954,2516.35229927,2026-10-29
+near,chain_fees,chain fees (gas),365d,1216606.00000000,6195376790.56777954,5092.34443244,2026-10-29
+near,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),30d_annualized,1723408.33333333,6195376790.56777954,3594.83975489,2026-10-29
+near,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),365d,852219.00000000,6195376790.56777954,7269.70038284,2026-10-29
+near,fees_plus_intents_fees,chain fees + Intents gross fees,30d_annualized,77397580.83333333,6195376790.56777954,80.04612966,2026-10-29
+near,fees_plus_intents_fees,chain fees + Intents gross fees,365d,55160016.00000000,6195376790.56777954,112.31644296,2026-10-29
+near,revenue_plus_intents_revenue,chain revenue + Intents captured revenue,30d_annualized,28196846.16666666,6195376790.56777954,219.71878535,2026-10-29
+near,revenue_plus_intents_revenue,chain revenue + Intents captured revenue,365d,10020224.05000000,6195376790.56777954,618.28725183,2026-10-29
+solana,chain_fees,chain fees (gas),30d_annualized,283718210.83333331,60359594991.62702179,212.74487392,2026-10-29
+solana,chain_fees,chain fees (gas),365d,235860363.00000000,60359594991.62702179,255.91241455,2026-10-29
+solana,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),30d_annualized,33834855.16666666,60359594991.62702179,1783.94719570,2026-10-29
+solana,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),365d,26330243.00000000,60359594991.62702179,2292.40554262,2026-10-29
+sui,chain_fees,chain fees (gas),30d_annualized,1941349.83333333,3881984855.99492502,1999.63179708,2026-10-29
+sui,chain_fees,chain fees (gas),365d,2886633.00000000,3881984855.99492502,1344.81413328,2026-10-29
+sui,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),30d_annualized,347618.57833333,3881984855.99492502,11167.36877128,2026-10-29
+sui,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),365d,677322.39000000,3881984855.99492502,5731.36945317,2026-10-29
+aptos,chain_fees,chain fees (gas),30d_annualized,1633703.50000000,618390567.45577741,378.52068472,2026-10-29
+aptos,chain_fees,chain fees (gas),365d,1202020.00000000,618390567.45577741,514.45946611,2026-10-29
+aptos,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),30d_annualized,1633703.50000000,618390567.45577741,378.52068472,2026-10-29
+aptos,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),365d,,618390567.45577741,,2026-10-29
+ethereum,chain_fees,chain fees (gas),30d_annualized,225289996.33333331,288012814110.96221924,1278.40924497,2026-10-29
+ethereum,chain_fees,chain fees (gas),365d,180665094.00000000,288012814110.96221924,1594.18074479,2026-10-29
+ethereum,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),30d_annualized,88406333.66666666,288012814110.96221924,3257.83009164,2026-10-29
+ethereum,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),365d,51701977.00000000,288012814110.96221924,5570.63444810,2026-10-29
+tron,chain_fees,chain fees (gas),30d_annualized,294340343.50000000,31300411864.12913513,106.34088244,2026-10-29
+tron,chain_fees,chain fees (gas),365d,336116610.00000000,31300411864.12913513,93.12366879,2026-10-29
+tron,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),30d_annualized,294340343.50000000,31300411864.12913513,106.34088244,2026-10-29
+tron,chain_revenue,chain revenue (DefiLlama: burned / protocol share of gas),365d,336116610.00000000,31300411864.12913513,93.12366879,2026-10-29

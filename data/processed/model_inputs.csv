@@ -1,0 +1,20 @@
+parameter,value,text
+as_of,,2026-10-29
+supply0,1310395452.29863429,""
+price,4.72852334,""
+market_cap,6195376790.56777954,""
+realized_to_cap,0.99577605,""
+issuance_rate_365d,0.02489440,""
+burn_rate,0.00040642,""
+treasury_share,0.10011311,""
+staking_ratio,0.45296545,""
+intents_volume_annualized_90d,45830719608.83332825,""
+intents_revenue_annualized_90d,18796725.38888889,""
+intents_holders_revenue_annualized_90d,18796725.38888889,""
+intents_fees_annualized_90d,69097724.16666666,""
+take_rate_90d,0.00041013,""
+buyback_yield_defillama,0.00303399,""
+buyback_near_per_year_onchain,4593820.24252842,""
+buyback_yield_onchain,0.00350567,""
+buyback_yield,0.00350567,""
+buyback_yield_source,,on-chain buyback ledger

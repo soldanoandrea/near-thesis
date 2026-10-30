@@ -16,8 +16,17 @@ fastnear_tx/block_sample_txs.csv,fastnear_tx,68081,2020-10,2026-10,2026-10-30T21
 fastnear_tx/month_boundaries.csv,fastnear_tx,76,2020-08-01,2026-10-30,2026-10-30T20:00:54Z,5a91755cca7a
 fastnear_tx/monthly_receiver_counts.csv,fastnear_tx,675,2020-08,2026-10,2026-10-30T21:23:14Z,eac40bb12dc1
 fastnear_tx/receiver_txs_alltime.csv,fastnear_tx,9,"","",2026-10-30T21:39:11Z,f6f790ce4100
+fastnear_tx/trail_hops.csv,fastnear_tx,163,"","",2026-10-30T23:14:43Z,38409007a68e
+fastnear_tx/wallet_flows.csv,fastnear_tx,6368,"","",2026-10-30T23:13:26Z,de4fd299e688
+github/contributor_weeks.csv,github,6717,"","",2026-10-30T22:57:54Z,ffbe0ff6fb44
+github/fetch_log.csv,github,44,"","",2026-10-30T22:57:54Z,58479c992081
+github/participation.csv,github,520,"","",2026-10-30T22:57:54Z,889e05101607
+github/releases.csv,github,855,"","",2026-10-30T22:57:54Z,a8f39db44ebc
+github/repos.csv,github,10,"","",2026-10-30T22:57:54Z,f3b933854a84
+governance/hsp029_status.csv,governance,1,"","",2026-10-30T22:59:35Z,924ee8bc8295
 nearblocks/charts_daily.csv,nearblocks,2292,2020-07-21,2026-10-29,2026-10-30T19:47:20Z,af38ad7eaf3b
 nearblocks/stats_snapshot.csv,nearblocks,1,"","",2026-10-30T19:47:30Z,43a3976a8cd0
+opendevdata/eco_mads_monthly.csv,opendevdata,916,2015-01,2026-10,2026-10-30T23:02:51Z,44f5fe977e8e
 rpc/final_block_header.csv,rpc,1,"","",2026-10-30T21:38:56Z,d031e1f29717
 rpc/genesis_config.csv,rpc,36,"","",2026-10-30T21:38:55Z,cb22404b7c21
 rpc/protocol_config_latest.csv,rpc,280,"","",2026-10-30T21:38:56Z,68aafeb2392d

@@ -1,0 +1,2 @@
+topic_url,title,created_at,last_posted_at,posts_count,hsp,status,decision_type,discussions_to,spec_cap_formula,activation
+https://gov.near.org/t/42644,HSP-029: Establish a 24-Month Issuance Ramp to a 1.6% Target Rate Of NEAR Token Emissions,2026-10-07T18:01:29.973Z,2026-10-23T14:11:14.971Z,60,029,Voting,Super Majority,https://houseofstake.org/proposals/29,"cap(t) = 2.5% − 0.9% × min(t, 24)/24 where t is months elapsed from activation, interpolated per epoch.",Activation occurs one full quarter after ratification.

@@ -1,0 +1,4 @@
+series,model,first_month,last_month,points,growth_per_month,K,r,t0,sigma_log,K_at_grid_edge
+intents_monthly_volume_usd,loglinear,2025-01,2026-09,21,0.29451333,,,,0.92247805,
+intents_monthly_volume_usd,logistic,2025-01,2026-09,21,,4805495924.18849945,0.42976059,13.35125170,0.59945599,false
+intents_monthly_volume_usd,naive,2025-01,2026-09,21,,,,,0.42703185,

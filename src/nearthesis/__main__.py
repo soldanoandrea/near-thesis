@@ -11,11 +11,14 @@ import argparse
 import sys
 import time
 
-STEPS = ["nearblocks", "defillama", "coingecko", "aurora", "onchain", "epochs", "activity", "treasury"]
+STEPS = ["nearblocks", "defillama", "coingecko", "aurora", "onchain", "epochs", "activity", "treasury",
+         # phase 2a (analysis layer)
+         "signer_blocks", "signers", "trails", "github", "opendevdata", "intents_check", "governance"]
 
 
 def refresh(only: list[str] | None, skip: list[str] | None) -> None:
-    from .fetch import aurora, coingecko, defillama, fastnear_activity, nearblocks, onchain_state, rpc_epochs
+    from .fetch import aurora, coingecko, defillama, fastnear_activity, nearblocks, onchain_state, rpc_epochs, signers
+    from .fetch import devdata, governance, intents_check, money_trails
     from .http import PoliteClient
 
     fns = {
@@ -27,6 +30,13 @@ def refresh(only: list[str] | None, skip: list[str] | None) -> None:
         "epochs": rpc_epochs.fetch,
         "activity": fastnear_activity.fetch,
         "treasury": fastnear_activity.fetch_treasury,
+        "signer_blocks": signers.fetch_extra_blocks,
+        "signers": signers.fetch,
+        "trails": money_trails.fetch,
+        "github": devdata.fetch_github,
+        "opendevdata": devdata.fetch_opendevdata,
+        "intents_check": intents_check.fetch,
+        "governance": governance.fetch,
     }
     steps = [s for s in STEPS if (not only or s in only) and (not skip or s not in skip)]
     client = PoliteClient()

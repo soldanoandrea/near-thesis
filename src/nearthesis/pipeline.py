@@ -370,7 +370,14 @@ def build(out_root: str | Path | None = None, quiet: bool = False) -> dict[str, 
     rp = reports / "metrics_summary.md"
     rp.write_text(md)
     written["metrics_summary.md"] = rp
+    # phase 2a: analysis layer and models (reports/analysis_summary.md, reports/models_summary.md)
+    from . import phase2
+    written.update(phase2.build(raw, processed, reports, daily=daily, epochs=epochs, peers=peers, as_of=as_of, fp=fp))
     if not quiet:
         print(report.console_table(fp))
-        print(f"\n[build] as-of {as_of}; wrote {len(written)} files to {processed} and {rp}")
+        p2 = written.get("metrics_phase2.csv")
+        if p2 is not None:
+            print("\n" + report.console_table(pl.read_csv(p2, infer_schema_length=None)).replace(
+                "Key results (first pass)", "Key results (phase 2a: analysis layer and models)"))
+        print(f"\n[build] as-of {as_of}; wrote {len(written)} files to {processed} and {reports}")
     return written

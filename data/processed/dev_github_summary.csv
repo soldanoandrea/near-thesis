@@ -1,0 +1,11 @@
+repo,group,archived,stars,window_last12,commits_last12,commits_prev12,commits_change,authors_last12,authors_prev12,authors_change,releases_last12,stable_releases_last12,last_release,participation_52w_commits,top100_52w_commits,top100_coverage_52w
+near/intents,intents,false,61,2025-10 to 2026-09,212,104,1.03846154,12,7,0.71428571,7,6,2026-06-30T23:28:42Z,182,211,1.15934066
+near/near-api-js,core,false,429,2025-10 to 2026-09,192,190,0.01052632,10,17,-0.41176471,85,85,2026-10-23T22:05:16Z,427,190,0.44496487
+near/near-cli-rs,core,false,150,2025-10 to 2026-09,109,80,0.36250000,12,14,-0.14285714,20,19,2026-10-19T15:43:57Z,102,117,1.14705882
+near/near-sdk-js,core,true,198,2025-10 to 2026-09,0,6,-1.00000000,0,3,-1.00000000,0,0,2024-06-07T01:49:29Z,0,1,
+near/near-sdk-rs,core,false,515,2025-10 to 2026-09,166,96,0.72916667,26,20,0.30000000,100,93,2026-10-27T15:07:04Z,159,177,1.11320755
+near/nearcore,core,false,2621,2025-10 to 2026-09,1717,1636,0.04951100,60,90,-0.33333333,37,18,2026-10-26T18:59:52Z,1364,1770,1.29765396
+nearai/cloud-api,nearai,false,15,2025-10 to 2026-09,835,42,18.88095238,19,1,18.00000000,72,72,2026-10-29T00:13:38Z,629,823,1.30842607
+nearai/ironclaw,nearai,false,12699,2025-10 to 2026-09,5497,0,,99,0,,50,42,2026-09-29T20:40:32Z,4073,5497,1.34961945
+nearai/official-agents,nearai,false,12,2025-10 to 2026-09,0,76,-1.00000000,0,7,-1.00000000,0,0,"",0,0,
+nearai/putnambench-deepseek,nearai,false,46,2025-10 to 2026-09,8,0,,2,0,,0,0,"",6,8,1.33333333
