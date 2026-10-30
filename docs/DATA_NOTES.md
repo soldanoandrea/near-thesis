@@ -224,3 +224,82 @@ signers. A per-signer reconciliation needs per-account histories (phase 2).
   ledger of buy transactions (phase 2: wallet histories).
 - The status of HSP-029 (1.6% issuance) and any change after the 2026-10-30 snapshot.
 - Market caps older than 365 days for peers (keyless CoinGecko limit).
+
+## 4. Phase 2a sources and quirks (fetched 2026-10-30/31 UTC)
+
+Computed results are in `reports/analysis_summary.md` and `reports/models_summary.md`; this section only documents
+what was fetched and how the sources behave.
+
+### FastNear Transactions API, per-signer histories (`fastnear_tx/signer_*.csv`, `block_sample_extra_*.csv`)
+- Draw design (`src/nearthesis/sampling.py`): 60 extra uniform block heights per month from 2025-11 (seed stream
+  `[seed, yyyymm, 2]`) widen the 30-block phase-1 sample, because recent months held only ~120-180 sampled
+  transactions. Transactions are then drawn without replacement from the pooled sampled transactions of each month
+  (60 per month from 2024-11, 15 before; seed stream `[seed, yyyymm, 3]`); the draw is recomputed offline from the
+  committed block samples, so the fetcher and the analysis agree by construction.
+- Per drawn signer: `/v0/account {is_real_signer, month range, limit 200, desc: true}` (exact monthly count +
+  timestamps), `/v0/account {limit 1, desc: false}` (first appearance in any role), and for signers new in that month
+  `/v0/account {is_real_signer, limit 1, desc: true}` (last signed transaction, for retention). Details of up to 20
+  recent transactions per signer-month come from `/v0/transactions`.
+- **`/v0/account` returns newest first when `desc` is omitted**, although the OpenAPI spec says oldest first; every
+  call sends `desc` explicitly.
+- Pages fetched with `resume_token` do not repeat `txs_count`; the first page's count is kept.
+- **HTTP 429 came from concurrent requests**, not only from the rate: with three processes spaced 1 s apart in total,
+  FastNear still answered 429 when a slow count query was in flight while another request started. The client now
+  holds a cross-process lock for the whole duration of a FastNear request (`[http.shared_min_interval_s]`).
+- Relayed transactions: `is_real_signer` counts the inner (delegate-action) signer, the same convention as the block
+  sample's `real_signer_id`.
+
+### NEAR Intents settlement check (`fastnear_tx/intents_*.csv`, `rpc_archival/intents_fee_collector_balances.csv`,
+`oneclick/tokens.csv`, `defillama/coin_prices_intents_days.csv`)
+- Contracts, from docs.near-intents.org (Verifier, Events and Fees pages, fetched 2026-10-31): `intents.near` is the
+  Verifier; swaps emit DIP-4 `token_diff` events (`account_id`, signed `diff` per token, `fees_collected`, optional
+  `referral` tag such as `1click-swapkit`); the protocol fee is `fee()` pips (1 pip = 0.0001%) of the sold leg,
+  rounded up per leg, paid in-ledger (NEP-245 `mt_transfer`) to `fee_collector()` =
+  `7066024d3f20f94de601c003163367873cca78507eeca4df66d9be645f197f05`. Deposits and withdrawals go through
+  `omft.near` tokens, `omni.bridge.near` and `v2_1.omni.hot.tg`; most `execute_intents` transactions are signed by
+  `intents.near` itself (the relay), so signer-based filters cannot isolate user swaps.
+- The fee collector never signs a transaction and appears only in event logs: `/v0/account {is_event_log: true}` over a
+  day's height range counts exactly the transactions that paid a protocol fee (the swaps).
+- Archival view calls `fee`, `fee_collector`, `mt_tokens_for_owner` and `mt_batch_balance_of` on `intents.near`
+  answer at historical heights on the FastNear archival RPC.
+- Rounding: the fee is rounded up per leg, so `fee x 10^6` overstates the sold amount for small legs in tokens with few
+  decimals (BTC: 1 satoshi of fee stands for 0.01 BTC of volume). The census estimate is corrected with the
+  sample's ratio of sold legs to fee-implied legs.
+- `https://1click.chaindefuser.com/v0/tokens` answers without the partner JWT (unlike the Explorer API) and gives each
+  asset id's decimals, symbol and CoinGecko id. Historical prices come from `coins.llama.fi/prices/historical`.
+- Not observable: confidential intents and anything that does not pay the protocol fee. DefiLlama's volume comes
+  from `dune.near.dataset_near_intents_metrics` (column `volume_amount_usd`), uploaded by the NEAR team; its
+  definition is not published.
+
+### Money trails (`fastnear_tx/wallet_flows.csv`, `fastnear_tx/trail_hops.csv`)
+- Complete histories (all roles) of `treasury.near`, `buybacks.multisignature.near`, `fefundsadmin.sputnik-dao.near`
+  and `1csfundsadmin.sputnik-dao.near`, expanded receipt by receipt: NEAR moved by successful action receipts
+  (Transfer and attached deposits; gas refunds from `system` dropped), NEP-141 and NEP-245 events, DIP-4 token_diff
+  legs.
+- DefiLlama's NEAR Intents revenue adapter (`dimension-adapters/fees/near-intents/index.ts`) defines revenue as NEAR
+  Transfer actions and positive `wrap.near` transfers into the three revenue wallets from accounts outside that set;
+  `transform/ledgers.py` applies the same rule to the on-chain flows.
+- Protocol rewards to `treasury.near` are credited at epoch boundaries without a receipt, so they never appear in the
+  transaction history; they are recovered as archival balance change minus transaction flows.
+- `treasury.near` is a multisig contract: outflows are `confirm` calls whose receipts carry the transfers.
+- Trails follow NEAR transfers of at least 100,000 NEAR, up to five hops, oldest first from the receiving height (up to
+  400 later transactions per account). NEAR is fungible: a hop shows what left an account after it received the
+  transfer, not that the same coins moved.
+
+### Developer activity (`github/*.csv`, `opendevdata/eco_mads_monthly.csv`)
+- GitHub REST API without a token: 60 requests/hour per IP (headers `x-ratelimit-*`); `stats/contributors` and
+  `stats/participation` answer 202 while GitHub computes them (retried after 30 s); `stats/contributors` lists the
+  top 100 contributors only. Its 52-week sum and `stats/participation` differ by up to about 35% for some repositories
+  (ratio published per repository); we report contributor-stats numbers.
+- `near/near-sdk-js` is archived. The `nearai` repositories are the most-starred non-fork, non-archived repositories
+  pushed in the last 365 days at fetch time.
+- Electric Capital Open Dev Data (CC BY 4.0) publishes a manifest (`https://data.opendevdata.org/manifest.json`) of
+  parquet files; `eco_mads.parquet` (76 MB) is read with HTTP range requests for eight ecosystem ids only (NEAR 2817,
+  Solana 391, Sui 9547, Aptos 9601, Base 13317, Ethereum 2, Tron 10, "All Web3 Ecosystems" 7164). Its `all_devs` and
+  `num_commits` columns are 28-day rolling values, so month-end rows are used (the stored monthly sum of
+  `num_commits` is not meaningful and is not used).
+
+### Governance (`governance/hsp029_status.csv`)
+- HSP-029 text and status come from the Discourse JSON of `https://gov.near.org/t/42644` (frontmatter `Status:`).
+  The House of Stake page `houseofstake.org/proposals/29` renders client-side and returned only its title without a
+  browser, so the final vote result (reported to close 2026-11-02) is not in the snapshot.

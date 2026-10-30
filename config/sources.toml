@@ -179,6 +179,8 @@ first_day = "2025-11-01"
 last_day = "2026-10-28"
 target_txs_per_window = 20       # window length chosen so a window holds ~this many fee-paying txs
 windows_per_day = 40
+control_windows_per_day = 10     # control sample of all intents.near transactions (frame check)
+control_txs_per_window = 20
 verifier = "intents.near"
 
 # Bot score and classes (src/nearthesis/transform/organic.py). Set before looking at the per-signer data; the

@@ -1,4 +1,8 @@
 question,metric_id,label,value,ci90_low,ci90_high,unit,window,source,grade,notes
+Q2,q2b.ratio_sample_median,"On-chain swap volume / DefiLlama volume, median of 6 days (sample estimate)",0.46042176,,,ratio,2025-11-01 to 2026-09-03,token_diff events vs defillama,A/B,Daily ratios range from 22.86% to 64.76%; per-day 90% CIs are in the Q2 table.
+Q2,q2b.ratio_two_sided_median,"Two-sided equivalent (2x on-chain one-sided) / DefiLlama volume, median of 6 days",0.92084351,,,ratio,2025-11-01 to 2026-09-03,token_diff events vs defillama,A/B,What a definition counting both legs of every swap would report.
+Q2,q2b.frame_check,Control-sample transactions with a token_diff that paid no protocol fee,0.00000000,,,count,488 token_diff txs in 1161 intents.near txs,control sample,A,0 means the fee-paying frame used for the volume sample contains every swap seen.
+Q2,q2b.top_asset_share,"Largest asset's share of sold volume (sample), median of sampled days",0.47930057,,,ratio,2025-11-01 to 2026-09-03,token_diff sample,A,From 32.48% to 66.24% across days.
 Q4,q4b.revenue_onchain_to_defillama,"Captured Intents revenue rebuilt on-chain / DefiLlama, last 6 months",0.98676671,,,ratio,2026-05 to 2026-10,wallet flows vs defillama,A/B,""
 Q4,q4b.near_captured_180d,"NEAR captured into the revenue wallets, last 180 days",2265445.59905511,,,NEAR,2026-05-03 to 2026-10-30,wallet flows,A,""
 Q4,q4b.near_captured_since_buybacks,NEAR captured into the revenue wallets since 2026-02-23,3107575.38982432,,,NEAR,2026-02-23 to last flow,wallet flows,A,""

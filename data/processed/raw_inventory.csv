@@ -6,13 +6,21 @@ defillama/chain_fees_daily.csv,defillama,27551,2015-08-07,2026-10-30,2026-10-30T
 defillama/chain_tvl_daily.csv,defillama,16006,2017-09-27,2026-10-30,2026-10-30T19:47:37Z,2691d095e9a3
 defillama/chains_snapshot.csv,defillama,420,"","",2026-10-30T19:48:45Z,9e17d1727e06
 defillama/coin_prices_daily.csv,defillama,11880,2020-07-01,2026-10-30,2026-10-30T19:48:45Z,e107b3352734
+defillama/coin_prices_intents_days.csv,defillama,535,"","",2026-10-30T23:31:18Z,5d95b6adc60d
 defillama/dex_volume_daily.csv,defillama,12973,2018-11-02,2026-10-30,2026-10-30T19:47:59Z,a850ef7ccbe8
 defillama/dex_volume_near_by_protocol_daily.csv,defillama,6512,2021-08-22,2026-10-30,2026-10-30T19:47:59Z,7016ea9a5049
 defillama/near_intents_daily.csv,defillama,2303,2024-12-10,2026-10-29,2026-10-30T19:48:09Z,acc3b900557f
 defillama/stablecoins_daily.csv,defillama,12873,2017-11-29,2026-10-30,2026-10-30T19:48:05Z,4a5e451e532e
 fastnear_api/treasury_holdings_current.csv,fastnear_api,26,"","",2026-10-30T21:39:03Z,0ef065fb1f52
 fastnear_tx/block_sample_blocks.csv,fastnear_tx,2250,2020-08,2026-10,2026-10-30T21:23:18Z,36bf07cb4d6e
+fastnear_tx/block_sample_extra_blocks.csv,fastnear_tx,720,2025-11,2026-10,2026-10-30T23:31:30Z,1881682a74d7
+fastnear_tx/block_sample_extra_txs.csv,fastnear_tx,10363,2025-11,2026-10,2026-10-30T23:31:30Z,47983263afa1
 fastnear_tx/block_sample_txs.csv,fastnear_tx,68081,2020-10,2026-10,2026-10-30T21:23:18Z,769175dc23aa
+fastnear_tx/intents_control_txs.csv,fastnear_tx,1161,"","",2026-10-30T23:31:18Z,5f28961ef326
+fastnear_tx/intents_days.csv,fastnear_tx,6,"","",2026-10-30T23:31:18Z,83b80a4a5940
+fastnear_tx/intents_swap_legs.csv,fastnear_tx,34362,"","",2026-10-30T23:31:18Z,6a440c282922
+fastnear_tx/intents_swap_txs.csv,fastnear_tx,4998,"","",2026-10-30T23:31:18Z,be8c0e916a5e
+fastnear_tx/intents_windows.csv,fastnear_tx,240,"","",2026-10-30T23:31:18Z,7f8ace0cad5e
 fastnear_tx/month_boundaries.csv,fastnear_tx,76,2020-08-01,2026-10-30,2026-10-30T20:00:54Z,5a91755cca7a
 fastnear_tx/monthly_receiver_counts.csv,fastnear_tx,675,2020-08,2026-10,2026-10-30T21:23:14Z,eac40bb12dc1
 fastnear_tx/receiver_txs_alltime.csv,fastnear_tx,9,"","",2026-10-30T21:39:11Z,f6f790ce4100
@@ -26,6 +34,7 @@ github/repos.csv,github,10,"","",2026-10-30T22:57:54Z,f3b933854a84
 governance/hsp029_status.csv,governance,1,"","",2026-10-30T22:59:35Z,924ee8bc8295
 nearblocks/charts_daily.csv,nearblocks,2292,2020-07-21,2026-10-29,2026-10-30T19:47:20Z,af38ad7eaf3b
 nearblocks/stats_snapshot.csv,nearblocks,1,"","",2026-10-30T19:47:30Z,43a3976a8cd0
+oneclick/tokens.csv,oneclick,210,"","",2026-10-30T23:31:18Z,d249522285b9
 opendevdata/eco_mads_monthly.csv,opendevdata,916,2015-01,2026-10,2026-10-30T23:02:51Z,44f5fe977e8e
 rpc/final_block_header.csv,rpc,1,"","",2026-10-30T21:38:56Z,d031e1f29717
 rpc/genesis_config.csv,rpc,36,"","",2026-10-30T21:38:55Z,cb22404b7c21
@@ -35,4 +44,5 @@ rpc/treasury_accounts_current.csv,rpc,4,"","",2026-10-30T21:39:03Z,51cb919dc4dc
 rpc/validators_current.csv,rpc,379,"","",2026-10-30T21:38:58Z,931102a549d8
 rpc_archival/epoch_validator_stakes.csv,rpc_archival,33567,"","",2026-10-30T21:38:46Z,5eca6a7b5846
 rpc_archival/epochs_sampled.csv,rpc_archival,176,2020-07-22,2026-10-25,2026-10-30T21:38:45Z,b1f755adab00
+rpc_archival/intents_fee_collector_balances.csv,rpc_archival,1019,"","",2026-10-30T23:31:18Z,a3991bfd5a9d
 rpc_archival/treasury_monthly.csv,rpc_archival,140,2024-01-01,2026-10-30,2026-10-30T21:44:05Z,8afa8e5139f0

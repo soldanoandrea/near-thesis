@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 import polars as pl
 
-from . import config, io, report2
+from . import config, io, predictions as preds, report2
 from .metrics import MetricTable, _d, at, full_wsum, ratio
 from .models import adoption, multiples, supply as msupply, yields as myields
 from .transform import devactivity, intents_check, ledgers, organic
@@ -25,7 +25,7 @@ def _years_between(a: str, b: str) -> float:
     return (_d(b) - _d(a)).days / 365.0
 
 
-def model_inputs(raw: Path, daily: pl.DataFrame, epochs: pl.DataFrame, as_of: str, led: dict) -> dict:
+def model_inputs(raw: Path, daily: pl.DataFrame, epochs: pl.DataFrame, as_of: str, led: dict, ic: dict) -> dict:
     end = _d(as_of)
     fb = io.read_csv(raw / "rpc" / "final_block_header.csv")
     supply0 = int(fb["total_supply_yocto"][0]) / 1e24
@@ -59,6 +59,9 @@ def model_inputs(raw: Path, daily: pl.DataFrame, epochs: pl.DataFrame, as_of: st
     else:
         inp["buyback_near_per_year_onchain"] = inp["buyback_yield_onchain"] = None
     inp["buyback_yield"] = inp["buyback_yield_onchain"] or inp["buyback_yield_defillama"] or 0.0
+    d = ic.get("days") if ic else None
+    inp["intents_onchain_one_sided_to_defillama"] = (float(d["ratio_sample_to_defillama"].median())
+                                                     if d is not None and d.height else None)
     inp["buyback_yield_source"] = "on-chain buyback ledger" if inp["buyback_yield_onchain"] else "DefiLlama holders revenue"
     return inp
 
@@ -205,7 +208,7 @@ def build(raw: Path, processed: Path, reports: Path, *, daily: pl.DataFrame, epo
         dev["dev_ecosystem_monthly"] = eco
         dev["dev_ecosystem_share_quarterly"] = devactivity.share_trend(eco)
 
-    inp = model_inputs(raw, daily, epochs, as_of, led)
+    inp = model_inputs(raw, daily, epochs, as_of, led, ic)
     sm = run_supply_models(inp, mcfg)
     mm = run_multiples(daily, peers)
     am = run_adoption(org, daily, as_of, mcfg)
@@ -234,6 +237,13 @@ def build(raw: Path, processed: Path, reports: Path, *, daily: pl.DataFrame, epo
     pa = reports / "analysis_summary.md"
     pa.write_text(report2.render_analysis(org=org, ic=ic, led=led, dev=dev, T=T, as_of=as_of))
     written["analysis_summary.md"] = pa
+    pred = preds.build(raw=raw, daily=daily, org=org, led=led, dev=dev, mm=mm, am=am, as_of=as_of)
+    w("predictions", pred)
+    thesis = reports.parent / "thesis"
+    thesis.mkdir(parents=True, exist_ok=True)
+    pf = thesis / "falsifiers.md"
+    pf.write_text(report2.render_falsifiers(pred, io.sha256_file(written["predictions.csv"]), as_of))
+    written["falsifiers.md"] = pf
     pm = reports / "models_summary.md"
     pm.write_text(report2.render_models(inp=inp, sm=sm, mm=mm, am=am, ym=ym, T=T, mcfg=mcfg, as_of=as_of))
     written["models_summary.md"] = pm

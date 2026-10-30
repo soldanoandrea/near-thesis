@@ -23,6 +23,7 @@ As-of date: 2026-10-29. Each model is a pure function in `src/nearthesis/models/
 | Buyback yield: holders revenue / market cap | 0.30% |
 | Buyback yield: on-chain NEAR captured (180d annualized) / supply | 0.35% |
 | Buyback yield used (source: on-chain buyback ledger) | 0.35% |
+| On-chain one-sided Intents volume / DefiLlama volume (median of sampled days, Q2) | 46.04% |
 
 ## (a) Supply and value-accrual scenarios: 2.5% vs HSP-029 (1.6%)
 
@@ -82,6 +83,8 @@ Net-zero threshold: Intents captured revenue (and volume at a take rate) at whic
 | 1.59% | $9.46 | 2.05 bp | $192.41M | 10.236 | $938.26B | 20.472 |
 | 1.59% | $9.46 | 4.10 bp | $192.41M | 10.236 | $469.13B | 10.236 |
 | 1.59% | $9.46 | 8.20 bp | $192.41M | 10.236 | $234.56B | 5.118 |
+
+Volumes in this grid are DefiLlama volumes. The on-chain check (Q2) finds public one-sided volume at 46.04% of DefiLlama's figure, so measured on-chain the required volume multiples are larger by about the inverse of that ratio, while the revenue multiples (which use captured revenue, reconciled on-chain in Q4) are unaffected.
 
 **Falsifier of the bullish case** (PIANO.md Q4): net float dilution after buybacks stays above 2% per year and the net-zero threshold needs more than 10x current volume at the current take rate.
 Current reading: float dilution in year 1 (status quo, base) 2.12% (above 2%); threshold 8.072x current volume (not above 10x). The falsifier is not met (it needs both conditions); the dilution leg holds.

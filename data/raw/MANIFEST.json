@@ -252,6 +252,43 @@
       },
       "notes": "coins.llama.fi/chart, period=1d, paged in 400-day spans. Timestamps are the provider's sample times (not always 00:00 UTC); one or more rows per UTC date."
     },
+    "defillama/coin_prices_intents_days.csv": {
+      "source": "defillama",
+      "urls": [
+        "https://coins.llama.fi/prices/historical/<ts>/<coins>"
+      ],
+      "params": {
+        "days": [
+          "2025-11-01",
+          "2026-01-28",
+          "2026-03-30",
+          "2026-06-06",
+          "2026-08-21",
+          "2026-09-03"
+        ],
+        "at": "12:00 UTC"
+      },
+      "fetched_at_utc": "2026-10-30T23:31:18Z",
+      "rows": 535,
+      "columns": [
+        "day",
+        "coin",
+        "price_usd",
+        "timestamp",
+        "confidence"
+      ],
+      "sha256": "5d95b6adc60dd3927fc8e39d44b1613b6d5502b5f9be9eac43e44194e3af5fe7",
+      "bytes": 34530,
+      "http": {
+        "requests": 0,
+        "cache_hits": 18,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 0
+      },
+      "notes": "DefiLlama historical prices for the CoinGecko ids of the 1Click token list, at noon UTC of each sampled day."
+    },
     "defillama/dex_volume_daily.csv": {
       "source": "defillama",
       "urls": [
@@ -434,6 +471,88 @@
       },
       "notes": "One row per sampled block (including empty blocks)."
     },
+    "fastnear_tx/block_sample_extra_blocks.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/block"
+      ],
+      "params": {
+        "blocks_per_month": 60,
+        "seed": 20261101,
+        "first_month": "2025-11",
+        "rng": "numpy.random.default_rng([seed, yyyymm, 2]).integers(h0, h1)",
+        "skipped_height_rule": "next existing height"
+      },
+      "fetched_at_utc": "2026-10-30T23:31:30Z",
+      "rows": 720,
+      "columns": [
+        "month",
+        "draw",
+        "sampled_height",
+        "block_height",
+        "block_timestamp_ns",
+        "num_transactions",
+        "num_receipts",
+        "gas_burnt",
+        "tokens_burnt_yocto",
+        "total_supply_yocto",
+        "protocol_version",
+        "chunks_included"
+      ],
+      "sha256": "1881682a74d71b427f4a82d13ba1896c864dfd33b9db79fc84d0100e8c42b2fb",
+      "bytes": 97394,
+      "http": {
+        "requests": 224,
+        "cache_hits": 497,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 900825
+      },
+      "notes": "Phase 2a widening of the stratified block sample for recent months (independent seed stream; pooled with block_sample_blocks.csv in the analysis)."
+    },
+    "fastnear_tx/block_sample_extra_txs.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/block"
+      ],
+      "params": {
+        "blocks_per_month": 60,
+        "seed": 20261101,
+        "first_month": "2025-11",
+        "rng": "numpy.random.default_rng([seed, yyyymm, 2]).integers(h0, h1)",
+        "skipped_height_rule": "next existing height"
+      },
+      "fetched_at_utc": "2026-10-30T23:31:30Z",
+      "rows": 10363,
+      "columns": [
+        "month",
+        "draw",
+        "block_height",
+        "tx_index",
+        "shard_id",
+        "signer_id",
+        "receiver_id",
+        "real_signer_id",
+        "real_receiver_id",
+        "is_relayed",
+        "is_success",
+        "gas_burnt",
+        "tokens_burnt_yocto",
+        "transaction_hash"
+      ],
+      "sha256": "47983263afa199ceb0b5d5650f718da26ec13cc1366f631489a49b8c3ddee057",
+      "bytes": 2102131,
+      "http": {
+        "requests": 224,
+        "cache_hits": 497,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 900825
+      },
+      "notes": "Every transaction of every extra sampled block. Public on-chain account IDs."
+    },
     "fastnear_tx/block_sample_txs.csv": {
       "source": "fastnear_tx",
       "urls": [
@@ -474,6 +593,209 @@
         "bytes": 80935
       },
       "notes": "Every transaction of every sampled block. Public on-chain account IDs."
+    },
+    "fastnear_tx/intents_control_txs.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/account",
+        "https://tx.main.fastnear.com/v0/transactions"
+      ],
+      "params": {
+        "days": 6,
+        "seed": 20261101,
+        "first_day": "2025-11-01",
+        "last_day": "2026-10-28",
+        "target_txs_per_window": 20,
+        "windows_per_day": 40,
+        "control_windows_per_day": 10,
+        "control_txs_per_window": 20,
+        "verifier": "intents.near"
+      },
+      "fetched_at_utc": "2026-10-30T23:31:18Z",
+      "rows": 1161,
+      "columns": [
+        "day",
+        "window",
+        "window_start",
+        "window_blocks",
+        "tx_hash",
+        "methods",
+        "token_diff_legs",
+        "legs_with_fee",
+        "fee_collector_in_logs"
+      ],
+      "sha256": "5f28961ef326f8ab0fdb0ddd6433b179263de9f0aa0bd9818d29160f68953067",
+      "bytes": 110486,
+      "http": {
+        "requests": 148,
+        "cache_hits": 719,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 21169116
+      },
+      "notes": "Control sample: every transaction in which intents.near receives a receipt, in a few short windows per day; whether it has token_diff legs and whether the fee collector appears in its logs (tests that the fee-paying frame contains all swaps)."
+    },
+    "fastnear_tx/intents_days.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/blocks",
+        "https://tx.main.fastnear.com/v0/account",
+        "https://archival-rpc.mainnet.fastnear.com call_function intents.near"
+      ],
+      "params": {
+        "days": 6,
+        "seed": 20261101,
+        "first_day": "2025-11-01",
+        "last_day": "2026-10-28",
+        "target_txs_per_window": 20,
+        "windows_per_day": 40,
+        "control_windows_per_day": 10,
+        "control_txs_per_window": 20,
+        "verifier": "intents.near"
+      },
+      "fetched_at_utc": "2026-10-30T23:31:18Z",
+      "rows": 6,
+      "columns": [
+        "day",
+        "from_height",
+        "to_height_exclusive",
+        "from_timestamp_ns",
+        "to_timestamp_ns",
+        "fee_pips_start",
+        "fee_pips_end",
+        "fee_collector",
+        "fee_collector_end",
+        "fee_paying_txs",
+        "intents_receiver_txs"
+      ],
+      "sha256": "83b80a4a5940353cec1ad865f7d843a3a1703f02bca543a6dc9614aa17afc241",
+      "bytes": 1470,
+      "http": {
+        "requests": 148,
+        "cache_hits": 719,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 21169116
+      },
+      "notes": "Sampled UTC days: height range, census counts (fee-paying txs = txs whose event logs name the fee collector), protocol fee in pips at both ends."
+    },
+    "fastnear_tx/intents_swap_legs.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/transactions"
+      ],
+      "params": {
+        "days": 6,
+        "seed": 20261101,
+        "first_day": "2025-11-01",
+        "last_day": "2026-10-28",
+        "target_txs_per_window": 20,
+        "windows_per_day": 40,
+        "control_windows_per_day": 10,
+        "control_txs_per_window": 20,
+        "verifier": "intents.near"
+      },
+      "fetched_at_utc": "2026-10-30T23:31:18Z",
+      "rows": 34362,
+      "columns": [
+        "day",
+        "tx_no",
+        "event_index",
+        "account_id",
+        "token_id",
+        "amount",
+        "fee_collected",
+        "referral"
+      ],
+      "sha256": "6a440c282922361e42926d3a796da246277b015808c31b1fafb7c7a98a6c6384",
+      "bytes": 4322421,
+      "http": {
+        "requests": 148,
+        "cache_hits": 719,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 21169116
+      },
+      "notes": "One row per token leg of every DIP-4 token_diff event of the sampled transactions (tx_no -> intents_swap_txs.csv; amount signed, raw units; fee_collected = protocol fee charged on that token in that event)."
+    },
+    "fastnear_tx/intents_swap_txs.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/transactions"
+      ],
+      "params": {
+        "days": 6,
+        "seed": 20261101,
+        "first_day": "2025-11-01",
+        "last_day": "2026-10-28",
+        "target_txs_per_window": 20,
+        "windows_per_day": 40,
+        "control_windows_per_day": 10,
+        "control_txs_per_window": 20,
+        "verifier": "intents.near"
+      },
+      "fetched_at_utc": "2026-10-30T23:31:18Z",
+      "rows": 4998,
+      "columns": [
+        "day",
+        "window",
+        "tx_no",
+        "tx_hash",
+        "block_height",
+        "legs"
+      ],
+      "sha256": "be8c0e916a5e2933b593b2260c7740df9ebe8b782cd4b5b9b6114baf397d00a5",
+      "bytes": 373722,
+      "http": {
+        "requests": 148,
+        "cache_hits": 719,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 21169116
+      },
+      "notes": "Every sampled fee-paying transaction: window, hash, block height, number of token_diff legs (0 = it paid a fee without a successful token_diff of intents.near)."
+    },
+    "fastnear_tx/intents_windows.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/account"
+      ],
+      "params": {
+        "days": 6,
+        "seed": 20261101,
+        "first_day": "2025-11-01",
+        "last_day": "2026-10-28",
+        "target_txs_per_window": 20,
+        "windows_per_day": 40,
+        "control_windows_per_day": 10,
+        "control_txs_per_window": 20,
+        "verifier": "intents.near"
+      },
+      "fetched_at_utc": "2026-10-30T23:31:18Z",
+      "rows": 240,
+      "columns": [
+        "day",
+        "window",
+        "window_start",
+        "window_blocks",
+        "fee_paying_txs_listed",
+        "txs_fetched"
+      ],
+      "sha256": "7f8ace0cad5e34fdaf60085251417750a1d014b1f8b60a24bd56b21689eec5c7",
+      "bytes": 8008,
+      "http": {
+        "requests": 148,
+        "cache_hits": 719,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 21169116
+      },
+      "notes": "Sampled windows of consecutive blocks per day: start height, length, number of fee-paying transactions listed and fetched."
     },
     "fastnear_tx/month_boundaries.csv": {
       "source": "fastnear_tx",
@@ -963,6 +1285,34 @@
       },
       "notes": "Current network snapshot (/v1/stats). Not a time series; changes every refresh."
     },
+    "oneclick/tokens.csv": {
+      "source": "oneclick",
+      "urls": [
+        "https://1click.chaindefuser.com/v0/tokens"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-10-30T23:31:18Z",
+      "rows": 210,
+      "columns": [
+        "assetId",
+        "decimals",
+        "blockchain",
+        "symbol",
+        "coingeckoId",
+        "contractAddress"
+      ],
+      "sha256": "d249522285b975803cd96ff1bb3f2a89d00904b04a87d0fa412ee012249ef3ca",
+      "bytes": 23403,
+      "http": {
+        "requests": 1,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 53338
+      },
+      "notes": "Public 1Click token list (no JWT needed for this endpoint): asset id, decimals, symbol, CoinGecko id. Current prices in the response are not kept."
+    },
     "opendevdata/eco_mads_monthly.csv": {
       "source": "opendevdata",
       "urls": [
@@ -1259,6 +1609,42 @@
         "bytes": 75472350
       },
       "notes": "One fully characterized epoch per sample (see module docstring for the identities). yoctoNEAR integers stored as strings. validators_available=false: archival nodes answer UNKNOWN_EPOCH before epoch 545 (~2021-03), so epoch boundaries were found by bisection on block-header epoch_id and stake fields are empty. Fallback host: archival-rpc.mainnet.near.org."
+    },
+    "rpc_archival/intents_fee_collector_balances.csv": {
+      "source": "rpc_archival",
+      "urls": [
+        "https://archival-rpc.mainnet.fastnear.com call_function intents.near mt_batch_balance_of"
+      ],
+      "params": {
+        "days": 6,
+        "seed": 20261101,
+        "first_day": "2025-11-01",
+        "last_day": "2026-10-28",
+        "target_txs_per_window": 20,
+        "windows_per_day": 40,
+        "control_windows_per_day": 10,
+        "control_txs_per_window": 20,
+        "verifier": "intents.near"
+      },
+      "fetched_at_utc": "2026-10-30T23:31:18Z",
+      "rows": 1019,
+      "columns": [
+        "day",
+        "token_id",
+        "balance_start",
+        "balance_end"
+      ],
+      "sha256": "a3991bfd5a9debcaca9f0d19acdee3907a19df06403fecd6b5695641b8d096a4",
+      "bytes": 82437,
+      "http": {
+        "requests": 148,
+        "cache_hits": 719,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 21169116
+      },
+      "notes": "Fee collector NEP-245 balances inside intents.near at the first block of the day and of the next day (raw token units)."
     },
     "rpc_archival/treasury_monthly.csv": {
       "source": "rpc_archival",

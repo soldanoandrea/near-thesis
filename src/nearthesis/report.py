@@ -14,6 +14,8 @@ def fmt(v, unit: str = "") -> str:
         return "yes" if v else "no"
     if unit in ("ratio", "ratio/yr"):
         return f"{v * 100:.2f}%"
+    if unit == "bp":
+        return f"{v * 1e4:.2f} bp"
     if unit == "USD":
         a = abs(v)
         if a >= 1e9:

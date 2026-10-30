@@ -8,6 +8,10 @@ As-of date: 2026-10-29.
 
 | Q | Metric | Value | 90% CI | Window | Source | Grade |
 |---|---|---|---|---|---|---|
+| Q2 | On-chain swap volume / DefiLlama volume, median of 6 days (sample estimate) | 46.04% |  | 2025-11-01 to 2026-09-03 | token_diff events vs defillama | A/B |
+| Q2 | Two-sided equivalent (2x on-chain one-sided) / DefiLlama volume, median of 6 days | 92.08% |  | 2025-11-01 to 2026-09-03 | token_diff events vs defillama | A/B |
+| Q2 | Control-sample transactions with a token_diff that paid no protocol fee | 0 |  | 488 token_diff txs in 1161 intents.near txs | control sample | A |
+| Q2 | Largest asset's share of sold volume (sample), median of sampled days | 47.93% |  | 2025-11-01 to 2026-09-03 | token_diff sample | A |
 | Q4 | Captured Intents revenue rebuilt on-chain / DefiLlama, last 6 months | 98.68% |  | 2026-05 to 2026-10 | wallet flows vs defillama | A/B |
 | Q4 | NEAR captured into the revenue wallets, last 180 days | 2.27M NEAR |  | 2026-05-03 to 2026-10-30 | wallet flows | A |
 | Q4 | NEAR captured into the revenue wallets since 2026-02-23 | 3.11M NEAR |  | 2026-02-23 to last flow | wallet flows | A |
@@ -21,6 +25,10 @@ As-of date: 2026-10-29.
 | Q6 | near/nearcore commits, last 12 months vs the 12 before | 4.95% |  | 2025-10 to 2026-09 | github stats/contributors | B |
 | Q6 | near/nearcore active authors, last 12 months | 60 |  | 2025-10 to 2026-09 | github stats/contributors | B |
 
+- On-chain swap volume / DefiLlama volume, median of 6 days (sample estimate): Daily ratios range from 22.86% to 64.76%; per-day 90% CIs are in the Q2 table.
+- Two-sided equivalent (2x on-chain one-sided) / DefiLlama volume, median of 6 days: What a definition counting both legs of every swap would report.
+- Control-sample transactions with a token_diff that paid no protocol fee: 0 means the fee-paying frame used for the volume sample contains every swap seen.
+- Largest asset's share of sold volume (sample), median of sampled days: From 32.48% to 66.24% across days.
 
 ## Q1. Bot-vs-human decomposition (per-signer activity score)
 
@@ -28,7 +36,38 @@ Signer histories not available in data/raw.
 
 ## Q2. NEAR Intents cross-check: on-chain settlement vs DefiLlama
 
-Intents samples not available in data/raw.
+| Day | Fee-paying txs (census) | Sampled txs | DefiLlama volume | On-chain one-sided volume (90% CI) | One-sided / DefiLlama | Two-sided equivalent / DefiLlama | Unpriced legs |
+|---|---|---|---|---|---|---|---|
+| 2025-11-01 | 21,728 | 802 | $109.65M | $71.01M ($41.58M to $100.70M) | 64.76% (37.92% to 91.84%) | 129.51% (75.84% to 183.67%) | 1.46% |
+| 2026-01-28 | 25,873 | 947 | $118.98M | $46.13M ($28.67M to $68.70M) | 38.77% (24.10% to 57.74%) | 77.54% (48.20% to 115.49%) | 0.10% |
+| 2026-03-30 | 31,418 | 793 | $78.69M | $41.95M ($24.37M to $62.45M) | 53.32% (30.98% to 79.36%) | 106.63% (61.95% to 158.72%) | 0.08% |
+| 2026-06-06 | 22,054 | 849 | $62.70M | $16.79M ($9.55M to $26.12M) | 26.77% (15.24% to 41.66%) | 53.55% (30.47% to 83.32%) | 0.16% |
+| 2026-08-21 | 42,400 | 828 | $165.41M | $37.82M ($26.94M to $48.71M) | 22.86% (16.29% to 29.45%) | 45.72% (32.57% to 58.90%) | 0.00% |
+| 2026-09-03 | 40,214 | 779 | $169.51M | $97.35M ($35.70M to $202.26M) | 57.43% (21.06% to 119.32%) | 114.87% (42.13% to 238.64%) | 0.00% |
+
+| Day | Gross sold legs (both sides, routing hops) | Gross / DefiLlama | Netting ratio | Referral-tagged side | Control: intents.near txs | with token_diff | token_diff without fee | Fee collector tokens up / down |
+|---|---|---|---|---|---|---|---|---|
+| 2025-11-01 | $172.99M | 157.77% | 41.04% | $64.88M | 149 | 55 | 0 | 40 / 33 |
+| 2026-01-28 | $101.04M | 84.92% | 45.65% | $41.41M | 248 | 125 | 0 | 43 / 48 |
+| 2026-03-30 | $86.50M | 109.92% | 48.50% | $32.35M | 128 | 71 | 0 | 64 / 40 |
+| 2026-06-06 | $33.99M | 54.20% | 49.39% | $14.60M | 209 | 78 | 0 | 68 / 40 |
+| 2026-08-21 | $85.10M | 51.45% | 44.43% | $31.97M | 223 | 96 | 0 | 110 / 8 |
+| 2026-09-03 | $205.09M | 120.99% | 47.47% | $90.40M | 204 | 63 | 0 | 105 / 13 |
+
+| Day | Largest asset (symbol, all chains) | Its share of sold volume (sample) | Herfindahl index |
+|---|---|---|---|
+| 2025-11-01 | USDT | 32.48% | 0.219 |
+| 2026-01-28 | USDT | 66.24% | 0.467 |
+| 2026-03-30 | USDT | 59.23% | 0.426 |
+| 2026-06-06 | USDT | 51.24% | 0.322 |
+| 2026-08-21 | USDT | 43.00% | 0.304 |
+| 2026-09-03 | USDT | 44.62% | 0.303 |
+
+**Reading.** On 6 sampled days the public on-chain swap volume counted once per swap is 46.04% of DefiLlama's daily figure at the median (from 22.86% to 64.76%); its 90% interval contains 100% on 1 of 6 days. Counting both legs of every swap gives 92.08% at the median, with 100% inside the interval on 4 of 6 days. The control sample found 0 swaps without a protocol fee among 488, so the gap is not swaps missing from our frame. Two readings fit: DefiLlama's (NEAR-uploaded) volume counts something close to both sides of each swap, or about half of the volume is settled where public events cannot see it (confidential intents). Either way, the one-sided public volume is the conservative number, and take rates computed on the DefiLlama volume are understated by up to that factor. Captured revenue, in contrast, reconciles with on-chain flows (Q4).
+
+**Method.** Contracts from docs.near-intents.org: the Verifier `intents.near` settles intents and emits DIP-4 `token_diff` events; its `fee()` (in pips, 1 pip = 0.0001%) is charged on the sold leg of each token_diff and paid to `fee_collector()` inside its NEP-245 ledger. The fee collector appears in the event logs of exactly the fee-paying transactions, which gives a census count per day. A cluster sample of 40 windows of consecutive blocks holding fee-paying transactions is rebuilt from its events: per transaction, each account's legs are netted (removing routing hops) and each swap is counted once (half the sum over accounts of max(USD sold, USD bought)); the mean per transaction times the census count is the day's volume, with a bootstrap over windows for the 90% CI. A control sample of every transaction touching intents.near checks that swaps always pay the fee. The fee collector's balance change was planned as a second, census estimate but is not usable: its balances fall during the day for many tokens (last column). Prices: DefiLlama at 12:00 UTC via the 1Click token list's CoinGecko ids.
+
+**What it cannot see.** Confidential intents (settled privately) and swaps that do not pay the protocol fee are outside both estimates; DefiLlama's source (`dataset_near_intents_metrics`, uploaded by the NEAR team) does not publish its definition of volume, so a ratio below 1 can mean either volume we cannot observe or a different definition (for example counting both sides or bridge deposits).
 
 ## Q4. Money trails: revenue wallets, buybacks and treasury.near
 

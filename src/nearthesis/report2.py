@@ -88,17 +88,19 @@ def headline_metrics(*, org, ic, led, dev, inp, sm, mm, am, ym, fp, as_of) -> pl
                   f"{d['day'].min()} to {d['day'].max()}", "token_diff events vs defillama", "A/B",
                   notes=f"Daily ratios range from {fmt(d['ratio_sample_to_defillama'].min(), 'ratio')} to "
                         f"{fmt(d['ratio_sample_to_defillama'].max(), 'ratio')}; per-day 90% CIs are in the Q2 table.")
-            dc = d.drop_nulls("ratio_census_to_defillama")
-            if dc.height:
-                T.add("Q2", "q2b.ratio_census_median", f"On-chain swap volume / DefiLlama volume, median of {dc.height} "
-                      "days (fee census estimate)", dc["ratio_census_to_defillama"].median(), "ratio",
-                      f"{dc['day'].min()} to {dc['day'].max()}", "fee collector balances vs defillama", "A/B",
-                      notes=f"Daily ratios range from {fmt(dc['ratio_census_to_defillama'].min(), 'ratio')} to "
-                            f"{fmt(dc['ratio_census_to_defillama'].max(), 'ratio')}.")
+            T.add("Q2", "q2b.ratio_two_sided_median", f"Two-sided equivalent (2x on-chain one-sided) / DefiLlama volume, "
+                  f"median of {d.height} days", d["ratio_two_sided_to_defillama"].median(), "ratio",
+                  f"{d['day'].min()} to {d['day'].max()}", "token_diff events vs defillama", "A/B",
+                  notes="What a definition counting both legs of every swap would report.")
+            T.add("Q2", "q2b.frame_check", "Control-sample transactions with a token_diff that paid no protocol fee",
+                  float(d["control_token_diff_without_fee"].sum()), "count",
+                  f"{int(d['control_txs_with_token_diff'].sum())} token_diff txs in {int(d['control_txs'].sum())} "
+                  "intents.near txs", "control sample", "A",
+                  notes="0 means the fee-paying frame used for the volume sample contains every swap seen.")
         h = ic.get("hhi")
         if h is not None and h.height:
-            T.add("Q2", "q2b.top_asset_share", "Largest asset's share of gross sold volume, median of sampled days",
-                  h["top_share"].median(), "ratio", f"{h['day'].min()} to {h['day'].max()}", "fee collector census", "A",
+            T.add("Q2", "q2b.top_asset_share", "Largest asset's share of sold volume (sample), median of sampled days",
+                  h["top_share"].median(), "ratio", f"{h['day'].min()} to {h['day'].max()}", "token_diff sample", "A",
                   notes=f"From {fmt(h['top_share'].min(), 'ratio')} to {fmt(h['top_share'].max(), 'ratio')} across days.")
     if led:
         rc = led["revenue_reconciliation"].filter(pl.col("usd_defillama") > 0).tail(6)
@@ -294,50 +296,62 @@ def _q2(ic) -> list[str]:
     if not ic:
         return L + ["Intents samples not available in data/raw.", ""]
     d = ic["days"]
-    L.append(table(["Day", "Fee-paying txs (census)", "Sampled txs", "DefiLlama volume", "On-chain volume, sample (90% CI)",
-                    "On-chain volume, fee census (90% CI)", "Sample / DefiLlama", "Census / DefiLlama",
+    L.append(table(["Day", "Fee-paying txs (census)", "Sampled txs", "DefiLlama volume",
+                    "On-chain one-sided volume (90% CI)", "One-sided / DefiLlama", "Two-sided equivalent / DefiLlama",
                     "Unpriced legs"],
                    [[r["day"], fmt(r["fee_paying_txs"]), fmt(r["sampled_txs"]), fmt(r["defillama_volume_usd"], "USD"),
                      _ci(r["volume_sample_usd"], r["volume_sample_p05"], r["volume_sample_p95"], "USD"),
-                     _ci(r["volume_census_usd"], r["volume_census_p05"], r["volume_census_p95"], "USD"),
                      _ci(r["ratio_sample_to_defillama"], r["ratio_sample_to_defillama_p05"],
                          r["ratio_sample_to_defillama_p95"], "ratio"),
-                     _ci(r["ratio_census_to_defillama"], r["ratio_census_to_defillama_p05"],
-                         r["ratio_census_to_defillama_p95"], "ratio"),
+                     _ci(r["ratio_two_sided_to_defillama"], r["ratio_two_sided_to_defillama_p05"],
+                         r["ratio_two_sided_to_defillama_p95"], "ratio"),
                      fmt(r["unpriced_leg_share"], "ratio")] for r in d.iter_rows(named=True)]))
     L.append("")
-    L.append(table(["Day", "Gross sold (both sides, routing incl.)", "Netting ratio (one side / gross)",
-                    "Fee rounding calibration", "Referral-tagged side", "Protocol fees (census)", "DefiLlama fees",
-                    "Fee tokens unpriced", "Fee tokens with a falling balance"],
-                   [[r["day"], fmt(r["gross_sold_sample_scaled_usd"], "USD"), fmt(r["netting_ratio"], "ratio"),
-                     fmt(r["fee_rounding_calibration"]), fmt(r["referral_side_sample_scaled_usd"], "USD"),
-                     fmt(r["census_protocol_fees_usd"], "USD"), fmt(r["defillama_fees_usd"], "USD"),
-                     r["fee_tokens_unpriced"], r["fee_tokens_with_negative_delta"]] for r in d.iter_rows(named=True)]))
+    L.append(table(["Day", "Gross sold legs (both sides, routing hops)", "Gross / DefiLlama", "Netting ratio",
+                    "Referral-tagged side", "Control: intents.near txs", "with token_diff", "token_diff without fee",
+                    "Fee collector tokens up / down"],
+                   [[r["day"], fmt(r["gross_sold_sample_scaled_usd"], "USD"), fmt(r["ratio_gross_sold_to_defillama"], "ratio"),
+                     fmt(r["netting_ratio"], "ratio"), fmt(r["referral_side_sample_scaled_usd"], "USD"),
+                     r["control_txs"], r["control_txs_with_token_diff"], r["control_token_diff_without_fee"],
+                     f"{r['fee_collector_tokens_rising']} / {r['fee_collector_tokens_falling']}"]
+                    for r in d.iter_rows(named=True)]))
     L.append("")
     h = ic.get("hhi")
     if h is not None and h.height:
-        L.append(table(["Day", "Largest asset", "Its share of gross sold volume", "Herfindahl index"],
+        L.append(table(["Day", "Largest asset (symbol, all chains)", "Its share of sold volume (sample)", "Herfindahl index"],
                        [[r["day"], r["top_symbol"], fmt(r["top_share"], "ratio"), fmt(r["hhi"])] for r in h.iter_rows(named=True)]))
         L.append("")
     dd = d.drop_nulls("ratio_sample_to_defillama")
     if dd.height:
-        lo, hi, med = dd["ratio_sample_to_defillama"].min(), dd["ratio_sample_to_defillama"].max(), dd["ratio_sample_to_defillama"].median()
-        inside = dd.filter((pl.col("ratio_sample_to_defillama_p05") <= 1) & (pl.col("ratio_sample_to_defillama_p95") >= 1)).height
-        verdict = ("consistent with the DefiLlama series on most sampled days" if inside >= (dd.height + 1) // 2
-                   else "not consistent with the DefiLlama series on most sampled days")
-        L.append(f"**Reading.** Across {dd.height} sampled days the on-chain one-sided swap volume is {fmt(med, 'ratio')} "
-                 f"of DefiLlama's figure at the median (range {fmt(lo, 'ratio')} to {fmt(hi, 'ratio')}); the 90% interval "
-                 f"contains 100% on {inside} of {dd.height} days, so the aggregate is {verdict}. What this does and does "
-                 "not establish is in the method notes below.")
+        med = dd["ratio_sample_to_defillama"].median()
+        med2 = dd["ratio_two_sided_to_defillama"].median()
+        inside1 = dd.filter((pl.col("ratio_sample_to_defillama_p05") <= 1) & (pl.col("ratio_sample_to_defillama_p95") >= 1)).height
+        inside2 = dd.filter((pl.col("ratio_two_sided_to_defillama_p05") <= 1)
+                            & (pl.col("ratio_two_sided_to_defillama_p95") >= 1)).height
+        L.append(f"**Reading.** On {dd.height} sampled days the public on-chain swap volume counted once per swap is "
+                 f"{fmt(med, 'ratio')} of DefiLlama's daily figure at the median (from "
+                 f"{fmt(dd['ratio_sample_to_defillama'].min(), 'ratio')} to {fmt(dd['ratio_sample_to_defillama'].max(), 'ratio')}); "
+                 f"its 90% interval contains 100% on {inside1} of {dd.height} days. Counting both legs of every swap gives "
+                 f"{fmt(med2, 'ratio')} at the median, with 100% inside the interval on {inside2} of {dd.height} days. "
+                 f"The control sample found {int(dd['control_token_diff_without_fee'].sum())} swaps without a protocol fee "
+                 f"among {int(dd['control_txs_with_token_diff'].sum())}, so the gap is not swaps missing from our frame. "
+                 "Two readings fit: DefiLlama's (NEAR-uploaded) volume counts something close to both sides of each swap, or "
+                 "about half of the volume is settled where public events cannot see it (confidential intents). Either "
+                 "way, the one-sided public volume is the conservative number, and take rates computed on the DefiLlama "
+                 "volume are understated by up to that factor. Captured revenue, in contrast, reconciles with on-chain "
+                 "flows (Q4).")
         L.append("")
     L += ["**Method.** Contracts from docs.near-intents.org: the Verifier `intents.near` settles intents and emits "
           "DIP-4 `token_diff` events; its `fee()` (in pips, 1 pip = 0.0001%) is charged on the sold leg of each "
-          "token_diff and paid to `fee_collector()` inside its NEP-245 ledger. Two independent estimates per day: "
-          "(A) the fee collector's balance change over the day, divided by the fee rate (a census of gross sold "
-          "volume), corrected with the sample for fee rounding and for netting to one side; (B) a cluster sample of "
-          "40 windows of consecutive blocks holding fee-paying transactions, each transaction rebuilt from its events "
-          "(per-account net legs, one side counted), scaled by the census count of fee-paying transactions. Prices: "
-          "DefiLlama at 12:00 UTC via the 1Click token list's CoinGecko ids.", "",
+          "token_diff and paid to `fee_collector()` inside its NEP-245 ledger. The fee collector appears in the event "
+          "logs of exactly the fee-paying transactions, which gives a census count per day. A cluster sample of 40 "
+          "windows of consecutive blocks holding fee-paying transactions is rebuilt from its events: per transaction, "
+          "each account's legs are netted (removing routing hops) and each swap is counted once (half the sum over "
+          "accounts of max(USD sold, USD bought)); the mean per transaction times the census count is the day's "
+          "volume, with a bootstrap over windows for the 90% CI. A control sample of every transaction touching "
+          "intents.near checks that swaps always pay the fee. The fee collector's balance change was planned as a "
+          "second, census estimate but is not usable: its balances fall during the day for many tokens (last column). "
+          "Prices: DefiLlama at 12:00 UTC via the 1Click token list's CoinGecko ids.", "",
           "**What it cannot see.** Confidential intents (settled privately) and swaps that do not pay the protocol fee "
           "are outside both estimates; DefiLlama's source (`dataset_near_intents_metrics`, uploaded by the NEAR team) "
           "does not publish its definition of volume, so a ratio below 1 can mean either volume we cannot observe or a "
@@ -492,7 +506,9 @@ def render_models(*, inp, sm, mm, am, ym, T, mcfg, as_of) -> str:
               "take_rate_90d": ("Captured revenue / volume, 90 days", "ratio"),
               "buyback_yield_defillama": ("Buyback yield: holders revenue / market cap", "ratio/yr"),
               "buyback_yield_onchain": ("Buyback yield: on-chain NEAR captured (180d annualized) / supply", "ratio/yr"),
-              "buyback_yield": (f"Buyback yield used (source: {inp['buyback_yield_source']})", "ratio/yr")}
+              "buyback_yield": (f"Buyback yield used (source: {inp['buyback_yield_source']})", "ratio/yr"),
+              "intents_onchain_one_sided_to_defillama": ("On-chain one-sided Intents volume / DefiLlama volume "
+                                                         "(median of sampled days, Q2)", "ratio")}
     L.append(table(["Input", "Value"], [[lab, fmt(inp.get(k), u)] for k, (lab, u) in labels.items()]))
     L.append("")
     L += _model_a(inp, sm, mcfg) + _model_b(mm) + _model_c(am, mcfg) + _model_d(inp, ym, mcfg)
@@ -531,6 +547,11 @@ def _model_a(inp, sm, mcfg) -> list[str]:
                 price_usd=sorted(sm["model_net_zero_grid"]["price_usd"].unique().to_list())[1],
                 take_rate=sorted(sm["model_net_zero_grid"]["take_rate"].unique().to_list())[1])
     sq = _row(sm["model_supply_scenarios"], scenario="status_quo/base", horizon_years=1)
+    if inp.get("intents_onchain_one_sided_to_defillama"):
+        L += ["", f"Volumes in this grid are DefiLlama volumes. The on-chain check (Q2) finds public one-sided volume at "
+              f"{fmt(inp['intents_onchain_one_sided_to_defillama'], 'ratio')} of DefiLlama's figure, so measured on-chain "
+              "the required volume multiples are larger by about the inverse of that ratio, while the revenue multiples "
+              "(which use captured revenue, reconciled on-chain in Q4) are unaffected."]
     L += ["", "**Falsifier of the bullish case** (PIANO.md Q4): net float dilution after buybacks stays above 2% per year "
           "and the net-zero threshold needs more than 10x current volume at the current take rate."]
     if base and sq:
@@ -638,3 +659,26 @@ def _model_d(inp, ym, mcfg) -> list[str]:
           "stays below -2% per year; i.e. value accrual does not offset dilution. Current reading: see the last-365-days "
           "row above.", ""]
     return L
+
+
+# ------------------------------------------------------------------------------------------------ falsifiers
+def render_falsifiers(pred: pl.DataFrame, sha: str, as_of: str) -> str:
+    L = ["# Falsifiers: dated predictions for the NEAR thesis", "",
+         "Generated by `make reproduce` (`src/nearthesis/predictions.py`) from the committed snapshot; do not edit by "
+         f"hand. Snapshot as-of {as_of}. Each line is a claim the bullish case needs, a metric anyone can recompute "
+         "with this repository (`make refresh`, then the file named), a threshold computed from the data (never typed "
+         "by hand; the basis is stated), and a date. A prediction that fails at its date counts against the thesis "
+         "and will be reported, not removed.", "",
+         f"sha256 of `data/processed/predictions.csv`: `{sha}`", ""]
+    L.append(table(["ID", "Question", "Bullish claim", "Metric", "Test", "Threshold", "Check on", "Current value",
+                    "Threshold basis", "How to check"],
+                   [[r["id"], r["question"], r["bullish_claim"], r["metric"], r["comparator"],
+                     fmt(r["threshold"], r["unit"] if r["unit"] != "multiple" else ""), r["check_date"],
+                     f"{fmt(r['current_value'], r['unit'] if r['unit'] != 'multiple' else '')} ({r['current_window']})",
+                     r["threshold_basis"], r["how_to_check"]] for r in pred.iter_rows(named=True)]))
+    L += ["", "Reading the table: the prediction holds if `metric test threshold` is true on the check date. Thresholds "
+          "that equal the current value mean \"at least no decline\"; thresholds at a lower 90% bound or a recent "
+          "minimum allow for sampling noise. The structural falsifiers of each model (for example net float dilution "
+          "above 2% per year with a net-zero threshold above 10x current volume) are in `reports/models_summary.md`.",
+          ""]
+    return "\n".join(L) + "\n"

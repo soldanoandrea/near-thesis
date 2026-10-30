@@ -78,7 +78,7 @@ def fetch(client: PoliteClient) -> None:
     days = sample_days(cfg, seed)
     print(f"  sampled days: {days}", file=sys.stderr)
 
-    day_rows, bal_rows, leg_rows = [], [], []
+    day_rows, bal_rows, leg_rows, tx_rows, win_rows, ctl_rows = [], [], [], [], [], []
     for day in days:
         d0 = dt.date.fromisoformat(day)
         bounds = []
@@ -118,6 +118,7 @@ def fetch(client: PoliteClient) -> None:
         w = max(1, round(int(cfg["target_txs_per_window"]) * (h1 - h0) / max(n_fee, 1)))
         rng = np.random.default_rng([seed, int(day.replace("-", "")), 5])
         starts = sorted(int(x) for x in rng.integers(h0, max(h0 + 1, h1 - w), size=int(cfg["windows_per_day"])))
+        tx_no = 0
         for k, s in enumerate(starts):
             hashes, token = [], None
             while True:
@@ -132,20 +133,44 @@ def fetch(client: PoliteClient) -> None:
                 if len(rows) < 200 or not token:
                     break
             hashes = list(dict.fromkeys(hashes))
+            n_in = 0
             for i in range(0, len(hashes), 20):
                 txs = client.post_json(f"{base}/v0/transactions", {"tx_hashes": hashes[i:i + 20]},
                                        immutable=True).get("transactions") or []
                 for t in txs:
-                    leg_rows += legs_of_tx(t, day, k, verifier)
-            if not hashes:
-                leg_rows.append({"day": day, "window": k, "window_start": s, "window_blocks": w, "tx_hash": "",
-                                 "block_height": None, "account_id": "", "token_id": "", "amount": "",
-                                 "fee_collected": "", "referral": "", "event_index": None})
-            for r in leg_rows:
-                if r["window"] == k and r["day"] == day:
-                    r["window_start"], r["window_blocks"] = s, w
+                    legs = legs_of_tx(t, day, k, verifier)
+                    tx_rows.append({"day": day, "window": k, "tx_no": tx_no, "tx_hash": t["transaction"]["hash"],
+                                    "block_height": int(t["execution_outcome"]["block_height"]), "legs": len(legs)})
+                    for lg in legs:
+                        leg_rows.append({"day": day, "tx_no": tx_no, **{c: lg[c] for c in (
+                            "event_index", "account_id", "token_id", "amount", "fee_collected", "referral")}})
+                    tx_no += 1
+                    n_in += 1
+            win_rows.append({"day": day, "window": k, "window_start": s, "window_blocks": w,
+                             "fee_paying_txs_listed": len(hashes), "txs_fetched": n_in})
+        # control sample: every transaction touching intents.near in a few short windows (any method, any signer)
+        wc = max(1, round(int(cfg["control_txs_per_window"]) * (h1 - h0) / max(n_int, 1)))
+        rngc = np.random.default_rng([seed, int(day.replace("-", "")), 6])
+        for k, s in enumerate(sorted(int(x) for x in rngc.integers(h0, max(h0 + 1, h1 - wc),
+                                                                    size=int(cfg["control_windows_per_day"])))):
+            d = client.post_json(f"{base}/v0/account", {"account_id": verifier, "is_real_receiver": True,
+                                                        "from_tx_block_height": s, "to_tx_block_height": s + wc - 1,
+                                                        "limit": 200, "desc": False}, immutable=True)
+            hashes = list(dict.fromkeys(r["transaction_hash"] for r in d.get("account_txs") or []))
+            for i in range(0, len(hashes), 20):
+                for t in client.post_json(f"{base}/v0/transactions", {"tx_hashes": hashes[i:i + 20]},
+                                          immutable=True).get("transactions") or []:
+                    logs = [lg for rc in t.get("receipts") or [] for lg in rc["execution_outcome"]["outcome"]["logs"]]
+                    legs = legs_of_tx(t, day, k, verifier)
+                    ctl_rows.append({"day": day, "window": k, "window_start": s, "window_blocks": wc,
+                                     "tx_hash": t["transaction"]["hash"],
+                                     "methods": "|".join(a["FunctionCall"]["method_name"] for a in t["transaction"]["actions"]
+                                                         if isinstance(a, dict) and "FunctionCall" in a),
+                                     "token_diff_legs": len(legs),
+                                     "legs_with_fee": sum(1 for x in legs if x["fee_collected"] not in ("", "0")),
+                                     "fee_collector_in_logs": any(fc in lg for lg in logs)})
         print(f"  intents {day}: heights {h0}-{h1}, {n_fee} fee-paying txs, {len(toks)} fee tokens, "
-              f"{sum(1 for r in leg_rows if r['day'] == day)} sampled legs", file=sys.stderr, flush=True)
+              f"{sum(1 for r in tx_rows if r['day'] == day)} sampled txs, {sum(1 for r in leg_rows if r['day'] == day)} legs", file=sys.stderr, flush=True)
 
     stats = client.stats_for("tx.main.fastnear.com", "archival-rpc.mainnet.fastnear.com")
     design = {"days": days, "seed": seed, **{k: cfg[k] for k in cfg}}
@@ -159,17 +184,30 @@ def fetch(client: PoliteClient) -> None:
                         sort_by=["day", "token_id"],
                         notes="Fee collector NEP-245 balances inside intents.near at the first block of the day and of "
                               "the next day (raw token units).", http_stats=stats)
-    lschema = {"day": pl.Utf8, "window": pl.Int64, "window_start": pl.Int64, "window_blocks": pl.Int64,
-               "tx_hash": pl.Utf8, "block_height": pl.Int64, "event_index": pl.Int64, "account_id": pl.Utf8,
-               "token_id": pl.Utf8, "amount": pl.Utf8, "fee_collected": pl.Utf8, "referral": pl.Utf8}
-    manifest.save_table("fastnear_tx", "intents_swap_legs",
-                        pl.DataFrame([{k: r.get(k) for k in lschema} for r in leg_rows], schema=lschema),
-                        urls=[f"{base}/v0/account", f"{base}/v0/transactions"], params=design,
-                        sort_by=["day", "window", "block_height", "tx_hash", "event_index", "account_id", "token_id"],
-                        notes="One row per token leg of every DIP-4 token_diff event in the sampled fee-paying "
-                              "transactions (amount signed, raw units; fee_collected = protocol fee charged on that "
-                              "token in that event). A window with no transaction has one empty row.",
+    manifest.save_table("fastnear_tx", "intents_windows", pl.DataFrame(win_rows, infer_schema_length=None),
+                        urls=[f"{base}/v0/account"], params=design, sort_by=["day", "window"],
+                        notes="Sampled windows of consecutive blocks per day: start height, length, number of "
+                              "fee-paying transactions listed and fetched.", http_stats=stats)
+    manifest.save_table("fastnear_tx", "intents_swap_txs", pl.DataFrame(tx_rows, infer_schema_length=None),
+                        urls=[f"{base}/v0/transactions"], params=design, sort_by=["day", "tx_no"],
+                        notes="Every sampled fee-paying transaction: window, hash, block height, number of token_diff "
+                              "legs (0 = it paid a fee without a successful token_diff of intents.near).",
                         http_stats=stats)
+    manifest.save_table("fastnear_tx", "intents_control_txs", pl.DataFrame(ctl_rows, infer_schema_length=None),
+                        urls=[f"{base}/v0/account", f"{base}/v0/transactions"], params=design,
+                        sort_by=["day", "window", "tx_hash"],
+                        notes="Control sample: every transaction in which intents.near receives a receipt, in a few "
+                              "short windows per day; whether it has token_diff legs and whether the fee collector "
+                              "appears in its logs (tests that the fee-paying frame contains all swaps).",
+                        http_stats=stats)
+    lschema = {"day": pl.Utf8, "tx_no": pl.Int64, "event_index": pl.Int64, "account_id": pl.Utf8, "token_id": pl.Utf8,
+               "amount": pl.Utf8, "fee_collected": pl.Utf8, "referral": pl.Utf8}
+    manifest.save_table("fastnear_tx", "intents_swap_legs", pl.DataFrame(leg_rows, schema=lschema),
+                        urls=[f"{base}/v0/transactions"], params=design,
+                        sort_by=["day", "tx_no", "event_index", "account_id", "token_id"],
+                        notes="One row per token leg of every DIP-4 token_diff event of the sampled transactions "
+                              "(tx_no -> intents_swap_txs.csv; amount signed, raw units; fee_collected = protocol fee "
+                              "charged on that token in that event).", http_stats=stats)
 
     # token list and prices -----------------------------------------------------------------------------------
     tl = client.get_json(ONECLICK_TOKENS)
