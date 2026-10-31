@@ -25,7 +25,7 @@ Track `thesis`, NEAR HACKATHON, Nov 1–14, 2026. Prepared on 2026-10-30. This i
 
 **Design decision: the default path needs no keys.**
 - BigQuery needs a Google Cloud account. The Dune API is not available on the free plan. The Intents Explorer needs a partner JWT. All three become optional enrichers that are skipped cleanly when no credentials are present.
-- If Andrea approves any key, it is injected from 1Password at runtime (`op run --env-file=.env.tpl -- make fetch-keyed`). Keys are never written to a `.env` file.
+- Keys and tokens are never stored in the repository; the pipeline is keyless.
 
 ## 1. Data sources
 
@@ -194,7 +194,7 @@ Each question lists metrics, sources, a model and a falsifier. We will set the f
 ```
 near-thesis/
   README.md  THESIS.md  LICENSE(MIT)  Makefile  pyproject.toml  uv.lock
-  config/{sources,priors,predictions}.yaml   .env.tpl (op:// refs only)
+  config/{sources,priors,predictions}.yaml
   src/near_thesis/fetch/   one module per source; raw → data/raw/<src>/*.parquet
   src/near_thesis/{transform,models,viz,site}/
   sql/bigquery/*.sql       (block_date-filtered; dry-run bytes printed first)
@@ -257,4 +257,4 @@ near-thesis/
 - **Agent activity is hard to observe.** The Agent Market is off-chain (UUID accounts, platform escrow). The NEAR AI staking pool is not documented. Activity in trusted execution environments and confidential payments is invisible to us.
 - **Unverified claims from secondary sources** (we will not use them as inputs): the April 2026 Rhea Lend exploit, Electric Capital's NEAR developer counts, HOT user counts, and Flipside's sale to SonarX.
 - **Small samples and regime changes:** the halving, the buybacks, HSP-029 and possibly sharding upgrades. Reflexivity between price and activity.
-- **Compliance.** No secrets anywhere in git history. Keys stay in 1Password. A second project means each README names the other. The X post and the submission go out only after Andrea gives explicit approval. The payout needs a mainnet NEAR account.
+- **Compliance.** No secrets anywhere in git history; keys and tokens are never stored in the repository. A second project means each README names the other. The X post and the submission go out only after Andrea gives explicit approval. The payout needs a mainnet NEAR account.

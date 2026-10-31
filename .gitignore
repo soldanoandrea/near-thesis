@@ -10,7 +10,7 @@ dist/
 # HTTP response cache used by `make refresh` (re-creatable, never committed)
 data/cache/
 
-# Secrets never live in this repo (keys, if ever approved, come from 1Password at runtime)
+# Keys and tokens are never stored in the repository; the pipeline is keyless
 .env
 .env.*
 !.env.tpl
