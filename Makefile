@@ -5,12 +5,13 @@
 #   make test       run the test suite (manifest sha256, schemas, gaps, sanity ranges, determinism)
 #   make refresh    ONLINE: re-download every raw snapshot from public keyless APIs (~2 h, rate limited)
 #   make verify     check data/raw against data/raw/MANIFEST.json
+#   make video      docs/media/demo.mp4 + docs/media/screens/ (needs VHS, ffmpeg, Chrome; Plotly.js from cdnjs)
 
 UV ?= uv
 export POLARS_MAX_THREADS ?= 1
 export PYTHONHASHSEED = 0
 
-.PHONY: setup reproduce build site test refresh fetch verify clean-cache
+.PHONY: setup reproduce build site test refresh fetch verify video clean-cache
 
 setup:
 	$(UV) sync --frozen
@@ -34,6 +35,9 @@ refresh: setup
 	$(UV) run --frozen python -m nearthesis build
 
 fetch: refresh
+
+video: setup
+	scripts/video/render.sh
 
 clean-cache:
 	rm -rf data/cache

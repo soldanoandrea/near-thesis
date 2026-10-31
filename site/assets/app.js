@@ -51,6 +51,13 @@
     if (!target) return;
     document.body.classList.add("capture");
     target.classList.add("capture-target");
+    var note = (/(?:^|[#&])note=([^&]+)/.exec(location.hash) || [])[1];
+    if (note) {  // a short heading for video frames, e.g. #capture=intents&note=2%2F6%20...
+      var div = document.createElement("div");
+      div.className = "capture-note";
+      div.textContent = decodeURIComponent(note);
+      target.insertBefore(div, target.firstChild);
+    }
     var p = target.parentElement;
     while (p && p !== document.body) { p.classList.add("capture-keep"); p = p.parentElement; }
   }

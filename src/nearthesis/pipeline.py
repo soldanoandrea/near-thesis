@@ -379,5 +379,10 @@ def build(out_root: str | Path | None = None, quiet: bool = False) -> dict[str, 
         if p2 is not None:
             print("\n" + report.console_table(pl.read_csv(p2, infer_schema_length=None)).replace(
                 "Key results (first pass)", "Key results (phase 2a: analysis layer and models)"))
-        print(f"\n[build] as-of {as_of}; wrote {len(written)} files to {processed} and {reports}")
+        def rel(p: Path) -> str:  # print repo-relative paths (no local directories in logs or the demo video)
+            try:
+                return str(p.relative_to(out))
+            except ValueError:
+                return str(p)
+        print(f"\n[build] as-of {as_of}; wrote {len(written)} files to {rel(processed)}/ and {rel(reports)}/")
     return written
