@@ -225,11 +225,11 @@ signers. A per-signer reconciliation needs per-account histories (phase 2).
 - Why the `validator_reward_paid_prev_epoch` map does not sum to the minted amount of any adjacent epoch.
 - Who controls the implicit accounts that received `treasury.near`'s April-May 2026 outflows: account ids carry no
   labels; trails stop at five hops or where no outflow is seen (phase 2a ledger).
-- The final HSP-029 vote and its validator adoption: the snapshot (2026-10-31) shows status "Voting".
+- The final HSP-029 vote and its validator adoption: the snapshot (2026-10-30 22:59 UTC) shows status "Voting".
 - Electric Capital's classification of repositories into ecosystems (taken as published).
 - Market caps older than 365 days for peers (keyless CoinGecko limit).
 
-## 4. Phase 2a sources and quirks (fetched 2026-10-30/31 UTC)
+## 4. Phase 2a sources and quirks (fetched 2026-10-30 and 2026-10-31 UTC)
 
 Computed results are in `reports/analysis_summary.md` and `reports/models_summary.md`; this section only documents
 what was fetched and how the sources behave.
@@ -245,6 +245,10 @@ what was fetched and how the sources behave.
   permutation, so the first 60 draws of the extended design are exactly the original ones.
 - Calls per draw: the monthly count + timestamps for every draw; first appearance and last activity only for the first
   60 draws of a month (cohorts); transaction details only for the first 40.
+- The responses were fetched between about 2026-10-30 22:20 and 2026-10-31 01:57 UTC (about 7,000 requests, one at a
+  time); the CSVs were then rewritten from the response cache in the delta-encoded format, so the manifest's
+  `fetched_at_utc` for the `signer_*` files is the time of that rewrite and their `http` block shows 0 requests. The same
+  applies to the NEAR Intents files (fetched between about 22:20 and 23:31 UTC on 2026-10-30, rewritten from cache).
 - Per drawn signer: `/v0/account {is_real_signer, month range, limit 200, desc: true}` (exact monthly count +
   timestamps), `/v0/account {limit 1, desc: false}` (first appearance in any role), and for signers new in that month
   `/v0/account {is_real_signer, limit 1, desc: true}` (last signed transaction, for retention). Details of up to 20
@@ -260,7 +264,7 @@ what was fetched and how the sources behave.
 
 ### NEAR Intents settlement check (`fastnear_tx/intents_*.csv`, `rpc_archival/intents_fee_collector_balances.csv`,
 `oneclick/tokens.csv`, `defillama/coin_prices_intents_days.csv`)
-- Contracts, from docs.near-intents.org (Verifier, Events and Fees pages, fetched 2026-10-31): `intents.near` is the
+- Contracts, from docs.near-intents.org (Verifier, Events and Fees pages, read 2026-10-30 UTC): `intents.near` is the
   Verifier; swaps emit DIP-4 `token_diff` events (`account_id`, signed `diff` per token, `fees_collected`, optional
   `referral` tag such as `1click-swapkit`); the protocol fee is `fee()` pips (1 pip = 0.0001%) of the sold leg,
   rounded up per leg, paid in-ledger (NEP-245 `mt_transfer`) to `fee_collector()` =

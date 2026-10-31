@@ -19,12 +19,15 @@ Bot score (thresholds in config [organic], fixed before looking at the per-signe
   I6 >= 90% of >= 10 detailed txs are the same (receiver, method) and c >= 30.
   automated if score >= 2 (strict: >= 1, lenient: >= 3).
 Account label (per signer-month), first match wins:
-  incentivized   majority of its detailed txs (or of its drawn txs) go to an incentivized contract (HOT, KaiChing,
-                 SWEAT, NEARCrowd, inscriptions);
+  incentivized   majority of its detailed txs (or of its drawn txs) go to a reward program (HOT, KaiChing, SWEAT and
+                 their namespaces, NEARCrowd, inscriptions, Harvest Moon, HOT airdrops);
   infrastructure automated and majority of its txs go to settlement / bridge / MPC / EVM-relay contracts;
   automated      score >= threshold;
+  account_setup  majority of its txs are calls to itself (key management or setup of a fresh account, typically a
+                 relayed one-off), not use of an application;
   organic        everything else.
-Transaction label: incentivized if the drawn tx goes to an incentivized contract; otherwise the account label.
+Transaction label: incentivized if the drawn tx goes to a reward program; infrastructure / automated as the account;
+for other accounts, account_setup if the drawn tx is a self-call, organic otherwise.
 
 Limits (also in the report): timing features use at most 200 timestamps per signer-month (the most recent); a
 human using an automated wallet feature can look automated and a slow bot can look human; relayed transactions are
@@ -43,7 +46,7 @@ import polars as pl
 
 from .. import config, io, sampling
 
-CLASSES = ["organic", "automated", "incentivized", "infrastructure"]
+CLASSES = ["organic", "automated", "incentivized", "infrastructure", "account_setup"]
 
 
 def _month_start_ts(month: str) -> int:
@@ -99,6 +102,7 @@ def signer_features(sma: pl.DataFrame, life: pl.DataFrame, det: pl.DataFrame, bo
         inc_share = (sum(1 for rc, _ in d if is_incentivized(rc, incentivized, ocfg)
                              or (rc == s and is_incentivized(s, incentivized, ocfg))) / n_det if n_det else None)
         infra_share = sum(1 for rc, _ in d if _is_infra(rc, ocfg)) / n_det if n_det else None
+        self_share = sum(1 for rc, _ in d if rc == s) / n_det if n_det else None
         lf = life_d.get(s, {})
         first_ts = lf.get("first_timestamp_s")
         h0, h1 = bounds[month]
@@ -116,6 +120,7 @@ def signer_features(sma: pl.DataFrame, life: pl.DataFrame, det: pl.DataFrame, bo
                      "timestamps": n_ts, "timestamps_complete": n_ts >= c, "median_gap_s": med_gap, "gap_cv": cv_gap,
                      "active_hours": hours, "details": n_det, "top_pair_share": top_share,
                      "incentivized_share_details": inc_share, "infrastructure_share_details": infra_share,
+                     "self_call_share_details": self_share,
                      "first_timestamp_s": first_ts,
                      "age_days_at_month_start": (_month_start_ts(month) - first_ts) / 86400 if first_ts else None,
                      "is_new": first_h is not None and h0 <= int(first_h) < h1,
@@ -140,7 +145,9 @@ def label_draws(draws: pl.DataFrame, feats: pl.DataFrame, incentivized: list[str
                              pl.col("real_receiver_id").map_elements(lambda a: _is_infra(a, ocfg),
                                                                      return_dtype=pl.Boolean).alias("_inf"))
           .group_by(["real_signer_id", "month"]).agg(pl.col("_inc").mean().alias("drawn_inc_share"),
-                                                     pl.col("_inf").mean().alias("drawn_infra_share")))
+                                                     pl.col("_inf").mean().alias("drawn_infra_share"),
+                                                     (pl.col("real_receiver_id") == pl.col("real_signer_id")).mean()
+                                                     .alias("drawn_self_share")))
     d = d.join(dm, on=["real_signer_id", "month"], how="left").sort(["month", "draw_rank"])  # joins may reorder
     out = []
     for r in d.iter_rows(named=True):
@@ -159,6 +166,7 @@ def label_draws(draws: pl.DataFrame, feats: pl.DataFrame, incentivized: list[str
             c_day, c_day_exact = max(c / ndays, 1.0), False
         inc_share = r["incentivized_share_details"] if r["incentivized_share_details"] is not None else r["drawn_inc_share"]
         inf_share = r["infrastructure_share_details"] if r["infrastructure_share_details"] is not None else r["drawn_infra_share"]
+        self_share = r["self_call_share_details"] if r["self_call_share_details"] is not None else r["drawn_self_share"]
         automated = (r["bot_score"] or 0) >= threshold
         if inc_share is not None and inc_share >= 0.5:
             acct = "incentivized"
@@ -166,12 +174,15 @@ def label_draws(draws: pl.DataFrame, feats: pl.DataFrame, incentivized: list[str
             acct = "infrastructure"
         elif automated:
             acct = "automated"
+        elif self_share is not None and self_share >= 0.5:
+            acct = "account_setup"
         else:
             acct = "organic"
+        self_call = r["real_receiver_id"] == r["real_signer_id"]
         if r["drawn_incentivized"]:
             txl = "incentivized"
-        elif acct == "incentivized":
-            txl = "automated" if automated else "organic"
+        elif acct in ("incentivized", "account_setup", "organic"):
+            txl = "automated" if automated else ("account_setup" if self_call else "organic")
         else:
             txl = acct
         out.append({**{k: r[k] for k in ("month", "draw_rank", "block_key", "real_signer_id", "real_receiver_id",
@@ -333,7 +344,7 @@ def build(raw: Path, daily: pl.DataFrame, as_of: str) -> dict[str, pl.DataFrame]
                .with_columns((pl.col("month") == as_of[:7]).alias("is_partial_month"),
                              (pl.col("das_all") / pl.col("nb_active_accounts_avg")).alias("das_all_to_nearblocks")))
     qkeys = ["txs_per_day_organic", "tx_share_organic", "mas_organic", "das_organic", "mas_all", "das_all",
-             "tx_share_automated", "tx_share_incentivized", "tx_share_infrastructure"]
+             "tx_share_automated", "tx_share_incentivized", "tx_share_infrastructure", "tx_share_account_setup"]
     full = monthly.filter(~pl.col("is_partial_month"))
     quarterly = quarterly_series(full, reps, qkeys)
     # sensitivity to the score threshold (point estimates, pooled by quarter)

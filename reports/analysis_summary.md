@@ -8,6 +8,17 @@ As-of date: 2026-10-29.
 
 | Q | Metric | Value | 90% CI | Window | Source | Grade |
 |---|---|---|---|---|---|---|
+| Q1 | Organic transactions per day, 2026-Q3 | 16,630 | 6,477 to 28,473 | 2026-Q3 | signer histories + block sample | A |
+| Q1 | Organic share of transactions, 2026-Q3 | 2.17% | 0.86% to 3.70% | 2026-Q3 | signer histories + block sample | A |
+| Q1 | Organic monthly active signers (mean of months), 2026-Q3 | 77,332 | 15,737 to 162,261 | 2026-Q3 | signer histories + block sample | A |
+| Q1 | Organic daily active signers (average day), 2026-Q3 | 6,437 | 1,935 to 12,045 | 2026-Q3 | signer histories + block sample | A |
+| Q1 | All daily active signers (average day), 2026-Q3 | 149,876 | 130,310 to 171,084 | 2026-Q3 | signer histories + block sample | A |
+| Q1 | Organic daily active signers, 2025-Q1 (first quarter with 200 draws in every month) | 23,402 | 0 to 55,725 | 2025-Q1 | signer histories + block sample | A |
+| Q1 | Organic daily active signers, 2026-Q3 vs 2025-Q1 | -72.49% |  | 2025-Q1 to 2026-Q3 | signer histories + block sample | A |
+| Q1 | All daily active signers / NearBlocks active accounts, last 12 months (median) | 519.23% |  | 2025-10 to 2026-09 | signer histories vs nearblocks | A/B |
+| Q1 | Organic share of transactions, strict bot threshold (score >= 1), 2026-Q3 | 1.17% |  | 2026-Q3 | signer histories + block sample | A |
+| Q1 | Organic share of transactions, lenient bot threshold (score >= 3), 2026-Q3 | 5.17% |  | 2026-Q3 | signer histories + block sample | A |
+| Q1 | 3-month rolling retention of new signers, cohort 2025-Q1 (largest cohort) | 57.73% | 33.35% to 78.83% | 2025-Q1 | signer histories | A |
 | Q2 | On-chain swap volume / DefiLlama volume, median of 6 days (sample estimate) | 46.04% |  | 2025-11-01 to 2026-09-03 | token_diff events vs defillama | A/B |
 | Q2 | Two-sided equivalent (2x on-chain one-sided) / DefiLlama volume, median of 6 days | 92.08% |  | 2025-11-01 to 2026-09-03 | token_diff events vs defillama | A/B |
 | Q2 | Control-sample transactions with a token_diff that paid no protocol fee | 0 |  | 488 token_diff txs in 1161 intents.near txs | control sample | A |
@@ -26,6 +37,9 @@ As-of date: 2026-10-29.
 | Q6 | near/nearcore commits, last 12 months vs the 12 before | 4.95% |  | 2025-10 to 2026-09 | github stats/contributors | B |
 | Q6 | near/nearcore active authors, last 12 months | 60 |  | 2025-10 to 2026-09 | github stats/contributors | B |
 
+- Organic daily active signers, 2026-Q3 vs 2025-Q1: Point estimates; both 90% intervals are in the rows above.
+- All daily active signers / NearBlocks active accounts, last 12 months (median): Real (inner) signers of relayed transactions are counted here; a ratio above 1 is consistent with NearBlocks counting the relayer of a meta-transaction as the active account.
+- 3-month rolling retention of new signers, cohort 2025-Q1 (largest cohort): 32 new-signer draws; every other cohort has fewer than 20 and is not informative.
 - On-chain swap volume / DefiLlama volume, median of 6 days (sample estimate): Daily ratios range from 22.86% to 64.76%; per-day 90% CIs are in the Q2 table.
 - Two-sided equivalent (2x on-chain one-sided) / DefiLlama volume, median of 6 days: What a definition counting both legs of every swap would report.
 - Control-sample transactions with a token_diff that paid no protocol fee: 0 means the fee-paying frame used for the volume sample contains every swap seen.
@@ -38,6 +52,7 @@ Each falsifier was written in PIANO.md before any phase 2a data was fetched. "Me
 
 | Q | Falsifier (PIANO.md) | Current reading | Status |
 |---|---|---|---|
+| Q1 | Organic active accounts show no growth over the last 24 months and month-3 cohort retention does not improve | organic daily active signers 23,402 (2025-Q1) -> 6,437 (2026-Q3), 18 months (the first quarter with the full sample design): changed by an amount within the sampling noise; month-3 retention assessable for 1 cohort(s) only (2025-Q1); the others have fewer than 20 new-signer draws | met on the activity leg; retention leg not assessable |
 | Q2 | 90-day Intents volume falls for two consecutive quarters | 2026-Q2 -13.04%; 2026-Q3 56.68% | not met |
 | Q2 | The top asset accounts for more than 40% of volume (fragility) | largest asset share above 40% on 5 of 6 sampled days (median 47.93%, asset USDT) | met |
 | Q2 | Reconstructed on-chain volume differs from reported volume by more than 20% on sampled days | one-sided: 6 of 6 days off by more than 20%; two-sided equivalent: 4 of 6 | met (definition-dependent) |
@@ -50,7 +65,106 @@ Each falsifier was written in PIANO.md before any phase 2a data was fetched. "Me
 
 ## Q1. Bot-vs-human decomposition (per-signer activity score)
 
-Signer histories not available in data/raw.
+| Quarter | Organic txs/day | Organic share of txs | Organic monthly active signers | Organic daily active signers | All daily active signers | Automated share | Incentivized share | Infrastructure share | Account-setup share |
+|---|---|---|---|---|---|---|---|---|---|
+| 2023-Q4 | 84,271 (0 to 210,677) | 2.22% (0.00% to 5.56%) | 41,188 (0 to 90,708) | 10,517 (0 to 24,314) | 652,012 (415,083 to 895,908) | 4.44% | 88.89% | 4.44% | 0.00% |
+| 2024-Q1 | 0 (0 to 0) | 0.00% (0.00% to 0.00%) | 0 (0 to 0) | 0 (0 to 0) | 1,636,662 (1,190,631 to 2,068,239) | 15.56% | 84.44% | 0.00% | 0.00% |
+| 2024-Q2 | 334,788 (0 to 777,647) | 4.44% (0.00% to 10.26%) | 742,762 (32,855 to 1,716,051) | 123,692 (16,861 to 269,793) | 2,634,759 (1,999,595 to 3,331,076) | 4.44% | 88.89% | 2.22% | 0.00% |
+| 2024-Q3 | 0 (0 to 0) | 0.00% (0.00% to 0.00%) | 0 (0 to 0) | 0 (0 to 0) | 2,452,123 (1,836,639 to 3,122,741) | 2.22% | 97.78% | 0.00% | 0.00% |
+| 2024-Q4 | 49,769 (12,172 to 94,288) | 0.67% (0.17% to 1.26%) | 5,662 (1,256 to 11,301) | 8,102 (487 to 19,140) | 2,950,660 (2,565,625 to 3,366,463) | 6.44% | 92.06% | 0.33% | 0.50% |
+| 2025-Q1 | 23,402 (0 to 55,725) | 0.33% (0.00% to 0.80%) | 691,105 (0 to 1,649,859) | 23,402 (0 to 55,725) | 2,891,608 (2,594,692 to 3,689,148) | 25.33% | 74.00% | 0.17% | 0.17% |
+| 2025-Q2 | 0 (0 to 0) | 0.00% (0.00% to 0.00%) | 0 (0 to 0) | 0 (0 to 0) | 3,301,992 (2,917,065 to 3,598,023) | 3.17% | 95.17% | 1.00% | 0.67% |
+| 2025-Q3 | 39,405 (13,798 to 67,987) | 0.83% (0.29% to 1.43%) | 153,922 (5,348 to 400,265) | 8,285 (1,864 to 17,130) | 2,921,124 (2,511,769 to 3,232,527) | 2.17% | 94.00% | 2.50% | 0.50% |
+| 2025-Q4 | 27,502 (6,603 to 55,378) | 0.67% (0.17% to 1.34%) | 230,932 (3,786 to 660,517) | 8,494 (235 to 22,859) | 2,402,140 (2,041,140 to 2,655,294) | 7.67% | 88.83% | 1.83% | 1.00% |
+| 2026-Q1 | 29,129 (10,531 to 55,286) | 0.83% (0.30% to 1.58%) | 201,548 (1,551 to 552,670) | 9,633 (1,241 to 22,959) | 2,250,681 (1,937,504 to 2,464,940) | 5.17% | 88.17% | 1.67% | 4.17% |
+| 2026-Q2 | 14,794 (7,468 to 22,896) | 1.83% (0.92% to 2.84%) | 196,123 (65,278 to 337,430) | 8,225 (3,440 to 13,327) | 252,956 (223,656 to 282,797) | 15.83% | 65.33% | 12.33% | 4.67% |
+| 2026-Q3 | 16,630 (6,477 to 28,473) | 2.17% (0.86% to 3.70%) | 77,332 (15,737 to 162,261) | 6,437 (1,935 to 12,045) | 149,876 (130,310 to 171,084) | 21.83% | 55.83% | 19.33% | 0.83% |
+
+90% intervals in parentheses (bootstrap over sampled blocks within months; a quarter is the mean of its months). Shares are of all transactions; signers are real (inner) signers of relayed transactions.
+
+| Month | Draws | Blocks | Organic MAS (90% CI) | Organic txs/day (90% CI) | All DAS / NearBlocks active accounts |
+|---|---|---|---|---|---|
+| 2025-10 | 200 | 29 | 10,680 (0 to 36,205) | 22,739 (0 to 77,082) | 862.33% |
+| 2025-11 | 200 | 63 | 640,162 (0 to 1,930,624) | 21,339 (0 to 64,354) | 1005.77% |
+| 2025-12 | 200 | 60 | 41,953 (0 to 107,143) | 38,427 (0 to 89,887) | 1062.73% |
+| 2026-01 | 200 | 55 | 111,877 (0 to 308,648) | 35,058 (0 to 83,912) | 1289.46% |
+| 2026-02 | 200 | 62 | 492,766 (0 to 1,533,543) | 52,329 (10,951 to 112,536) | 784.96% |
+| 2026-03 | 200 | 60 | 0 (0 to 0) | 0 (0 to 0) | 1602.58% |
+| 2026-04 | 200 | 77 | 0 (0 to 0) | 0 (0 to 0) | 253.49% |
+| 2026-05 | 200 | 77 | 343,218 (67,829 to 654,222) | 28,105 (11,099 to 48,667) | 192.56% |
+| 2026-06 | 200 | 79 | 245,151 (0 to 561,374) | 16,277 (4,131 to 29,750) | 175.74% |
+| 2026-07 | 200 | 79 | 152,500 (0 to 382,990) | 11,069 (0 to 26,494) | 164.88% |
+| 2026-08 | 200 | 74 | 53,798 (0 to 148,893) | 6,817 (0 to 15,151) | 226.50% |
+| 2026-09 | 200 | 69 | 25,700 (3,684 to 51,034) | 32,006 (8,165 to 63,259) | 178.16% |
+| 2026-10 (partial) | 200 | 72 | 33,796 (8,553 to 62,729) | 33,259 (15,890 to 53,339) | 152.95% |
+
+Sensitivity of the organic share of transactions to the bot-score threshold (point estimates):
+
+| Quarter | Strict (score >= 1) | Base (score >= 2) | Lenient (score >= 3) |
+|---|---|---|---|
+| 2024-Q4 | 0.17% | 0.67% | 0.67% |
+| 2025-Q1 | 0.33% | 0.33% | 1.33% |
+| 2025-Q2 | 0.00% | 0.00% | 0.33% |
+| 2025-Q3 | 0.50% | 0.83% | 1.50% |
+| 2025-Q4 | 0.67% | 0.67% | 1.33% |
+| 2026-Q1 | 0.67% | 0.83% | 1.00% |
+| 2026-Q2 | 1.83% | 1.83% | 3.50% |
+| 2026-Q3 | 1.17% | 2.17% | 5.17% |
+
+Top receivers of transactions labelled organic (draws; lets a reader judge the label):
+
+| Quarter | Receiver | Organic draws | Share of the quarter's organic draws |
+|---|---|---|---|
+| 2026-Q1 | 454e9a19b4552d08132efb9db354f8cdb1ceb155d8c2c9806f6cb15d947187cf | 1 | 20.00% |
+| 2026-Q1 | contract.main.burrow.near | 1 | 20.00% |
+| 2026-Q1 | nestedwallet.near | 1 | 20.00% |
+| 2026-Q1 | usdt.tether-token.near | 1 | 20.00% |
+| 2026-Q1 | wrap.near | 1 | 20.00% |
+| 2026-Q2 | coin.abound.near | 3 | 27.27% |
+| 2026-Q2 | 17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1 | 2 | 18.18% |
+| 2026-Q2 | 25ab96ddd0d9a8e0ab48b45c2ef7473a83c4ff7e49239b46613b3d688e024731 | 1 | 9.09% |
+| 2026-Q2 | aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near | 1 | 9.09% |
+| 2026-Q2 | gear.enleap.near | 1 | 9.09% |
+| 2026-Q3 | aurora | 3 | 23.08% |
+| 2026-Q3 | coin.abound.near | 2 | 15.38% |
+| 2026-Q3 | 41ca5cd11ffc034a3b73c7ecef251e808cd01903898480a96376e8e5d957f8d8 | 1 | 7.69% |
+| 2026-Q3 | 52435fe912307fb3a088b8b8f3882781762fc1f0a404e8579c7fb1a964362c8d | 1 | 7.69% |
+| 2026-Q3 | aggregatedex.near | 1 | 7.69% |
+| 2026-Q4 | doge.neardogecoin.near | 2 | 22.22% |
+| 2026-Q4 | 825090a3bf5401cb080e757ef4751ab77f3d3378b06de81a944b510f1e0f5ed8 | 1 | 11.11% |
+| 2026-Q4 | base.sputnik-dao.near | 1 | 11.11% |
+| 2026-Q4 | dclv2.ref-labs.near | 1 | 11.11% |
+| 2026-Q4 | intents.near | 1 | 11.11% |
+
+New-signer cohort retention (rolling: share of accounts first seen in the cohort quarter that really signed a transaction at or after month m+k; account-weighted; 90% CI):
+
+| Cohort | Month +1 | Month +3 | Month +6 | Organic only, month +3 | New-signer draws |
+|---|---|---|---|---|---|
+| 2020-Q4 | 0.07% (0.02% to 100.00%) | 0.00% (0.00% to 0.00%) | 0.00% (0.00% to 0.00%) |  | 3 |
+| 2021-Q1 | 0.08% (0.00% to 100.00%) | 0.08% (0.00% to 100.00%) | 0.00% (0.00% to 0.56%) |  | 4 |
+| 2021-Q2 | 16.71% (4.53% to 74.85%) | 16.61% (3.74% to 81.16%) | 16.55% (4.07% to 78.44%) | 34.01% | 16 |
+| 2021-Q3 | 2.46% (0.02% to 15.30%) | 0.06% (0.00% to 0.32%) | 0.06% (0.00% to 0.32%) |  | 8 |
+| 2021-Q4 | 7.15% (0.45% to 26.91%) | 5.71% (0.00% to 21.69%) | 5.71% (0.00% to 23.30%) | 14.99% | 8 |
+| 2022-Q4 | 31.03% (4.76% to 100.00%) | 24.14% (0.00% to 100.00%) | 24.14% (0.00% to 100.00%) |  | 5 |
+| 2023-Q3 | 100.00% (100.00% to 100.00%) | 100.00% (100.00% to 100.00%) | 100.00% (100.00% to 100.00%) |  | 6 |
+| 2023-Q4 | 100.00% (100.00% to 100.00%) | 100.00% (100.00% to 100.00%) | 99.97% (99.86% to 100.00%) |  | 9 |
+| 2024-Q1 | 100.00% (100.00% to 100.00%) | 42.81% (5.85% to 100.00%) | 42.81% (6.30% to 100.00%) |  | 15 |
+| 2024-Q2 | 94.87% (68.40% to 100.00%) | 84.01% (30.72% to 98.66%) | 68.47% (1.09% to 90.97%) |  | 12 |
+| 2024-Q3 | 97.96% (90.48% to 100.00%) | 59.19% (3.90% to 100.00%) | 58.15% (0.00% to 98.23%) |  | 5 |
+| 2024-Q4 | 97.40% (88.95% to 100.00%) | 97.40% (89.58% to 100.00%) | 78.64% (58.67% to 99.57%) |  | 11 |
+| 2025-Q1 | 68.29% (45.77% to 90.73%) | 57.73% (33.35% to 78.83%) | 29.98% (12.27% to 47.36%) |  | 32 |
+| 2025-Q2 | 71.74% (46.21% to 100.00%) | 36.41% (10.85% to 69.06%) | 1.09% (0.00% to 4.88%) |  | 10 |
+| 2025-Q3 | 51.58% (23.56% to 85.72%) | 7.11% (0.00% to 21.77%) | 7.11% (0.00% to 19.95%) |  | 12 |
+| 2025-Q4 | 74.27% (49.22% to 100.00%) | 61.40% (23.83% to 100.00%) | 0.00% (0.00% to 0.00%) |  | 8 |
+| 2026-Q1 | 33.33% (6.67% to 57.89%) | 0.00% (0.00% to 0.00%) | 0.00% (0.00% to 0.00%) |  | 8 |
+| 2026-Q2 | 10.48% (1.82% to 40.81%) | 0.00% (0.00% to 0.00%) |  |  | 8 |
+| 2026-Q3 | 53.29% (2.92% to 99.95%) | 21.74% (0.00% to 99.99%) |  |  | 11 |
+
+New signers are rare among drawn transactions (a few per month), so these cohorts are small: treat any cohort with fewer than 20 new-signer draws as not informative. A cohort design that samples new accounts directly is phase 2b work.
+
+**Method.** Each month, transactions are drawn uniformly without replacement (seeded) from the stratified block sample (30 blocks per month, 90 from 2025-11): 200 draws per month from 2024-11, 15 before. For each draw the FastNear indexer gives the real signer's exact count of transactions that month and up to 200 timestamps; for the first 60 draws of a month also its first appearance (cohorts) and, for new accounts, its last signed transaction; for the first 40 draws the receivers and methods of its 20 latest transactions. A rule-based score (volume, round-the-clock activity, sub-30-second median gaps, metronome-like regularity, single repeated action) labels accounts automated at score >= 2; accounts mostly calling reward programs (HOT mining and airdrops, KaiChing, SWEAT and their namespaces, NEARCrowd, inscriptions, Harvest Moon) are incentivized; automated accounts mostly calling settlement, bridge, MPC or EVM-relay contracts are infrastructure; accounts whose transactions are mostly calls to themselves (relayed one-off key or account setup of fresh implicit accounts, seen in bulk in early 2026) are account setup, not application use. Distinct active signers are estimated with 1/c weights (a signer with c transactions in the period is drawn c times as often as a signer with one). Monthly active signers are much noisier than daily ones: a signer with a single transaction in the month carries the weight of N/n accounts (hundreds of thousands in 2024-2025), so read them by quarter; the adoption model and the Q1 prediction use daily active signers.
+
+**Limits.** (1) The score is rule-based, not trained on labelled data: the sensitivity table shows how much the organic share moves with the threshold. (2) Timing features see at most the 200 most recent transactions of a signer-month. (3) A human using an app that batches or automates actions can look automated; a slow bot looks human. (4) Retention is rolling (any later activity), measured to the fetch date, and only for cohorts whose horizon has elapsed. (5) Early months (before 2024-11) have 15 draws, so their intervals are wide. (6) Monthly totals use NearBlocks transactions; FastNear's index agrees within a few percent (phase 1). (7) The incentivized namespaces were extended after the pilot months (2026-08/09/10) showed Harvest Moon, HOT airdrops and SWEAT / KaiChing sub-accounts among "organic" draws; the top-receivers table above is there to catch what is still missing. (8) Retention cohorts are small (see the table).
 
 ## Q2. NEAR Intents cross-check: on-chain settlement vs DefiLlama
 
@@ -280,6 +394,8 @@ Monthly active developers (28-day rolling, quarter end). From 2025-Q3 to 2026-Q3
 
 | Repo | Group | Stars | Commits last 12m | vs prior 12m | Authors last 12m | vs prior 12m | Releases last 12m | Last release | Archived |
 |---|---|---|---|---|---|---|---|---|---|
+| defuse-protocol/near-intents-amm-solver | intents | 29 | 2 | -95.35% | 2 | -60.00% | 0 |  | no |
+| defuse-protocol/sdk-monorepo | intents | 17 | 426 | 42.00% | 15 | 114.29% | 189 | 2026-10-29 | no |
 | near/intents | intents | 61 | 212 | 103.85% | 12 | 71.43% | 7 | 2026-06-30 | no |
 | near/near-api-js | core | 429 | 192 | 1.05% | 10 | -41.18% | 85 | 2026-10-23 | no |
 | near/near-cli-rs | core | 150 | 109 | 36.25% | 12 | -14.29% | 20 | 2026-10-19 | no |
@@ -292,4 +408,6 @@ Monthly active developers (28-day rolling, quarter end). From 2025-Q3 to 2026-Q3
 | nearai/putnambench-deepseek | nearai | 46 | 8 | n/a | 2 | n/a | 0 |  | no |
 
 GitHub REST API without a token (60 requests/hour): commits and authors come from `stats/contributors` (top 100 contributors per repository, default branch); `stats/participation` counts all contributors over 52 weeks and differs from it by up to the ratio in `dev_github_summary.csv` (`top100_coverage_52w`). Windows are the last 12 complete months.
+
+**Not fetched.** Commits outside the top 100 contributors of a repository, non-default branches and private repositories (GitHub without a token); repositories beyond the 12 listed (the full NEAR ecosystem has thousands, which the keyless 60 requests/hour cannot cover: Electric Capital's ecosystem-level counts stand in for them); Electric Capital's per-repository and per-developer tables (2 to 22 GB each), so NEAR's developer count is taken as published, not rebuilt.
 

@@ -78,6 +78,13 @@ def model_inputs(raw: Path, daily: pl.DataFrame, epochs: pl.DataFrame, as_of: st
     else:
         inp["buyback_near_per_year_onchain"] = inp["buyback_yield_onchain"] = None
     inp["buyback_yield"] = inp["buyback_yield_onchain"] or inp["buyback_yield_defillama"] or 0.0
+    gp = raw / "governance" / "hsp029_status.csv"
+    if gp.exists():
+        g = io.read_csv(gp).row(0, named=True)
+        from . import manifest as _m
+        inp["hsp029_status"] = g["status"]
+        inp["hsp029_snapshot_utc"] = _m.load()["files"]["governance/hsp029_status.csv"]["fetched_at_utc"]
+        inp["hsp029_url"] = g["topic_url"]
     d = ic.get("days") if ic else None
     inp["intents_onchain_one_sided_to_defillama"] = (float(d["ratio_sample_to_defillama"].median())
                                                      if d is not None and d.height else None)
@@ -142,9 +149,16 @@ def run_adoption(org: dict, daily: pl.DataFrame, as_of: str, mcfg: dict) -> dict
         first = config.load()["signers"]["recent_first_month"]  # months with the full 200-draw design
         mon = (org["monthly"].filter(~pl.col("is_partial_month") & (pl.col("month") >= first)).sort("month")
                .tail(int(mcfg["adoption_fit_months"])))
-        series_list += [("organic_daily_active_signers", mon["month"].to_list(), mon["das_organic"].to_list()),
-                        ("organic_monthly_active_signers", mon["month"].to_list(), mon["mas_organic"].to_list()),
-                        ("organic_txs_per_day", mon["month"].to_list(), mon["txs_per_day_organic"].to_list())]
+        # monthly estimates can be 0 (no organic draw among 200), which a log model cannot use: the organic series
+        # are trailing 3-month means (past data only, so the backtest stays out of sample)
+        def trailing(col: str):
+            v = mon[col].to_list()
+            return mon["month"].to_list()[2:], [sum(v[i - 2:i + 1]) / 3 for i in range(2, len(v))]
+        for name, col in (("organic_daily_active_signers_3m", "das_organic"),
+                          ("organic_monthly_active_signers_3m", "mas_organic"),
+                          ("organic_txs_per_day_3m", "txs_per_day_organic")):
+            months_, vals_ = trailing(col)
+            series_list.append((name, months_, vals_))
     iv = (series(daily, "near", "intents_volume_usd", "defillama")
           .with_columns(pl.col("date").dt.strftime("%Y-%m").alias("month"))
           .group_by("month").agg(pl.col("value").sum(), pl.len().alias("days")).sort("month")

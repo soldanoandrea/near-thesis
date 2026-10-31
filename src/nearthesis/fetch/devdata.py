@@ -25,8 +25,9 @@ import polars as pl
 from .. import config, manifest, paths
 
 GH = "https://api.github.com"
-CORE_REPOS = ["near/nearcore", "near/near-sdk-rs", "near/near-sdk-js", "near/near-api-js", "near/near-cli-rs",
-              "near/intents"]
+CORE_REPOS = ["near/nearcore", "near/near-sdk-rs", "near/near-sdk-js", "near/near-api-js", "near/near-cli-rs"]
+# NEAR Intents: the Verifier contract and the two repositories linked from docs.near-intents.org (SDK, example solver)
+INTENTS_REPOS = ["near/intents", "defuse-protocol/sdk-monorepo", "defuse-protocol/near-intents-amm-solver"]
 NEARAI_ORG = "nearai"
 NEARAI_TOP = 4
 ODD_MANIFEST = "https://data.opendevdata.org/manifest.json"
@@ -96,13 +97,13 @@ def fetch_github(client=None) -> None:
         cutoff = (dt.datetime.now(dt.UTC) - dt.timedelta(days=365)).isoformat()
         cand = [r for r in org if not r.get("fork") and not r.get("archived") and (r.get("pushed_at") or "") >= cutoff]
         nearai = [r["full_name"] for r in sorted(cand, key=lambda r: (-r["stargazers_count"], r["full_name"]))][:NEARAI_TOP]
-    repos = CORE_REPOS + nearai
+    repos = CORE_REPOS + INTENTS_REPOS + nearai
     meta_rows, week_rows, part_rows, rel_rows = [], [], [], []
     for repo in repos:
         st, m, _ = gh.get(f"/repos/{repo}")
         if st != 200 or not m:
             continue
-        group = "nearai" if repo in nearai else ("intents" if repo == "near/intents" else "core")
+        group = "nearai" if repo in nearai else ("intents" if repo in INTENTS_REPOS else "core")
         meta_rows.append({"repo": repo, "resolved_full_name": m["full_name"], "group": group,
                           "created_at": m["created_at"], "pushed_at": m["pushed_at"], "stars": m["stargazers_count"],
                           "forks": m["forks_count"], "open_issues": m["open_issues_count"], "archived": m["archived"],

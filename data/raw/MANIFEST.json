@@ -890,6 +890,121 @@
       },
       "notes": "All-time count of transactions whose real receiver is the account (relayers excluded)."
     },
+    "fastnear_tx/signer_lifetime.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/account"
+      ],
+      "params": {
+        "draws_recent": 200,
+        "draws_early": 15,
+        "lifetime_draws": 60,
+        "detail_draws": 40,
+        "recent_first_month": "2024-11",
+        "seed": 20261101,
+        "rng": "numpy.random.default_rng([seed, yyyymm, 3]).permutation(pooled block-sample txs)"
+      },
+      "fetched_at_utc": "2026-10-31T01:57:54Z",
+      "rows": 1457,
+      "columns": [
+        "signer_id",
+        "lifetime_txs_any_role",
+        "first_height",
+        "first_timestamp_s",
+        "lifetime_txs_real_signer",
+        "last_signed_height",
+        "last_signed_timestamp_s"
+      ],
+      "sha256": "58f4a79c39d03451e7ecce078b0e6775f39236bc09f3444af643215b89ea3cfe",
+      "bytes": 86162,
+      "http": {
+        "requests": 0,
+        "cache_hits": 6967,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 0
+      },
+      "notes": "First appearance in any role (creation / first funding) for every drawn signer; last really-signed transaction and lifetime signed count only for signers new in their drawn month (cohort retention). Lifetime counts are as of the fetch."
+    },
+    "fastnear_tx/signer_month_activity.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/account"
+      ],
+      "params": {
+        "draws_recent": 200,
+        "draws_early": 15,
+        "lifetime_draws": 60,
+        "detail_draws": 40,
+        "recent_first_month": "2024-11",
+        "seed": 20261101,
+        "rng": "numpy.random.default_rng([seed, yyyymm, 3]).permutation(pooled block-sample txs)"
+      },
+      "fetched_at_utc": "2026-10-31T01:57:54Z",
+      "rows": 4198,
+      "columns": [
+        "signer_id",
+        "month",
+        "from_height",
+        "to_height_inclusive",
+        "txs_count",
+        "rows_returned",
+        "ts_first_s",
+        "ts_gaps_s"
+      ],
+      "sha256": "2dcecadcfe8428eeb93efce531e71f80675506ece565df79f4e230f48b4c7d9d",
+      "bytes": 1410651,
+      "http": {
+        "requests": 0,
+        "cache_hits": 6967,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 0
+      },
+      "notes": "Per drawn (signer, month): exact count of transactions really signed in the month (is_real_signer, relayers unwrapped) and the unix-second timestamps of up to 200 of them (the most recent), delta-encoded: ts_first_s = earliest returned, ts_gaps_s = space-separated gaps in seconds, ascending."
+    },
+    "fastnear_tx/signer_tx_details.csv": {
+      "source": "fastnear_tx",
+      "urls": [
+        "https://tx.main.fastnear.com/v0/transactions"
+      ],
+      "params": {
+        "draws_recent": 200,
+        "draws_early": 15,
+        "lifetime_draws": 60,
+        "detail_draws": 40,
+        "recent_first_month": "2024-11",
+        "seed": 20261101,
+        "rng": "numpy.random.default_rng([seed, yyyymm, 3]).permutation(pooled block-sample txs)"
+      },
+      "fetched_at_utc": "2026-10-31T01:57:54Z",
+      "rows": 19722,
+      "columns": [
+        "signer_id",
+        "month",
+        "tx_hash",
+        "outer_signer_id",
+        "receiver_id",
+        "real_receiver_id",
+        "is_relayed",
+        "methods",
+        "action_kinds",
+        "block_height"
+      ],
+      "sha256": "4695241b2ad99f80913d9f155491e5f1a5c72a870236dd2e03af80b9787a89b3",
+      "bytes": 3407871,
+      "http": {
+        "requests": 0,
+        "cache_hits": 6967,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 0
+      },
+      "notes": "Receiver, real receiver (inside Delegate actions), FunctionCall method names and action kinds of up to 20 recent txs per detailed (signer, month)."
+    },
     "fastnear_tx/trail_hops.csv": {
       "source": "fastnear_tx",
       "urls": [
@@ -1000,6 +1115,8 @@
           "near/near-api-js",
           "near/near-cli-rs",
           "near/intents",
+          "defuse-protocol/sdk-monorepo",
+          "defuse-protocol/near-intents-amm-solver",
           "nearai/ironclaw",
           "nearai/putnambench-deepseek",
           "nearai/cloud-api",
@@ -1007,18 +1124,18 @@
         ],
         "nearai_top": 4
       },
-      "fetched_at_utc": "2026-10-30T22:57:54Z",
-      "rows": 6717,
+      "fetched_at_utc": "2026-10-30T23:45:29Z",
+      "rows": 6958,
       "columns": [
         "repo",
         "author",
         "week_start",
         "commits"
       ],
-      "sha256": "ffbe0ff6fb44abfecdd652ab1dd9204162a3436cc569926eb79f86e610fd1bc1",
-      "bytes": 260601,
+      "sha256": "a9ca69a50de0bc77fe7928e3af9e13274654e52c39c59d0b7be9c045eb571081",
+      "bytes": 274609,
       "http": {
-        "requests": 46
+        "requests": 9
       },
       "notes": "Weekly commits (default branch) of the top 100 contributors per repo, weeks with >0 commits only. Public GitHub logins."
     },
@@ -1035,6 +1152,8 @@
           "near/near-api-js",
           "near/near-cli-rs",
           "near/intents",
+          "defuse-protocol/sdk-monorepo",
+          "defuse-protocol/near-intents-amm-solver",
           "nearai/ironclaw",
           "nearai/putnambench-deepseek",
           "nearai/cloud-api",
@@ -1042,17 +1161,17 @@
         ],
         "nearai_top": 4
       },
-      "fetched_at_utc": "2026-10-30T22:57:54Z",
-      "rows": 44,
+      "fetched_at_utc": "2026-10-30T23:45:29Z",
+      "rows": 53,
       "columns": [
         "url",
         "status",
         "from_cache"
       ],
-      "sha256": "58479c99208199d37c9535202b8f7456b01a1d4216dee5dfe75a74f257a9c8ac",
-      "bytes": 3251,
+      "sha256": "2230708444c1023f41f5798c4a983156796cbc01cb3b7d11a18f35bd22b28958",
+      "bytes": 4003,
       "http": {
-        "requests": 46
+        "requests": 9
       },
       "notes": "Every GitHub URL requested and its final HTTP status (202 = statistics still being computed by GitHub; such tables are missing for that repo)."
     },
@@ -1069,6 +1188,8 @@
           "near/near-api-js",
           "near/near-cli-rs",
           "near/intents",
+          "defuse-protocol/sdk-monorepo",
+          "defuse-protocol/near-intents-amm-solver",
           "nearai/ironclaw",
           "nearai/putnambench-deepseek",
           "nearai/cloud-api",
@@ -1076,8 +1197,8 @@
         ],
         "nearai_top": 4
       },
-      "fetched_at_utc": "2026-10-30T22:57:54Z",
-      "rows": 520,
+      "fetched_at_utc": "2026-10-30T23:45:29Z",
+      "rows": 624,
       "columns": [
         "repo",
         "weeks_ago",
@@ -1085,10 +1206,10 @@
         "commits_all",
         "commits_owner"
       ],
-      "sha256": "889e0510160740440005f09211fb02d10c34003ddc37feec3cbb84957b726ffc",
-      "bytes": 18772,
+      "sha256": "2ee95beebde9355ad6a4195733205effc91c07d3eac182d541fe4aba0144a274",
+      "bytes": 24219,
       "http": {
-        "requests": 46
+        "requests": 9
       },
       "notes": "Weekly commit counts of all contributors, last 52 weeks (bucket 0 = most recent)."
     },
@@ -1105,6 +1226,8 @@
           "near/near-api-js",
           "near/near-cli-rs",
           "near/intents",
+          "defuse-protocol/sdk-monorepo",
+          "defuse-protocol/near-intents-amm-solver",
           "nearai/ironclaw",
           "nearai/putnambench-deepseek",
           "nearai/cloud-api",
@@ -1112,8 +1235,8 @@
         ],
         "nearai_top": 4
       },
-      "fetched_at_utc": "2026-10-30T22:57:54Z",
-      "rows": 855,
+      "fetched_at_utc": "2026-10-30T23:45:29Z",
+      "rows": 1055,
       "columns": [
         "repo",
         "tag",
@@ -1121,10 +1244,10 @@
         "prerelease",
         "draft"
       ],
-      "sha256": "a8f39db44ebc83f21b3aa595363f74ee8bbf63370716d2e7d523f7d5be7a1347",
-      "bytes": 56661,
+      "sha256": "a6c37f529da639aa0240154b1eefefd648d965671cfb6d10dccd0b236b34a3af",
+      "bytes": 76565,
       "http": {
-        "requests": 46
+        "requests": 9
       },
       "notes": "Up to 200 most recent releases per repo."
     },
@@ -1142,6 +1265,8 @@
           "near/near-api-js",
           "near/near-cli-rs",
           "near/intents",
+          "defuse-protocol/sdk-monorepo",
+          "defuse-protocol/near-intents-amm-solver",
           "nearai/ironclaw",
           "nearai/putnambench-deepseek",
           "nearai/cloud-api",
@@ -1149,8 +1274,8 @@
         ],
         "nearai_top": 4
       },
-      "fetched_at_utc": "2026-10-30T22:57:54Z",
-      "rows": 10,
+      "fetched_at_utc": "2026-10-30T23:45:29Z",
+      "rows": 12,
       "columns": [
         "repo",
         "resolved_full_name",
@@ -1164,10 +1289,10 @@
         "default_branch",
         "language"
       ],
-      "sha256": "f3b933854a84bb87261cda6eaddc3744cc3e035144a1adf666f4387f21f08f9f",
-      "bytes": 1235,
+      "sha256": "1d03bf83cf7e15eaaffe6f228638f67fce689afdc4f9b920506dfaaf201ac0b7",
+      "bytes": 1534,
       "http": {
-        "requests": 46
+        "requests": 9
       },
       "notes": "Repository metadata at fetch time. nearai repos = most-starred non-fork, non-archived repos pushed in the last 365 days."
     },

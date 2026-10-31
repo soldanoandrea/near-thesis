@@ -1,4 +1,6 @@
 repo,resolved_full_name,group,created_at,pushed_at,stars,forks,open_issues,archived,default_branch,language
+defuse-protocol/near-intents-amm-solver,defuse-protocol/near-intents-amm-solver,intents,2025-01-31T06:39:00Z,2026-08-12T10:12:01Z,29,15,4,false,main,TypeScript
+defuse-protocol/sdk-monorepo,defuse-protocol/sdk-monorepo,intents,2025-06-17T11:39:00Z,2026-10-30T06:26:02Z,17,25,30,false,main,TypeScript
 near/intents,near/intents,intents,2024-05-02T12:38:40Z,2026-10-29T09:53:34Z,61,55,22,false,main,Rust
 near/near-api-js,near/near-api-js,core,2019-05-04T06:33:50Z,2026-10-26T04:29:46Z,429,267,24,false,master,TypeScript
 near/near-cli-rs,near/near-cli-rs,core,2021-03-02T18:37:25Z,2026-10-22T21:43:38Z,150,80,43,false,main,Rust

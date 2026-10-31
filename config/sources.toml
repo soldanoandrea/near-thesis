@@ -206,9 +206,12 @@ seed = 20261101
 # incentivized receivers beyond the phase-1 census list ([activity.groups].incentivized): whole namespaces of the
 # reward programs (SWEAT claims / jars / oracles, KaiChing user sub-accounts) and the tap-to-earn game Harvest Moon,
 # identified in the first two pilot months (2026-09, 2026-10). A signer inside such a namespace that calls itself
-# (app-driven account setup) also counts as incentivized.
-incentivized_extra = ["aa-harvest-moon.near", "wallet.kaiching", "v2.jars.sweat", "claim.sweat"]
-incentivized_suffixes = [".sweat", ".kaiching"]
+# (app-driven account setup) also counts as incentivized. Added after looking at the receivers of "organic" draws:
+# HOT airdrop and claim contracts (firedrop / claim namespaces of hot.tg, not the v2_1.omni.hot.tg bridge) after
+# 2026-08, and the PlayEmber tap-to-earn reserve, which made up most "organic" draws of 2024-11..2025-09.
+incentivized_extra = ["aa-harvest-moon.near", "wallet.kaiching", "v2.jars.sweat", "claim.sweat",
+                      "embr.playember_reserve.near"]
+incentivized_suffixes = [".sweat", ".kaiching", "firedrop.hot.tg", "claim.hot.tg", "playember_reserve.near", "harvest-moon.near"]
 # receivers whose transactions are infrastructure relays (settlement, bridges, MPC signing, EVM relay)
 infrastructure = ["aurora", "intents.near", "v1.signer", "omft.near", "omni.bridge.near", "v2_1.omni.hot.tg",
                   "relay.aurora", "factory.bridge.near", "rainbow-bridge.near", "solver-relay.near"]

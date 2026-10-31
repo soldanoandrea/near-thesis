@@ -1,4 +1,5 @@
 question,falsifier,reading,status
+Q1,Organic active accounts show no growth over the last 24 months and month-3 cohort retention does not improve,"organic daily active signers 23,402 (2025-Q1) -> 6,437 (2026-Q3), 18 months (the first quarter with the full sample design): changed by an amount within the sampling noise; month-3 retention assessable for 1 cohort(s) only (2025-Q1); the others have fewer than 20 new-signer draws",met on the activity leg; retention leg not assessable
 Q2,90-day Intents volume falls for two consecutive quarters,2026-Q2 -13.04%; 2026-Q3 56.68%,not met
 Q2,The top asset accounts for more than 40% of volume (fragility),"largest asset share above 40% on 5 of 6 sampled days (median 47.93%, asset USDT)",met
 Q2,Reconstructed on-chain volume differs from reported volume by more than 20% on sampled days,one-sided: 6 of 6 days off by more than 20%; two-sided equivalent: 4 of 6,met (definition-dependent)

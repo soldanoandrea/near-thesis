@@ -1,4 +1,6 @@
 repo,group,archived,stars,window_last12,commits_last12,commits_prev12,commits_change,authors_last12,authors_prev12,authors_change,releases_last12,stable_releases_last12,last_release,participation_52w_commits,top100_52w_commits,top100_coverage_52w
+defuse-protocol/near-intents-amm-solver,intents,false,29,2025-10 to 2026-09,2,43,-0.95348837,2,5,-0.60000000,0,0,"",2,2,1.00000000
+defuse-protocol/sdk-monorepo,intents,false,17,2025-10 to 2026-09,426,300,0.42000000,15,7,1.14285714,189,189,2026-10-29T13:55:11Z,288,395,1.37152778
 near/intents,intents,false,61,2025-10 to 2026-09,212,104,1.03846154,12,7,0.71428571,7,6,2026-06-30T23:28:42Z,182,211,1.15934066
 near/near-api-js,core,false,429,2025-10 to 2026-09,192,190,0.01052632,10,17,-0.41176471,85,85,2026-10-23T22:05:16Z,427,190,0.44496487
 near/near-cli-rs,core,false,150,2025-10 to 2026-09,109,80,0.36250000,12,14,-0.14285714,20,19,2026-10-19T15:43:57Z,102,117,1.14705882

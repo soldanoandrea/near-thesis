@@ -1,7 +1,7 @@
 """NEAR Intents settlement cross-check (PIANO.md Q2 / section 3.2, phase 2a). Keyless: FastNear Transactions API,
 FastNear archival RPC view calls, the public 1Click token list and DefiLlama coin prices.
 
-Contracts (docs.near-intents.org, fetched 2026-10-31): the Verifier `intents.near` settles every intent and emits
+Contracts (docs.near-intents.org, read 2026-10-30 UTC): the Verifier `intents.near` settles every intent and emits
 DIP-4 `token_diff` events for swaps; it charges a protocol fee of `fee()` pips (1 pip = 0.0001%) on the sold leg of
 each token_diff and moves it to `fee_collector()` (an implicit account) inside its own NEP-245 ledger.
 

@@ -1,4 +1,15 @@
 question,metric_id,label,value,ci90_low,ci90_high,unit,window,source,grade,notes
+Q1,q1b.organic_txs_per_day,"Organic transactions per day, 2026-Q3",16630.37665591,6477.16282311,28472.53926205,count,2026-Q3,signer histories + block sample,A,""
+Q1,q1b.organic_tx_share,"Organic share of transactions, 2026-Q3",0.02166667,0.00857723,0.03701605,ratio,2026-Q3,signer histories + block sample,A,""
+Q1,q1b.organic_mas,"Organic monthly active signers (mean of months), 2026-Q3",77332.43096162,15737.02498927,162261.10732820,count,2026-Q3,signer histories + block sample,A,""
+Q1,q1b.organic_das,"Organic daily active signers (average day), 2026-Q3",6436.75584231,1934.70348581,12044.73753730,count,2026-Q3,signer histories + block sample,A,""
+Q1,q1b.all_das,"All daily active signers (average day), 2026-Q3",149876.47753257,130310.32080094,171084.37519988,count,2026-Q3,signer histories + block sample,A,""
+Q1,q1b.organic_das_first_full_quarter,"Organic daily active signers, 2025-Q1 (first quarter with 200 draws in every month)",23401.74292051,0.00000000,55724.52800054,count,2025-Q1,signer histories + block sample,A,""
+Q1,q1b.organic_das_change,"Organic daily active signers, 2026-Q3 vs 2025-Q1",-0.72494545,,,ratio,2025-Q1 to 2026-Q3,signer histories + block sample,A,Point estimates; both 90% intervals are in the rows above.
+Q1,q1b.das_to_nearblocks,"All daily active signers / NearBlocks active accounts, last 12 months (median)",5.19226062,,,ratio,2025-10 to 2026-09,signer histories vs nearblocks,A/B,Real (inner) signers of relayed transactions are counted here; a ratio above 1 is consistent with NearBlocks counting the relayer of a meta-transaction as the active account.
+Q1,q1b.organic_share_strict,"Organic share of transactions, strict bot threshold (score >= 1), 2026-Q3",0.01166667,,,ratio,2026-Q3,signer histories + block sample,A,""
+Q1,q1b.organic_share_lenient,"Organic share of transactions, lenient bot threshold (score >= 3), 2026-Q3",0.05166667,,,ratio,2026-Q3,signer histories + block sample,A,""
+Q1,q1b.retention_3m_largest_cohort,"3-month rolling retention of new signers, cohort 2025-Q1 (largest cohort)",0.57728428,0.33346704,0.78833448,ratio,2025-Q1,signer histories,A,32 new-signer draws; every other cohort has fewer than 20 and is not informative.
 Q2,q2b.ratio_sample_median,"On-chain swap volume / DefiLlama volume, median of 6 days (sample estimate)",0.46042176,,,ratio,2025-11-01 to 2026-09-03,token_diff events vs defillama,A/B,Daily ratios range from 22.86% to 64.76%; per-day 90% CIs are in the Q2 table.
 Q2,q2b.ratio_two_sided_median,"Two-sided equivalent (2x on-chain one-sided) / DefiLlama volume, median of 6 days",0.92084351,,,ratio,2025-11-01 to 2026-09-03,token_diff events vs defillama,A/B,What a definition counting both legs of every swap would report.
 Q2,q2b.frame_check,Control-sample transactions with a token_diff that paid no protocol fee,0.00000000,,,count,488 token_diff txs in 1161 intents.near txs,control sample,A,0 means the fee-paying frame used for the volume sample contains every swap seen.
@@ -26,5 +37,9 @@ M,mb.chain_fees,"NEAR market cap / annualized chain fees (30d), vs peer median 3
 M,mb.fees_plus_intents_fees,"NEAR market cap / annualized fees plus intents fees (30d), vs peer median 379x",80.04612966,,,count,30d annualized,model (b),model,"Peer range 106x to 2,000x."
 M,mb.revenue_plus_intents_revenue,"NEAR market cap / annualized revenue plus intents revenue (30d), vs peer median 1,784x",219.71878535,,,count,30d annualized,model (b),model,"Peer range 106x to 11,167x."
 M,mc.best.intents_monthly_volume_usd,Best out-of-sample model for intents_monthly_volume_usd at 6 months (naive),0.34045594,,,ratio,4 forecasts,model (c),model,Mean absolute log error (about a relative error).
+M,mc.best.organic_daily_active_signers_3m,Best out-of-sample model for organic_daily_active_signers_3m at 6 months (loglinear),0.40365240,,,ratio,2 forecasts,model (c),model,Mean absolute log error (about a relative error).
+M,mc.best.organic_monthly_active_signers_3m,Best out-of-sample model for organic_monthly_active_signers_3m at 6 months (loglinear),0.49684381,,,ratio,2 forecasts,model (c),model,Mean absolute log error (about a relative error).
+M,mc.best.organic_txs_per_day_3m,Best out-of-sample model for organic_txs_per_day_3m at 6 months (logistic),0.88497254,,,ratio,2 forecasts,model (c),model,Mean absolute log error (about a relative error).
+M,mc.organic_das_trend,"Organic daily active signers, fitted trend per year (log-linear)",-0.37832812,,,ratio/yr,2025-01 to 2026-09,model (c),model,""
 M,md.real_staker_yield,"Real staker yield (share of float), last 365 days, 5% commission",0.02505881,,,ratio/yr,last 365 days,model (d),model,""
 M,md.non_staker,"Non-staker real yield (dilution of float), last 365 days",-0.02055110,,,ratio/yr,last 365 days,model (d),model,""

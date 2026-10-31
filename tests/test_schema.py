@@ -27,6 +27,38 @@ RAW_COLUMNS = {
     "fastnear_tx/block_sample_blocks.csv": {"month", "draw", "sampled_height", "block_height", "num_transactions"},
     "fastnear_tx/block_sample_txs.csv": {"month", "draw", "block_height", "real_signer_id", "real_receiver_id",
                                          "is_relayed"},
+    # phase 2a
+    "fastnear_tx/block_sample_extra_blocks.csv": {"month", "draw", "sampled_height", "block_height", "num_transactions"},
+    "fastnear_tx/block_sample_extra_txs.csv": {"month", "draw", "block_height", "real_signer_id", "real_receiver_id",
+                                               "is_relayed", "transaction_hash"},
+    "fastnear_tx/signer_month_activity.csv": {"signer_id", "month", "from_height", "to_height_inclusive", "txs_count",
+                                              "rows_returned", "ts_first_s", "ts_gaps_s"},
+    "fastnear_tx/signer_lifetime.csv": {"signer_id", "lifetime_txs_any_role", "first_height", "first_timestamp_s",
+                                        "lifetime_txs_real_signer", "last_signed_height", "last_signed_timestamp_s"},
+    "fastnear_tx/signer_tx_details.csv": {"signer_id", "month", "tx_hash", "outer_signer_id", "receiver_id",
+                                          "real_receiver_id", "is_relayed", "methods", "action_kinds", "block_height"},
+    "fastnear_tx/intents_days.csv": {"day", "from_height", "to_height_exclusive", "fee_pips_start", "fee_collector",
+                                     "fee_paying_txs", "intents_receiver_txs"},
+    "fastnear_tx/intents_swap_legs.csv": {"day", "tx_no", "event_index", "account_id", "token_id", "amount",
+                                          "fee_collected", "referral"},
+    "fastnear_tx/intents_swap_txs.csv": {"day", "window", "tx_no", "tx_hash", "block_height", "legs"},
+    "fastnear_tx/intents_windows.csv": {"day", "window", "window_start", "window_blocks", "fee_paying_txs_listed",
+                                        "txs_fetched"},
+    "rpc_archival/intents_fee_collector_balances.csv": {"day", "token_id", "balance_start", "balance_end"},
+    "oneclick/tokens.csv": {"assetId", "decimals", "symbol", "coingeckoId"},
+    "defillama/coin_prices_intents_days.csv": {"day", "coin", "price_usd", "timestamp"},
+    "fastnear_tx/wallet_flows.csv": {"wallet", "tx_hash", "receipt_id", "block_height", "block_timestamp_ns", "kind",
+                                     "direction", "counterparty", "asset", "amount_raw", "method"},
+    "fastnear_tx/trail_hops.csv": {"depth", "source", "account", "account_class", "received_tx", "received_height",
+                                   "received_near_yocto", "out_tx", "out_counterparty", "out_asset", "out_amount_raw",
+                                   "stop_reason"},
+    "github/repos.csv": {"repo", "group", "created_at", "pushed_at", "stars", "archived"},
+    "github/contributor_weeks.csv": {"repo", "author", "week_start", "commits"},
+    "github/participation.csv": {"repo", "weeks_ago", "commits_all"},
+    "github/releases.csv": {"repo", "tag", "published_at", "prerelease", "draft"},
+    "opendevdata/eco_mads_monthly.csv": {"ecosystem", "ecosystem_id", "month", "day", "all_devs", "full_time_devs",
+                                         "exclusive_devs"},
+    "governance/hsp029_status.csv": {"topic_url", "title", "status", "spec_cap_formula", "activation"},
 }
 
 
@@ -52,6 +84,16 @@ def test_daily_long_schema(processed):
     assert d.select(["date", "chain", "metric", "source"]).is_duplicated().sum() == 0
     units = d.group_by(["metric", "source"]).agg(pl.col("unit").n_unique())
     assert (units["unit"] == 1).all(), "a metric changes unit inside one source"
+
+
+def test_yocto_and_raw_amounts_are_integers(raw):
+    """Phase 2a raw amounts are exact integers in the token's smallest unit (no float rounding in data/raw)."""
+    f = raw("fastnear_tx/wallet_flows.csv")
+    assert f["amount_raw"].str.contains(r"^\d+$").all()
+    legs = raw("fastnear_tx/intents_swap_legs.csv")
+    assert legs["amount"].str.contains(r"^-?\d+$").all()
+    b = raw("rpc_archival/intents_fee_collector_balances.csv")
+    assert b["balance_start"].str.contains(r"^\d+$").all() and b["balance_end"].str.contains(r"^\d+$").all()
 
 
 def test_metrics_table_schema(processed):

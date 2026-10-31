@@ -17,5 +17,8 @@ buyback_yield_defillama,0.00303399,""
 buyback_near_per_year_onchain,4593820.24252842,""
 buyback_yield_onchain,0.00350567,""
 buyback_yield,0.00350567,""
+hsp029_status,,Voting
+hsp029_snapshot_utc,,2026-10-30T22:59:35Z
+hsp029_url,,https://gov.near.org/t/42644
 intents_onchain_one_sided_to_defillama,0.46042176,""
 buyback_yield_source,,on-chain buyback ledger
