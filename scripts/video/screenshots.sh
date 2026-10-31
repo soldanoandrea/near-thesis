@@ -12,7 +12,7 @@ set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUT="${1:-$REPO/docs/media/screens}"
 LIST="${2:-}"
-CARDS="${CARDS:-hero classes signers intents revenue treasury supply multiples developers scorecard predictions outro}"
+CARDS="${CARDS:-hero classes signers intents revenue treasury supply multiples developers pathtoyes scorecard predictions outro}"
 W=1280 H=720
 
 CHROME="${CHROME:-}"

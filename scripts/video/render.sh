@@ -26,15 +26,16 @@ make -C "$REPO" site >/dev/null
 # name, seconds, capture hash (the note is a heading for the frame; numbers stay in the cards themselves)
 cat > "$WORK/scenes.txt" <<'SCENES'
 00_title 7 capture=hero&note=NEAR%20HACKATHON%202026%20%C2%B7%20track%20thesis%20%C2%B7%20judged%20on%20the%20evidence
-02_classes 14 capture=classes&note=1%2F6%20%C2%B7%20Organic%20use%3A%20who%20actually%20sends%20NEAR's%20transactions
+02_classes 13 capture=classes&note=1%2F6%20%C2%B7%20Organic%20use%3A%20who%20actually%20sends%20NEAR's%20transactions
 03_signers 13 capture=signers&note=1%2F6%20%C2%B7%20Organic%20use%3A%20small%20and%20not%20growing%2C%20and%20why%20NearBlocks%20undercounts%20signers
 04_intents 15 capture=intents&note=2%2F6%20%C2%B7%20NEAR%20Intents%3A%20real%2C%20but%20only%20half%20the%20reported%20volume%20is%20visible%20on-chain
-05_revenue 12 capture=revenue&note=3%2F6%20%C2%B7%20Revenue%20verified%3A%20DefiLlama's%20captured%20revenue%2C%20rebuilt%20from%20on-chain%20flows
-06_treasury 15 capture=treasury&note=4%2F6%20%C2%B7%20The%20treasury%20trail%3A%20where%20the%20April-May%202026%20outflows%20went
+05_revenue 12 capture=revenue&note=3%2F6%20%C2%B7%20Captured%20revenue%20checks%20out%2C%20and%20since%20April%202026%20it%20comes%20straight%20from%20intents.near
+06_treasury 13 capture=treasury&note=4%2F6%20%C2%B7%20The%20treasury%20trail%3A%20where%20the%20April-May%202026%20outflows%20went
 07_supply 12 capture=supply&note=5%2F6%20%C2%B7%20Dilution%3A%202.5%25%20issuance%20vs%20HSP-029%2C%20after%20burn%20and%20buybacks
 08_multiples 10 capture=multiples&note=5%2F6%20%C2%B7%20Valuation%20depends%20on%20whether%20Intents%20counts
-09_predictions 15 capture=predictions&note=6%2F6%20%C2%B7%20What%20would%20change%20our%20mind%3A%20dated%20predictions%2C%20hashed%20and%20tagged
-10_outro 8 capture=outro
+09_pathtoyes 12 capture=pathtoyes&note=6%2F6%20%C2%B7%20Path%20to%20yes%3A%20what%20would%20confirm%20the%20bull%20case%20by%20late%202027
+10_predictions 13 capture=predictions&note=6%2F6%20%C2%B7%20What%20would%20change%20our%20mind%3A%20dated%20predictions%2C%20hashed%20and%20tagged
+11_outro 8 capture=outro
 SCENES
 awk '{print $1, $3}' "$WORK/scenes.txt" > "$WORK/shots.txt"
 "$REPO/scripts/video/screenshots.sh" "$WORK/frames" "$WORK/shots.txt" >/dev/null
