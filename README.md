@@ -32,7 +32,8 @@ and sentence that quotes a number. Not financial advice.
   2026-04 99.7% of it has come straight from `intents.near`.
 - **Holders are still diluted.** 3.11M NEAR has been bought back and held since 2026-02-23, yet
   the float grows 2.12% a year at the 2.5% cap; offsetting that needs
-  8.1x today's Intents revenue (5.1x under HSP-029, in vote at the
+  8.1x today's Intents revenue (4.0x at half today's price, 16.6x against the last 365 days of revenue;
+  5.1x under HSP-029, in vote at the
   snapshot). Stakers gain 2.51% a year in share of the float; non-stakers lose 2.06%.
 - **The valuation depends on whether Intents counts.** NEAR's market cap is 2,516x its annualized chain fees
   (peer median 379x) but 80.0x counting Intents fees.

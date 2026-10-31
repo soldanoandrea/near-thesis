@@ -1,4 +1,4 @@
-# NEAR on the evidence: verified Intents revenue, thin organic use, and an {{ma.net_zero_multiple.0.0249:x}} gap to cover dilution
+# NEAR on the evidence: verified Intents revenue, thin organic use, and an {{ma.net_zero_multiple.0.0249:x}} gap ({{ma.net_zero_multiple_half_price.0.0249:x}} to {{ma.net_zero_multiple_365d.0.0249:x}}) to cover dilution
 
 *A data-backed long-term thesis on NEAR for the NEAR HACKATHON 2026, track `thesis`. Snapshot as-of {{in.as_of}} (UTC).
 Every number in this essay is filled in by `make site` from the tables in `data/processed/`;
@@ -20,8 +20,9 @@ Intents contract. Its reported volume does not check out one to one: public on-c
 once, add up to {{q2b.ratio_sample_median}} of DefiLlama's figure, so the headline volume either counts both sides of each swap
 or includes flow that public events cannot see. Value accrual
 does not yet cover issuance: after burn and buybacks the float grows {{sc.status_quo/base.1y.float_cagr}} a year at the
-current 2.5% cap, and offsetting that would take {{ma.net_zero_multiple.0.0249:x}} today's Intents revenue
-({{ma.net_zero_multiple.0.0159:x}} if HSP-029 cuts issuance to 1.6%). Our long-term case is therefore conditional, not
+current 2.5% cap, and offsetting that would take {{ma.net_zero_multiple.0.0249:x}} today's Intents revenue ({{ma.net_zero_multiple_half_price.0.0249:x}} if the NEAR price halved, {{ma.net_zero_multiple_365d.0.0249:x}}
+measured against the last 365 days of revenue instead of the last 90; {{ma.net_zero_multiple.0.0159:x}} if HSP-029 cuts
+issuance to 1.6%). Our long-term case is therefore conditional, not
 bullish: it needs Intents revenue to grow several-fold while organic use stops shrinking. Under our stated priors the
 probability that burn plus buybacks cover issuance within {{vp.horizon}} years is {{vp.p_offsets_cover}}; that is simply the
 weight we gave the {{par.revenue_change.high:sp0}}-a-year revenue path, the only one that gets there, not a measurement. The
@@ -181,7 +182,10 @@ float, not the supply. At the last six months' pace that is {{in.buyback_near_pe
 **Dilution.** Net of burn and buybacks the float grows {{sc.status_quo/base.1y.float_cagr}} a year at the 2.5% cap. A
 staker's share of the float grows {{md.real_staker_yield}} a year (5% commission) while a non-staker's shrinks
 {{md.non_staker:abs}}. For burn plus buybacks to offset issuance at today's price and take rate, captured revenue would have
-to reach {{nz.sq.required_revenue}} a year, against {{in.intents_revenue_annualized_90d}} today: {{ma.net_zero_multiple.0.0249:x}}.
+to reach {{nz.sq.required_revenue}} a year, against {{in.intents_revenue_annualized_90d}} today: {{ma.net_zero_multiple.0.0249:x}}. The multiple moves with the
+price and with the revenue window: at half today's NEAR price it is {{ma.net_zero_multiple_half_price.0.0249:x}}, because the new NEAR to offset is worth half
+as much; measured against the last 365 days of revenue ({{q2.intents_revenue_usd_365d}}) instead of the last 90 days
+annualized it is {{ma.net_zero_multiple_365d.0.0249:x}}, and on that basis the second leg of PIANO.md's Q4 falsifier (more than 10x) would be met too.
 HSP-029, which phases the cap down to 1.6% over 24 months, lowers the bar to {{nz.hsp.required_revenue}}
 ({{ma.net_zero_multiple.0.0159:x}}); it was in status "{{in.hsp029_status}}" at our snapshot ({{in.hsp029_snapshot_utc}}),
 with the vote reported to close on 2026-11-02 ([chart](../site/dashboard.html#card-supply)).
@@ -278,7 +282,8 @@ The same weight, the same tests: each claim names the prediction whose failure w
 3. **Intents is concentrated.** One asset, USDT, makes up {{q2b.top_asset_share}} of sold volume. A stablecoin-route
    shock would hit P2 and P4 together.
 4. **Holders are diluted and will stay so without large revenue growth.** Float dilution {{sc.status_quo/base.1y.float_cagr}}
-   a year, non-staker real yield {{md.non_staker}}, offset needs {{ma.net_zero_multiple.0.0249:x}} today's revenue.
+   a year, non-staker real yield {{md.non_staker}}, offset needs {{ma.net_zero_multiple.0.0249:x}} today's revenue ({{ma.net_zero_multiple_half_price.0.0249:x}} at half the price, {{ma.net_zero_multiple_365d.0.0249:x}}
+   against the last 365 days of revenue).
    Confirmed if P4 fails (captured revenue below {{pred.P4.threshold}} for 2026-11 to 2027-04).
 5. **On its own fees the chain is priced on narrative.** {{mb.chain_fees:x}} annualized chain fees against a peer median
    of {{mv.chain_fees.30d_annualized.peer_median}}, and NEAR captures only {{in.capture_share}} of Intents fees. Confirmed
@@ -298,7 +303,7 @@ decides how much of Intents belongs to NEAR holders. The data verify that the ca
 that the market should capitalize it at a peer multiple.
 
 **What you have to believe.** For holders to stop being diluted at today's price, captured Intents revenue has to reach
-{{nz.sq.required_revenue}} a year ({{ma.net_zero_multiple.0.0249:x}} today) at the 2.5% cap, or {{nz.hsp.required_revenue}}
+{{nz.sq.required_revenue}} a year ({{ma.net_zero_multiple.0.0249:x}} today; {{ma.net_zero_multiple_half_price.0.0249:x}} at half the price, {{ma.net_zero_multiple_365d.0.0249:x}} against trailing 365-day revenue) at the 2.5% cap, or {{nz.hsp.required_revenue}}
 ({{ma.net_zero_multiple.0.0159:x}}) under HSP-029. A higher NEAR price raises the bar in dollars, because buybacks buy
 fewer tokens.
 
@@ -347,7 +352,7 @@ evidence against it.
 
 Decision rule, stated now: if P1, P2 and P4 all hold, we upgrade the case from conditional to supported on usage and
 value capture; if P1 and P4 both fail, the long-term case as stated here is falsified. Before those dates, three things
-would move us: the HSP-029 result (a pass lowers the offset bar from {{ma.net_zero_multiple.0.0249:x}} to
+would move us: the HSP-029 result (a pass lowers the offset bar from {{ma.net_zero_multiple.0.0249:x}}, {{ma.net_zero_multiple_half_price.0.0249:x}} to {{ma.net_zero_multiple_365d.0.0249:x}} by price and window, to
 {{ma.net_zero_multiple.0.0159:x}}); a published definition of DefiLlama's Intents volume (it would tell us whether the
 missing half is double counting or confidential flow); and a public account of the April-May treasury transfers.
 

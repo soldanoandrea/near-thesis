@@ -128,7 +128,9 @@ def tiles(R: numbers.Registry) -> str:
          f"each swap once; both legs: {R.fmt('q2b.ratio_two_sided_median', 'p0')}"),
         ("Q4", "Intents revenue rebuilt on-chain / DefiLlama", R.fmt("q4b.revenue_onchain_to_defillama", "p1"), "last six months"),
         ("Q4", "Float dilution after buybacks", R.fmt("sc.status_quo/base.1y.float_cagr") + " / yr",
-         f"offset needs {R.fmt('ma.net_zero_multiple.0.0249', 'x')} today's Intents revenue"),
+         f"offset needs {R.fmt('ma.net_zero_multiple.0.0249', 'x')} today's Intents revenue "
+         f"({R.fmt('ma.net_zero_multiple_half_price.0.0249', 'x')} at half the price, "
+         f"{R.fmt('ma.net_zero_multiple_365d.0.0249', 'x')} vs 365-day revenue)"),
         ("Q7", "Market cap / chain fees", R.fmt("mb.chain_fees", "x"),
          f"{R.fmt('mb.fees_plus_intents_fees', 'x')} incl. Intents fees; peer median {R.fmt('mv.chain_fees.30d_annualized.peer_median')}"),
         ("Q6", "Monthly active developers", R.fmt("q6.near_mad"), f"{R.fmt('q6.near_mad_yoy')} y/y; share vs peers rising"),

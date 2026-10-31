@@ -67,6 +67,7 @@ def model_inputs(raw: Path, daily: pl.DataFrame, epochs: pl.DataFrame, as_of: st
         "intents_revenue_annualized_90d": rev90 * ann if rev90 else None,
         "intents_holders_revenue_annualized_90d": hrev90 * ann if hrev90 else None,
         "intents_fees_annualized_90d": fee90 * ann if fee90 else None,
+        "intents_revenue_365d": full_wsum(dl("intents_revenue_usd"), end, 365),  # the slower basis for the net-zero bar
     }
     inp["take_rate_90d"] = ratio(rev90, vol90)
     inp["buyback_yield_defillama"] = ratio(inp["intents_holders_revenue_annualized_90d"], mcap)

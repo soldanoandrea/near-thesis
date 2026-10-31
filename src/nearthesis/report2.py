@@ -194,6 +194,17 @@ def headline_metrics(*, org, ic, led, dev, inp, sm, mm, am, ym, fp, as_of) -> pl
                 T.add("M", f"ma.net_zero_multiple.{iss:.4f}", f"Intents revenue needed for burn + buybacks to offset "
                       f"issuance at {iss:.2%} (multiple of current)", rr["multiple_of_current_revenue"], "count",
                       "current price and take rate", "model (a)", "model")
+        # the same bar at half today's price, and against trailing 365-day revenue instead of the 90-day run rate
+        iss = max(g["issuance_rate"].unique().to_list())
+        rr = _row(g, price_usd=mid_p, take_rate=mid_t, issuance_rate=iss)
+        lo = _row(g, price_usd=min(g["price_usd"].unique().to_list()), take_rate=mid_t, issuance_rate=iss)
+        if rr and lo:
+            T.add("M", f"ma.net_zero_multiple_half_price.{iss:.4f}", f"Same, at half today's price (issuance {iss:.2%})",
+                  lo["multiple_of_current_revenue"], "count", "half price, current take rate", "model (a)", "model")
+        if rr and inp.get("intents_revenue_365d"):
+            T.add("M", f"ma.net_zero_multiple_365d.{iss:.4f}", f"Same, as a multiple of trailing 365-day revenue "
+                  f"(issuance {iss:.2%})", rr["required_revenue_usd"] / inp["intents_revenue_365d"], "count",
+                  "current price; revenue 365d to as-of", "model (a)", "model")
     nv = mm["model_multiples_near_vs_peers"]
     for variant in ("chain_fees", "fees_plus_intents_fees", "revenue_plus_intents_revenue"):
         r = _row(nv, variant=variant, basis="30d_annualized")
@@ -335,7 +346,11 @@ def falsifier_status(*, org, ic, led, dev, sm, mm, ym, iq, inp, census, daily) -
         add("Q4", "Net dilution after buybacks stays above 2%/yr and the net-zero threshold needs more than 10x current "
             "volume at the current take rate",
             f"float dilution {fmt(r1['year_net_float_dilution'], 'ratio')} per year (status quo, base); threshold "
-            f"{fmt(base['multiple_of_current_volume'])}x DefiLlama volume", "met" if a and b else
+            f"{fmt(base['multiple_of_current_volume'])}x DefiLlama volume on the 90-day run rate"
+            + (f" ({fmt(base['required_revenue_usd'] / inp['intents_revenue_365d'])}x on trailing 365-day revenue, "
+               "which would meet this leg)" if inp.get("intents_revenue_365d")
+               and base["required_revenue_usd"] / inp["intents_revenue_365d"] > 10 else ""),
+            "met" if a and b else
             ("half met (dilution leg)" if a else "half met (threshold leg)" if b else "not met"))
     # Q5
     if iq is not None and iq.height >= 4:
@@ -745,7 +760,9 @@ def _model_a(inp, sm, mcfg) -> list[str]:
         b = base["multiple_of_current_volume"] > 10
         L.append(f"Current reading: float dilution in year 1 (status quo, base) {fmt(sq['year_net_float_dilution'], 'ratio')} "
                  f"({'above' if a else 'not above'} 2%); threshold {fmt(base['multiple_of_current_volume'])}x current volume "
-                 f"({'above' if b else 'not above'} 10x). The falsifier "
+                 f"({'above' if b else 'not above'} 10x) on the 90-day run rate"
+                 + (f"; {fmt(base['required_revenue_usd'] / inp['intents_revenue_365d'])}x against trailing 365-day revenue"
+                    if inp.get("intents_revenue_365d") else "") + ". The falsifier "
                  + ("is met: the supply side does not support the bullish case at current activity." if a and b else
                     "is not met (it needs both conditions); "
                     + ("the dilution leg holds." if a else "the threshold leg holds." if b else "neither leg holds.")))

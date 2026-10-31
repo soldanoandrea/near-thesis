@@ -33,6 +33,8 @@ M,ma.supply_5y.hsp029_act3m/base,"Total supply in 5 years, HSP-029 (activation m
 M,ma.float_cagr_5y.hsp029_act3m/base,"Float growth per year over 5 years, HSP-029 (activation month 3), base offsets",0.01453875,,,ratio/yr,5 years,model (a),model,""
 M,ma.net_zero_multiple.0.0249,Intents revenue needed for burn + buybacks to offset issuance at 2.49% (multiple of current),8.07232748,,,count,current price and take rate,model (a),model,""
 M,ma.net_zero_multiple.0.0159,Intents revenue needed for burn + buybacks to offset issuance at 1.59% (multiple of current),5.11805938,,,count,current price and take rate,model (a),model,""
+M,ma.net_zero_multiple_half_price.0.0249,"Same, at half today's price (issuance 2.49%)",4.03616374,,,count,"half price, current take rate",model (a),model,""
+M,ma.net_zero_multiple_365d.0.0249,"Same, as a multiple of trailing 365-day revenue (issuance 2.49%)",16.55030969,,,count,current price; revenue 365d to as-of,model (a),model,""
 M,mb.chain_fees,"NEAR market cap / annualized chain fees (30d), vs peer median 379x",2516.35229927,,,count,30d annualized,model (b),model,"Peer range 106x to 2,000x."
 M,mb.fees_plus_intents_fees,"NEAR market cap / annualized fees plus intents fees (30d), vs peer median 379x",80.04612966,,,count,30d annualized,model (b),model,"Peer range 106x to 2,000x."
 M,mb.revenue_plus_intents_revenue,"NEAR market cap / annualized revenue plus intents revenue (30d), vs peer median 1,784x",219.71878535,,,count,30d annualized,model (b),model,"Peer range 106x to 11,167x."

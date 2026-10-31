@@ -87,7 +87,7 @@ Net-zero threshold: Intents captured revenue (and volume at a take rate) at whic
 Volumes in this grid are DefiLlama volumes. The on-chain check (Q2) finds public one-sided volume at 46.04% of DefiLlama's figure. That changes the absolute volumes (and makes the on-chain take rate higher by the inverse ratio) but not the multiples: at a constant take rate, the volume multiple equals the multiple of captured revenue, and captured revenue reconciles with on-chain flows (Q4).
 
 **Falsifier of the bullish case** (PIANO.md Q4): net float dilution after buybacks stays above 2% per year and the net-zero threshold needs more than 10x current volume at the current take rate.
-Current reading: float dilution in year 1 (status quo, base) 2.12% (above 2%); threshold 8.072x current volume (not above 10x). The falsifier is not met (it needs both conditions); the dilution leg holds.
+Current reading: float dilution in year 1 (status quo, base) 2.12% (above 2%); threshold 8.072x current volume (not above 10x) on the 90-day run rate; 16.550x against trailing 365-day revenue. The falsifier is not met (it needs both conditions); the dilution leg holds.
 
 ## (b) Fee and revenue multiples vs peers
 
