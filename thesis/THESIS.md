@@ -236,8 +236,8 @@ Each claim names the prediction that will test it ([falsifiers.md](falsifiers.md
    379x, and 220x captured revenue against
    1,784x. Tested by P7: the multiple stays at or below the peer median
    (today 379x) on 2027-04-30.
-3. **Supply discipline is real and may tighten.** Issuance halved in the data, buybacks retire about
-   0.35% of supply a year into a held balance, and HSP-029 would lower the offset bar to
+3. **Supply discipline is real and may tighten.** Issuance halved in the data, buybacks take about
+   0.35% of supply a year off the market into a held balance, and HSP-029 would lower the offset bar to
    5.1x. First check: the HSP-029 vote, reported to close on 2026-11-02; then the
    structural Q4 falsifier (float dilution above 2% a year), re-measured by every `make refresh`.
 4. **NEAR's developer base is holding up relative to its peers** (3.07% to 4.19%).

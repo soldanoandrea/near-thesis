@@ -235,8 +235,8 @@ Each claim names the prediction that will test it ([falsifiers.md](falsifiers.md
    {{mv.chain_fees.30d_annualized.peer_median}}, and {{mb.revenue_plus_intents_revenue:x}} captured revenue against
    {{mv.chain_revenue.30d_annualized.peer_median}}. Tested by P7: the multiple stays at or below the peer median
    (today {{pred.P7.threshold}}) on {{pred.P7.date}}.
-3. **Supply discipline is real and may tighten.** Issuance halved in the data, buybacks retire about
-   {{in.buyback_yield_onchain}} of supply a year into a held balance, and HSP-029 would lower the offset bar to
+3. **Supply discipline is real and may tighten.** Issuance halved in the data, buybacks take about
+   {{in.buyback_yield_onchain}} of supply a year off the market into a held balance, and HSP-029 would lower the offset bar to
    {{ma.net_zero_multiple.0.0159:x}}. First check: the HSP-029 vote, reported to close on 2026-11-02; then the
    structural Q4 falsifier (float dilution above 2% a year), re-measured by every `make refresh`.
 4. **NEAR's developer base is holding up relative to its peers** ({{dev.2025q3.to_peers}} to {{dev.2026q3.to_peers}}).
