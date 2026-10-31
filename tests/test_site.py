@@ -54,3 +54,31 @@ def test_registry_sources_point_at_committed_files():
         f = n.source.split(":")[0].split(" ")[0]
         if f.startswith(("data/", "thesis/")):
             assert (paths.ROOT / f).exists(), f"{key}: {f}"
+
+
+def _code_blocks(text: str) -> list[str]:
+    return re.findall(r"```(?:json)?\n(.*?)\n```", text, flags=re.S)
+
+
+def test_x_post_draft_fits_and_says_what_the_rules_ask():
+    post = (paths.ROOT / "docs" / "DEMO_POST.md").read_text()
+    blocks = _code_blocks(post)
+    main = blocks[0]
+    for b in blocks:  # X counts every URL as 23 characters
+        assert len(re.sub(r"https?://\S+", "x" * 23, b)) <= 280, b[:60]
+    assert "@NEARProtocol" in main and "#NEARHackathon" in main and "NEAR HACKATHON" in main
+    assert "https://github.com/soldanoandrea/near-thesis" in main
+    assert "archival RPC" in main or "intents.near" in main  # NEAR's concrete role
+
+
+def test_submission_json_is_valid_and_within_limits():
+    import json
+    doc = (paths.ROOT / "docs" / "SUBMISSION.md").read_text()
+    payload = json.loads(_code_blocks(doc)[0])
+    assert payload["tracks"] == ["thesis"]
+    assert "website" not in payload
+    assert 20 <= len(payload["idea"]) <= 2000
+    assert len(json.dumps(payload).encode()) <= 12_000
+    assert payload["projectUrl"] == "https://github.com/soldanoandrea/near-thesis"
+    for k in ("requestId", "leadName", "email", "size", "nearAddress", "demoUrl", "consent"):
+        assert payload[k].startswith("<HUMAN"), k
