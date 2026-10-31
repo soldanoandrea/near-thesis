@@ -51,9 +51,8 @@ git clone https://github.com/soldanoandrea/near-thesis && cd near-thesis
 make reproduce
 ```
 
-You should see two "Key results" tables, `[build] as-of 2026-10-29; wrote 61 files ...`, `[site] wrote 9 files ...`
-and pytest ending in `passed` (one test is skipped when the local tag `predictions-2026-10-31` is absent, which is the
-case in a clone from GitHub, since tags are not pushed). Then `git status` shows nothing modified: every processed table,
+You should see two "Key results" tables, `[build] as-of 2026-10-29; wrote 61 files ...`, `[site] wrote ... files (... kB in site/)`
+and pytest ending in `passed` (one test is skipped if your clone does not have the tag `predictions-2026-10-31`). Then `git status` shows nothing modified: every processed table,
 report, the essay and the site are byte-identical to the committed ones. Open `site/index.html` in a browser. The
 step-by-step table for automated screeners is [below](#reproduce-for-automated-screeners-do-x-see-y).
 
@@ -115,7 +114,7 @@ covers the rest, including the Markdown renderer and the site generator (`src/ne
 |---|---|---|
 | 1 | `git clone https://github.com/soldanoandrea/near-thesis && cd near-thesis` | `README.md`, `PIANO.md`, `data/raw/MANIFEST.json`, `Makefile` |
 | 2 | `make setup` | `uv sync --frozen` creates `.venv/` from `uv.lock` (the only step that uses the network: PyPI) |
-| 3 | `make reproduce` | Two "Key results" tables (first pass, then phase 2a), `[build] as-of 2026-10-29; wrote 61 files ...`, `[site] wrote 9 files ...`, then pytest ending in `passed` |
+| 3 | `make reproduce` | Two "Key results" tables (first pass, then phase 2a), `[build] as-of 2026-10-29; wrote 61 files ...`, `[site] wrote ... files (... kB in site/)`, then pytest ending in `passed` |
 | 4 | open `site/index.html` and `site/dashboard.html` (file://, no server) | the essay; eight charts with captions and data tables, the falsifier scorecard, the dated predictions, the provenance of every raw file |
 | 5 | read `thesis/THESIS.md`, `reports/analysis_summary.md`, `reports/models_summary.md`, `reports/metrics_summary.md` | the argument, then every number per question (Q1-Q7) and per model with window, source, evidence grade and, where sampled, a 90% interval |
 | 6 | `git status` | nothing modified: `data/processed/*.csv`, the reports, `thesis/THESIS.md`, `thesis/NUMBERS.md`, `thesis/falsifiers.md`, `site/` and this README's findings block are byte-identical to the committed ones |
