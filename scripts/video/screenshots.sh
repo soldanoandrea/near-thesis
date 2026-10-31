@@ -30,7 +30,7 @@ TMP="$(mktemp -d "${TMPDIR:-/tmp}/near-thesis-screens.XXXXXX")"
 trap 'rm -rf "$TMP"' EXIT
 URL="file://$REPO/site/dashboard.html"
 chrome() { "$CHROME" --headless=new --disable-gpu --no-first-run --no-default-browser-check --user-data-dir="$TMP/profile" \
-             --hide-scrollbars --force-device-scale-factor=1 --virtual-time-budget=20000 "$@" 2>/dev/null; }
+             --hide-scrollbars --force-device-scale-factor=1 --virtual-time-budget=20000 "$@" 2>/dev/null < /dev/null; }
 
 if [ -z "$LIST" ]; then
   LIST="$TMP/shots.txt"
@@ -48,6 +48,6 @@ while read -r name hash; do
     echo "[screens] Plotly.js did not load (offline?): the charts would be missing"; exit 1
   fi
   chrome --window-size=$W,$WH --screenshot="$TMP/$name.png" "$URL#$hash" >/dev/null
-  ffmpeg -v error -y -i "$TMP/$name.png" -vf "crop=$W:$H:0:0" "$OUT/$name.png"
+  ffmpeg -nostdin -v error -y -i "$TMP/$name.png" -vf "crop=$W:$H:0:0" "$OUT/$name.png"
   echo "[screens] $OUT/$name.png"
 done < "$LIST"

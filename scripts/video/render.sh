@@ -49,14 +49,14 @@ echo "[video] composing"
 enc=(-c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p -r $FPS -an)
 clip() {  # clip <png> <seconds> <out>
   local d="$2"; local fo; fo="$(awk -v d="$d" 'BEGIN { printf "%.2f", d - 0.4 }')"
-  ffmpeg -v error -y -loop 1 -framerate $FPS -t "$d" -i "$1" \
+  ffmpeg -nostdin -v error -y -loop 1 -framerate $FPS -t "$d" -i "$1" \
     -vf "scale=1280:720,format=yuv420p,fade=t=in:st=0:d=0.4,fade=t=out:st=$fo:d=0.4" "${enc[@]}" "$3"
 }
 : > "$WORK/list.txt"
 while read -r name secs _hash; do
   clip "$WORK/frames/$name.png" "$secs" "$WORK/$name.mp4"
   if [ "$name" = "00_title" ]; then
-    ffmpeg -v error -y -i "$WORK/near-thesis/terminal.mp4" \
+    ffmpeg -nostdin -v error -y -i "$WORK/near-thesis/terminal.mp4" \
       -vf "setpts=0.5*PTS,fps=$FPS,scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,format=yuv420p" \
       "${enc[@]}" "$WORK/01_terminal.mp4"
     printf "file '%s'\nfile '%s'\n" "$WORK/$name.mp4" "$WORK/01_terminal.mp4" >> "$WORK/list.txt"

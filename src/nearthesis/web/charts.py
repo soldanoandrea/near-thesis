@@ -110,7 +110,7 @@ def classes(processed: Path, R: Registry) -> dict:
                                       zip(q[f"tx_share_{c}_p05"].to_list(), q[f"tx_share_{c}_p95"].to_list())],
                        "hovertemplate": f"{label}<br>%{{x}}: %{{y:.2%}}<br>90% CI %{{customdata[0]}} to %{{customdata[1]}}<extra></extra>"})
         base_axes[f"xaxis{s}"] = _axis("", tickangle=-45, tickfont={"size": 10})
-        base_axes[f"yaxis{s}"] = _axis("", tickformat=".0%", rangemode="tozero")
+        base_axes[f"yaxis{s}"] = _axis("", tickformat=".1~%", rangemode="tozero")
         ann.append(_panel_title(label, i))
     wide, narrow = _panels(5, "cols", "rows")
     layout = {**base_axes, "annotations": ann, "margin": {"l": 50, "r": 10, "t": 30, "b": 60}, "showlegend": False}
