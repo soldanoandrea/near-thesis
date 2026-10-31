@@ -11,7 +11,11 @@ Estimators (N_m = NearBlocks transactions of month m, D_m = days in month m, n =
   monthly active signers       MAS_k = N_m (1/n) sum_i 1{account label_i = k} / c_i
   daily active signers (avg)   DAS_k = (N_m / D_m) (1/n) sum_i 1{account label_i = k} / c_day_i
 because sum over a month's transactions of 1/c(signer) counts each signer once (and likewise per day). 90% intervals:
-bootstrap that resamples sampled blocks within each month (draws travel with their block), fixed seed.
+bootstrap that resamples sampled blocks within each month (draws travel with their block), fixed seed. When a class
+has no draw at all in a month (or in a whole quarter), every replicate is 0 and the bootstrap returns [0, 0]; the upper
+end is then the exact binomial (Clopper-Pearson) bound for 0 of n draws, p_u = 1 - 0.05^(1/n), the upper end of a
+two-sided 90% interval, scaled by each estimator's largest per-draw weight (1/c <= 1): share p_u, transactions per day
+N p_u / D, MAS N p_u, DAS N p_u / D.
 
 Bot score (thresholds in config [organic], fixed before looking at the per-signer data):
   I1 c >= 300 txs/month; I2 c >= 3000 (extra point); I3 >= 18 distinct UTC hours active (>= 50 timestamps);
@@ -205,6 +209,23 @@ def _monthly_arrays(lab: pl.DataFrame):
     return res
 
 
+def zero_count_upper(n: int, conf: float = 0.95) -> float:
+    """Exact one-sided upper bound on a share when 0 of n draws fall in it (Clopper-Pearson; with conf = 0.95 it is
+    the upper end of a two-sided 90% interval). A bootstrap cannot see past 0 and returns [0, 0]."""
+    return 1.0 - (1.0 - conf) ** (1.0 / n) if n > 0 else 1.0
+
+
+def _zero_scale(key: str, N: float, D: float) -> float | None:
+    """Largest value an estimator can take per unit of share (1/c <= 1); None for keys that are not class estimates."""
+    if key.startswith("tx_share_"):
+        return 1.0
+    if key.startswith(("txs_per_day_", "das_")):
+        return N / D
+    if key.startswith("mas_"):
+        return N
+    return None
+
+
 def _estimates(a: dict, idx: np.ndarray, N: float, D: float) -> dict:
     out = {}
     n = len(idx)
@@ -245,6 +266,14 @@ def monthly_series(lab: pl.DataFrame, nb_month: pl.DataFrame, boot: int, seed: i
         for key in [k for k in point if k != "draws"]:
             vals = np.array([r[key] for r in rep])
             row[f"{key}_p05"], row[f"{key}_p95"] = float(np.quantile(vals, 0.05)), float(np.quantile(vals, 0.95))
+        pu = zero_count_upper(len(a["block"]))
+        for k in CLASSES:  # no draw of the class this month: exact upper bound instead of a [0, 0] bootstrap interval
+            if not (a["tx"] == k).any():
+                for key in (f"tx_share_{k}", f"txs_per_day_{k}"):
+                    row[f"{key}_p95"] = _zero_scale(key, N, D) * pu
+            if not (a["acct"] == k).any():
+                for key in (f"mas_{k}", f"das_{k}"):
+                    row[f"{key}_p95"] = _zero_scale(key, N, D) * pu
         rows.append(row)
     return pl.DataFrame(rows, infer_schema_length=None), reps
 
@@ -265,6 +294,13 @@ def quarterly_series(monthly: pl.DataFrame, reps: dict, keys: list[str]) -> pl.D
             nrep = min(len(reps[m]) for m in months)
             comb = np.mean([[reps[m][i][k] for i in range(nrep)] for m in months], axis=0)
             row[f"{k}_p05"], row[f"{k}_p95"] = float(np.quantile(comb, 0.05)), float(np.quantile(comb, 0.95))
+            mrows = monthly.filter(pl.col("month").is_in(months))
+            scale = _zero_scale(k, 1.0, 1.0)
+            if scale is not None and row[k] == 0 and row[f"{k}_p95"] == 0:
+                # no draw of the class in the whole quarter: exact bound over the quarter's pooled draws
+                pu = zero_count_upper(int(mrows["draws"].sum()))
+                per = [_zero_scale(k, float(r["nb_txns"]), float(r["nb_days"])) for r in mrows.iter_rows(named=True)]
+                row[f"{k}_p95"] = float(np.mean(per)) * pu
         rows.append(row)
     return pl.DataFrame(rows, infer_schema_length=None)
 
@@ -299,9 +335,12 @@ def cohort_retention(lab: pl.DataFrame, last_month: str, horizons=(1, 3, 6), boo
                 for _ in range(boot):
                     idx = np.concatenate([mem[b] for b in rng.choice(ub, size=len(ub), replace=True)])
                     bs.append((w[idx] * ret[idx]).sum() / w[idx].sum())
+                lo, hi = float(np.quantile(bs, 0.05)), float(np.quantile(bs, 0.95))
+                if lo == hi and ret.min() == ret.max():  # every draw retained, or none: exact binomial bound
+                    lo, hi = ((0.0, zero_count_upper(ok.height)) if ret.max() == 0
+                              else (1.0 - zero_count_upper(ok.height), 1.0))
                 rows.append({"group": group, "cohort": cohort, "horizon_months": k, "new_signer_draws": ok.height,
-                             "retention": point, "retention_p05": float(np.quantile(bs, 0.05)),
-                             "retention_p95": float(np.quantile(bs, 0.95)),
+                             "retention": point, "retention_p05": lo, "retention_p95": hi,
                              "unweighted_retention": float(ret.mean())})
     schema = {"group": pl.Utf8, "cohort": pl.Utf8, "horizon_months": pl.Int64, "new_signer_draws": pl.Int64,
               "retention": pl.Float64, "retention_p05": pl.Float64, "retention_p95": pl.Float64,

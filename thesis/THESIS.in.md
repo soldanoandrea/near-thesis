@@ -13,7 +13,7 @@ reward programs, bots and relays: organic, human-like signers sent {{q1b.organic
 against a point estimate of {{q1b.organic_das_first_full_quarter}} in 2025-Q1 that rests on {{draws.2025q1.organic:int}} organic draws.
 Since 2025-Q3 every quarter has stayed between {{oq.from2025q3.das_organic_min}} and {{oq.from2025q3.das_organic_max}}, so
 organic use is small and not growing; the fitted trend of {{mc.organic_das_trend}} a year leans on early 2025 and forecasts
-only slightly better than a random walk. NEAR Intents, the cross-chain swap layer that settles on NEAR,
+no better than a random walk. NEAR Intents, the cross-chain swap layer that settles on NEAR,
 is real, and its captured revenue checks out: rebuilt from public wallet flows it is {{q4b.revenue_onchain_to_defillama}}
 of what DefiLlama reports, and since {{rev.src.recent.first_month}} {{rev.src_intents_share.recent:p1}} of it has come straight from the
 Intents contract. Its reported volume does not check out one to one: public on-chain swaps, each counted
@@ -127,8 +127,8 @@ Organic daily active signers were {{q1b.organic_das}} in 2026-Q3 against {{q1b.o
 2025-Q1 interval ({{q1b.organic_das_first_full_quarter:ci}}) reaches zero, so the sample does not resolve the size of the
 decline: the 2025-Q1 estimate rests on {{draws.2025q1.organic:int}} organic draws out of {{draws.2025q1.all:int}} (2026-Q3: {{draws.2026q3.organic:int}}).
 From 2025-Q3 on, the quarterly estimates stay between {{oq.from2025q3.das_organic_min}} and
-{{oq.from2025q3.das_organic_max}} with overlapping intervals, so most of the fitted decline comes from early 2025. The log-linear trend over 2025-01 to 2026-09 is {{mc.organic_das_trend}} a year. Out of sample it barely beats
-a random walk: mean absolute log error {{bt.das.loglinear.6m}} against {{bt.das.naive.6m}} at six months
+{{oq.from2025q3.das_organic_max}} with overlapping intervals, so most of the fitted decline comes from early 2025. The log-linear trend over 2025-01 to 2026-09 is {{mc.organic_das_trend}} a year. Out of sample it is no better
+than a random walk: mean absolute log error {{bt.das.loglinear.6m}} against {{bt.das.naive.6m}} for the random walk at six months
 ({{bt.das.loglinear.6m.n}} forecasts) and {{bt.das.loglinear.3m}} against {{bt.das.naive.3m}} at three months
 ({{bt.das.loglinear.3m.n}} forecasts). We read it as a description, not a forecast; extrapolated, it puts organic daily
 active signers at {{fc.das.12m}} in a year ({{fc.das.12m:ci}}). Retention cannot carry the case either way: the one

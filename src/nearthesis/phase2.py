@@ -171,7 +171,8 @@ def run_adoption(org: dict, daily: pl.DataFrame, as_of: str, mcfg: dict) -> dict
         y = y[keep]
         if len(y) < mcfg["adoption_min_train"] + 3:
             continue
-        t = np.arange(len(y), dtype=float)
+        # time in calendar months since the first kept month: dropping a month (a value of 0) must not shift later ones
+        t = np.array([(int(m[:4]) - int(months[0][:4])) * 12 + int(m[5:7]) - int(months[0][5:7]) for m in months], float)
         out_series.append(pl.DataFrame({"series": name, "month": months, "t": t.astype(int), "value": y}))
         for m in adoption.MODELS:
             p = adoption.fit(m, t, y)

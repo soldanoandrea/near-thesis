@@ -8,7 +8,7 @@ import polars as pl
 from nearthesis import paths
 from nearthesis.report import fmt
 
-QUOTE = re.compile(r"`([a-z0-9]+\.[A-Za-z0-9_.]+)` = (-?\d[\d,]*(?:\.\d+)?(?:%|M NEAR| NEAR)?)")
+QUOTE = re.compile(r"`([a-z0-9]+\.[A-Za-z0-9_.]+)`\s+=\s+(-?\d[\d,]*(?:\.\d+)?(?:%|M NEAR| NEAR)?)")  # quotes may wrap
 
 
 def _metrics() -> dict[str, str]:

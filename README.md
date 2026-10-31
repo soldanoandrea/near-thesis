@@ -22,7 +22,7 @@ and sentence that quotes a number. Not financial advice.
 - **Organic use is about 2% of NEAR's transactions, and not growing.** Human-like signers sent 2.17% of
   transactions in 2026-Q3 (90% interval 0.86% to 3.70%); organic daily active signers were 6,437
   (1,935 to 12,045) and have stayed between 6,437 and 9,633 in every
-  quarter since 2025-Q3 (the fitted -37.83% a year leans on early-2025 estimates built from
+  quarter since 2025-Q3 (the fitted -38.53% a year leans on early-2025 estimates built from
   2 organic draws). NearBlocks' "active accounts" miss real signers by 1.9x over the last six
   months (5.2x at the 12-month median), because relayed transactions hide the signer behind the relayer.
 - **NEAR Intents is real and its revenue checks out; half its reported volume is not visible as public swaps.** Public

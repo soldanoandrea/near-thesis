@@ -1,7 +1,8 @@
 """(c) Adoption model on organic activity: log-linear trend vs logistic S-curve, with a rolling-origin out-of-sample
 backtest and residual-bootstrap forecast ranges. Pure numpy.
 
-Models for a positive monthly series y_t (t = 0, 1, ... months):
+Models for a positive monthly series y_t (t = months since the first point; months with no usable value are absent,
+so t can skip, and every horizon is in calendar months):
   loglinear : log y_t = a + b t + e_t                        (constant growth or decay; b > 0 = growth)
   logistic  : y_t = K / (1 + exp(-r (t - t0))) x exp(e_t)    (S-curve; r < 0 gives a decaying S-curve)
               fitted by profiling K over a log grid (above max y) with OLS of log(y / (K - y)) on t, selecting the K
@@ -57,16 +58,18 @@ def predict(p: dict, t: np.ndarray) -> np.ndarray:
 
 
 def backtest(t: np.ndarray, y: np.ndarray, horizons=(3, 6), min_train: int = 12) -> pl.DataFrame:
-    """Rolling origin: fit on [0, T), forecast T-1+h, for every T >= min_train with data at T-1+h."""
+    """Rolling origin: fit on the first T points, forecast the month h after the origin t[T-1], for every T >= min_train
+    with a point at that month (t is in months, so a gap in the series never shortens a horizon)."""
     t, y = np.asarray(t, float), np.asarray(y, float)
     rows = []
     for T in range(min_train, len(t)):
         for m in MODELS:
             p = fit(m, t[:T], y[:T])
             for h in horizons:
-                j = T - 1 + h
-                if j >= len(t):
+                hit = np.flatnonzero(t == t[T - 1] + h)
+                if not hit.size:
                     continue
+                j = int(hit[0])
                 err = float(predict(p, t[j:j + 1])[0] - math.log(y[j]))
                 rows.append({"model": m, "origin_t": int(t[T - 1]), "horizon": h, "log_error": err})
     return pl.DataFrame(rows, schema={"model": pl.Utf8, "origin_t": pl.Int64, "horizon": pl.Int64,
@@ -92,7 +95,7 @@ def forecast_ranges(t: np.ndarray, y: np.ndarray, model: str, horizons=(12, 24, 
     sims = np.empty((n_boot, len(horizons)))
     for b in range(n_boot):
         if model == "naive":
-            d = np.diff(np.log(y))
+            d = np.diff(np.log(y)) / np.sqrt(np.diff(t))  # one-month steps (a k-month gap has k times the variance)
             steps = rng.choice(d - d.mean(), size=(int(max(horizons)),), replace=True)  # random walk, no drift
             path = np.log(y[-1]) + np.cumsum(steps)
             sims[b] = path[np.asarray(horizons) - 1]

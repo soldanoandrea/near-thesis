@@ -144,14 +144,14 @@ Current reading (captured revenue incl. Intents, 30d annualized): NEAR 220x vs p
 
 | Series | Model | Months | Growth /month (log-linear) | K (logistic) | r (logistic) | Residual sd (log) |
 |---|---|---|---|---|---|---|
-| organic_daily_active_signers_3m | loglinear | 2025-01 to 2026-09 | -3.96% | n/a | n/a | 0.480 |
-| organic_daily_active_signers_3m | logistic | 2025-01 to 2026-09 | n/a | 1,192,844 | -0.040 | 0.495 |
+| organic_daily_active_signers_3m | loglinear | 2025-01 to 2026-09 | -4.06% | n/a | n/a | 0.464 |
+| organic_daily_active_signers_3m | logistic | 2025-01 to 2026-09 | n/a | 1,192,844 | -0.041 | 0.478 |
 | organic_daily_active_signers_3m | naive | 2025-01 to 2026-09 | n/a | n/a | n/a | 0.493 |
-| organic_monthly_active_signers_3m | loglinear | 2025-01 to 2026-09 | -5.37% | n/a | n/a | 0.817 |
-| organic_monthly_active_signers_3m | logistic | 2025-01 to 2026-09 | n/a | 34,578,014 | -0.054 | 0.843 |
+| organic_monthly_active_signers_3m | loglinear | 2025-01 to 2026-09 | -5.45% | n/a | n/a | 0.801 |
+| organic_monthly_active_signers_3m | logistic | 2025-01 to 2026-09 | n/a | 34,578,014 | -0.055 | 0.826 |
 | organic_monthly_active_signers_3m | naive | 2025-01 to 2026-09 | n/a | n/a | n/a | 1.008 |
-| organic_txs_per_day_3m | loglinear | 2025-01 to 2026-09 | -4.25% | n/a | n/a | 0.475 |
-| organic_txs_per_day_3m | logistic | 2025-01 to 2026-09 | n/a | 224,991 | -0.049 | 0.489 |
+| organic_txs_per_day_3m | loglinear | 2025-01 to 2026-09 | -3.68% | n/a | n/a | 0.480 |
+| organic_txs_per_day_3m | logistic | 2025-01 to 2026-09 | n/a | 210,734 | -0.043 | 0.494 |
 | organic_txs_per_day_3m | naive | 2025-01 to 2026-09 | n/a | n/a | n/a | 0.456 |
 | intents_monthly_volume_usd | loglinear | 2025-01 to 2026-09 | 29.45% | n/a | n/a | 0.922 |
 | intents_monthly_volume_usd | logistic | 2025-01 to 2026-09 | n/a | 4,805,495,924 | 0.430 | 0.599 |
@@ -165,23 +165,23 @@ Current reading (captured revenue incl. Intents, 30d annualized): NEAR 220x vs p
 | intents_monthly_volume_usd | 6 | naive | 4 | 0.340 | -0.235 |
 | intents_monthly_volume_usd | 6 | logistic | 4 | 0.597 | 0.467 |
 | intents_monthly_volume_usd | 6 | loglinear | 4 | 3.678 | 3.678 |
-| organic_daily_active_signers_3m | 3 | loglinear | 5 | 0.315 | -0.315 |
-| organic_daily_active_signers_3m | 3 | logistic | 5 | 0.317 | -0.317 |
+| organic_daily_active_signers_3m | 3 | loglinear | 5 | 0.344 | -0.344 |
+| organic_daily_active_signers_3m | 3 | logistic | 5 | 0.347 | -0.347 |
 | organic_daily_active_signers_3m | 3 | naive | 5 | 0.363 | 0.084 |
-| organic_daily_active_signers_3m | 6 | loglinear | 2 | 0.404 | -0.404 |
-| organic_daily_active_signers_3m | 6 | logistic | 2 | 0.408 | -0.408 |
 | organic_daily_active_signers_3m | 6 | naive | 2 | 0.422 | 0.422 |
+| organic_daily_active_signers_3m | 6 | loglinear | 2 | 0.435 | -0.435 |
+| organic_daily_active_signers_3m | 6 | logistic | 2 | 0.439 | -0.439 |
 | organic_monthly_active_signers_3m | 3 | naive | 5 | 0.455 | 0.182 |
-| organic_monthly_active_signers_3m | 3 | loglinear | 5 | 0.549 | -0.441 |
-| organic_monthly_active_signers_3m | 3 | logistic | 5 | 0.550 | -0.444 |
-| organic_monthly_active_signers_3m | 6 | loglinear | 2 | 0.497 | -0.497 |
-| organic_monthly_active_signers_3m | 6 | logistic | 2 | 0.501 | -0.501 |
+| organic_monthly_active_signers_3m | 3 | loglinear | 5 | 0.565 | -0.474 |
+| organic_monthly_active_signers_3m | 3 | logistic | 5 | 0.566 | -0.477 |
+| organic_monthly_active_signers_3m | 6 | loglinear | 2 | 0.511 | -0.511 |
+| organic_monthly_active_signers_3m | 6 | logistic | 2 | 0.515 | -0.515 |
 | organic_monthly_active_signers_3m | 6 | naive | 2 | 0.659 | 0.659 |
 | organic_txs_per_day_3m | 3 | naive | 5 | 0.509 | 0.361 |
-| organic_txs_per_day_3m | 3 | logistic | 5 | 0.575 | 0.575 |
-| organic_txs_per_day_3m | 3 | loglinear | 5 | 0.576 | 0.576 |
-| organic_txs_per_day_3m | 6 | logistic | 2 | 0.885 | 0.885 |
-| organic_txs_per_day_3m | 6 | loglinear | 2 | 0.886 | 0.886 |
+| organic_txs_per_day_3m | 3 | logistic | 5 | 0.584 | 0.584 |
+| organic_txs_per_day_3m | 3 | loglinear | 5 | 0.584 | 0.584 |
+| organic_txs_per_day_3m | 6 | logistic | 2 | 0.843 | 0.843 |
+| organic_txs_per_day_3m | 6 | loglinear | 2 | 0.844 | 0.844 |
 | organic_txs_per_day_3m | 6 | naive | 2 | 0.932 | 0.932 |
 
 | Series | Model | Months ahead | Last value | p05 | p50 | p95 |
@@ -195,39 +195,39 @@ Current reading (captured revenue incl. Intents, 30d annualized): NEAR 220x vs p
 | intents_monthly_volume_usd | naive | 12 | $4.80B | $450.08M | $5.03B | $52.00B |
 | intents_monthly_volume_usd | naive | 24 | $4.80B | $147.91M | $6.23B | $133.04B |
 | intents_monthly_volume_usd | naive | 36 | $4.80B | $74.44M | $4.59B | $216.35B |
-| organic_daily_active_signers_3m | logistic | 12 | 6,437 | 1,216 | 3,941 | 10,605 |
-| organic_daily_active_signers_3m | logistic | 24 | 6,437 | 410 | 2,142 | 9,266 |
-| organic_daily_active_signers_3m | logistic | 36 | 6,437 | 184 | 1,381 | 6,776 |
-| organic_daily_active_signers_3m | loglinear | 12 | 6,437 | 1,352 | 4,117 | 10,671 |
-| organic_daily_active_signers_3m | loglinear | 24 | 6,437 | 663 | 2,356 | 9,372 |
-| organic_daily_active_signers_3m | loglinear | 36 | 6,437 | 308 | 1,556 | 6,868 |
-| organic_daily_active_signers_3m | naive | 12 | 6,437 | 358 | 7,982 | 112,906 |
-| organic_daily_active_signers_3m | naive | 24 | 6,437 | 120 | 6,735 | 600,958 |
-| organic_daily_active_signers_3m | naive | 36 | 6,437 | 45.957 | 6,392 | 688,201 |
-| organic_monthly_active_signers_3m | logistic | 12 | 77,332 | 7,603 | 66,539 | 264,141 |
-| organic_monthly_active_signers_3m | logistic | 24 | 77,332 | 1,665 | 31,192 | 252,336 |
-| organic_monthly_active_signers_3m | logistic | 36 | 77,332 | 367 | 15,379 | 224,455 |
-| organic_monthly_active_signers_3m | loglinear | 12 | 77,332 | 9,950 | 69,118 | 272,553 |
-| organic_monthly_active_signers_3m | loglinear | 24 | 77,332 | 2,627 | 34,917 | 255,820 |
-| organic_monthly_active_signers_3m | loglinear | 36 | 77,332 | 1,099 | 18,167 | 228,990 |
-| organic_monthly_active_signers_3m | naive | 12 | 77,332 | 401 | 113,053 | 32,262,722 |
-| organic_monthly_active_signers_3m | naive | 24 | 77,332 | 26.585 | 76,512 | 661,307,299 |
-| organic_monthly_active_signers_3m | naive | 36 | 77,332 | 5.261 | 58,134 | 1,980,973,159 |
-| organic_txs_per_day_3m | logistic | 12 | 16,630 | 2,939 | 8,877 | 24,403 |
-| organic_txs_per_day_3m | logistic | 24 | 16,630 | 1,007 | 4,813 | 17,991 |
-| organic_txs_per_day_3m | logistic | 36 | 16,630 | 299 | 2,984 | 14,533 |
-| organic_txs_per_day_3m | loglinear | 12 | 16,630 | 3,489 | 9,596 | 25,394 |
-| organic_txs_per_day_3m | loglinear | 24 | 16,630 | 1,624 | 5,488 | 19,163 |
-| organic_txs_per_day_3m | loglinear | 36 | 16,630 | 689 | 3,438 | 15,521 |
-| organic_txs_per_day_3m | naive | 12 | 16,630 | 1,595 | 16,503 | 234,502 |
-| organic_txs_per_day_3m | naive | 24 | 16,630 | 620 | 17,501 | 898,697 |
-| organic_txs_per_day_3m | naive | 36 | 16,630 | 234 | 15,333 | 1,612,979 |
+| organic_daily_active_signers_3m | logistic | 12 | 6,437 | 1,176 | 3,840 | 8,996 |
+| organic_daily_active_signers_3m | logistic | 24 | 6,437 | 403 | 1,973 | 7,386 |
+| organic_daily_active_signers_3m | logistic | 36 | 6,437 | 164 | 1,262 | 5,481 |
+| organic_daily_active_signers_3m | loglinear | 12 | 6,437 | 1,358 | 3,984 | 9,029 |
+| organic_daily_active_signers_3m | loglinear | 24 | 6,437 | 672 | 2,235 | 7,515 |
+| organic_daily_active_signers_3m | loglinear | 36 | 6,437 | 305 | 1,466 | 5,564 |
+| organic_daily_active_signers_3m | naive | 12 | 6,437 | 404 | 7,528 | 95,191 |
+| organic_daily_active_signers_3m | naive | 24 | 6,437 | 144 | 6,371 | 438,385 |
+| organic_daily_active_signers_3m | naive | 36 | 6,437 | 60.281 | 6,447 | 522,296 |
+| organic_monthly_active_signers_3m | logistic | 12 | 77,332 | 7,445 | 63,179 | 243,287 |
+| organic_monthly_active_signers_3m | logistic | 24 | 77,332 | 1,324 | 28,578 | 203,910 |
+| organic_monthly_active_signers_3m | logistic | 36 | 77,332 | 305 | 13,851 | 164,227 |
+| organic_monthly_active_signers_3m | loglinear | 12 | 77,332 | 11,674 | 67,145 | 245,122 |
+| organic_monthly_active_signers_3m | loglinear | 24 | 77,332 | 2,610 | 32,558 | 208,038 |
+| organic_monthly_active_signers_3m | loglinear | 36 | 77,332 | 1,216 | 17,257 | 167,689 |
+| organic_monthly_active_signers_3m | naive | 12 | 77,332 | 363 | 96,610 | 30,196,652 |
+| organic_monthly_active_signers_3m | naive | 24 | 77,332 | 26.608 | 69,657 | 589,013,875 |
+| organic_monthly_active_signers_3m | naive | 36 | 77,332 | 6.187 | 54,317 | 1,623,181,891 |
+| organic_txs_per_day_3m | logistic | 12 | 16,630 | 3,459 | 9,830 | 26,426 |
+| organic_txs_per_day_3m | logistic | 24 | 16,630 | 1,328 | 5,726 | 20,887 |
+| organic_txs_per_day_3m | logistic | 36 | 16,630 | 405 | 3,759 | 16,156 |
+| organic_txs_per_day_3m | loglinear | 12 | 16,630 | 3,958 | 10,732 | 27,256 |
+| organic_txs_per_day_3m | loglinear | 24 | 16,630 | 2,046 | 6,442 | 22,131 |
+| organic_txs_per_day_3m | loglinear | 36 | 16,630 | 985 | 4,444 | 17,321 |
+| organic_txs_per_day_3m | naive | 12 | 16,630 | 1,605 | 16,652 | 227,608 |
+| organic_txs_per_day_3m | naive | 24 | 16,630 | 650 | 17,249 | 808,289 |
+| organic_txs_per_day_3m | naive | 36 | 16,630 | 251 | 15,013 | 1,645,945 |
 
 Forecast ranges are mechanical extrapolations of each model; only the model with the lowest out-of-sample error for a series should be read as a forecast, and an explosive log-linear range for a young series (NEAR Intents started in late 2024) mainly shows that the trend model fails the backtest.
 
 **Falsifier of the bullish case** (PIANO.md Q1): organic active accounts show no growth over the last 24 months and month-3 cohort retention does not improve. Model reading: the log-linear trend of organic monthly active signers and its sign are in the fits table; the cohort trend is in reports/analysis_summary.md.
-Fitted log-linear trend of organic daily active signers (trailing 3-month mean): -3.96% per month (decline) over 2025-01 to 2026-09.
-Fitted log-linear trend of organic monthly active signers (trailing 3-month mean): -5.37% per month (decline) over 2025-01 to 2026-09.
+Fitted log-linear trend of organic daily active signers (trailing 3-month mean): -4.06% per month (decline) over 2025-01 to 2026-09.
+Fitted log-linear trend of organic monthly active signers (trailing 3-month mean): -5.45% per month (decline) over 2025-01 to 2026-09.
 
 ## (d) Staking yield and real yield
 

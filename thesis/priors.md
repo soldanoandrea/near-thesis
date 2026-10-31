@@ -56,8 +56,9 @@ Timeline (git history is the record):
   and KaiChing namespaces). Organic transactions per day: `q1b.organic_txs_per_day` = 16,630.
 - Organic daily active signers: `q1b.organic_das` = 6,437 in 2026-Q3 against `q1b.organic_das_first_full_quarter` =
   23,402 in 2025-Q1 (`q1b.organic_das_change` = -72.49%), with overlapping 90% intervals: the direction matches the
-  prior (P(decline) = 0.75), the size is not resolved by the sample. The fitted trend is `mc.organic_das_trend` =
-  -37.83% per year; out of sample it beats a random walk only marginally and on very few forecasts (model (c) in
+  prior (P(decline) = 0.75), the size is not resolved by the sample (the 2025-Q1 estimate rests on two organic draws,
+  and every quarter since 2025-Q3 is between 6,437 and 9,633). The fitted trend is `mc.organic_das_trend` =
+  -38.53% per year; out of sample it does no better than a random walk, on very few forecasts (model (c) in
   `reports/models_summary.md`), so it is a description, not a forecast.
 - Our daily active real signers / NearBlocks active accounts: prior 0.5 to 0.9; data `q1b.das_to_nearblocks` = 519.23%.
   Wrong sign of the gap: NearBlocks appears to count the relayer of a meta-transaction, not the inner signer, so its

@@ -13,8 +13,8 @@ reward programs, bots and relays: organic, human-like signers sent 2.17% of all 
 0.86% to 3.70%), and organic daily active signers averaged 6,437 (1,935 to 12,045),
 against a point estimate of 23,402 in 2025-Q1 that rests on 2 organic draws.
 Since 2025-Q3 every quarter has stayed between 6,437 and 9,633, so
-organic use is small and not growing; the fitted trend of -37.83% a year leans on early 2025 and forecasts
-only slightly better than a random walk. NEAR Intents, the cross-chain swap layer that settles on NEAR,
+organic use is small and not growing; the fitted trend of -38.53% a year leans on early 2025 and forecasts
+no better than a random walk. NEAR Intents, the cross-chain swap layer that settles on NEAR,
 is real, and its captured revenue checks out: rebuilt from public wallet flows it is 98.68%
 of what DefiLlama reports, and since 2026-04 99.7% of it has come straight from the
 Intents contract. Its reported volume does not check out one to one: public on-chain swaps, each counted
@@ -128,11 +128,11 @@ Organic daily active signers were 6,437 in 2026-Q3 against 23,402 in
 2025-Q1 interval (0 to 55,725) reaches zero, so the sample does not resolve the size of the
 decline: the 2025-Q1 estimate rests on 2 organic draws out of 600 (2026-Q3: 13).
 From 2025-Q3 on, the quarterly estimates stay between 6,437 and
-9,633 with overlapping intervals, so most of the fitted decline comes from early 2025. The log-linear trend over 2025-01 to 2026-09 is -37.83% a year. Out of sample it barely beats
-a random walk: mean absolute log error 0.404 against 0.422 at six months
-(2 forecasts) and 0.315 against 0.363 at three months
+9,633 with overlapping intervals, so most of the fitted decline comes from early 2025. The log-linear trend over 2025-01 to 2026-09 is -38.53% a year. Out of sample it is no better
+than a random walk: mean absolute log error 0.435 against 0.422 for the random walk at six months
+(2 forecasts) and 0.344 against 0.363 at three months
 (5 forecasts). We read it as a description, not a forecast; extrapolated, it puts organic daily
-active signers at 4,117 in a year (1,352 to 10,671). Retention cannot carry the case either way: the one
+active signers at 3,984 in a year (1,358 to 9,029). Retention cannot carry the case either way: the one
 informative cohort (2025-Q1) kept 57.73% of its new signers active three months later
 (33.35% to 78.83%).
 

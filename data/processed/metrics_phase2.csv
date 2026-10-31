@@ -37,9 +37,9 @@ M,mb.chain_fees,"NEAR market cap / annualized chain fees (30d), vs peer median 3
 M,mb.fees_plus_intents_fees,"NEAR market cap / annualized fees plus intents fees (30d), vs peer median 379x",80.04612966,,,count,30d annualized,model (b),model,"Peer range 106x to 2,000x."
 M,mb.revenue_plus_intents_revenue,"NEAR market cap / annualized revenue plus intents revenue (30d), vs peer median 1,784x",219.71878535,,,count,30d annualized,model (b),model,"Peer range 106x to 11,167x."
 M,mc.best.intents_monthly_volume_usd,Best out-of-sample model for intents_monthly_volume_usd at 6 months (naive),0.34045594,,,ratio,4 forecasts,model (c),model,Mean absolute log error (about a relative error).
-M,mc.best.organic_daily_active_signers_3m,Best out-of-sample model for organic_daily_active_signers_3m at 6 months (loglinear),0.40365240,,,ratio,2 forecasts,model (c),model,Mean absolute log error (about a relative error).
-M,mc.best.organic_monthly_active_signers_3m,Best out-of-sample model for organic_monthly_active_signers_3m at 6 months (loglinear),0.49684381,,,ratio,2 forecasts,model (c),model,Mean absolute log error (about a relative error).
-M,mc.best.organic_txs_per_day_3m,Best out-of-sample model for organic_txs_per_day_3m at 6 months (logistic),0.88497254,,,ratio,2 forecasts,model (c),model,Mean absolute log error (about a relative error).
-M,mc.organic_das_trend,"Organic daily active signers, fitted trend per year (log-linear)",-0.37832812,,,ratio/yr,2025-01 to 2026-09,model (c),model,""
+M,mc.best.organic_daily_active_signers_3m,Best out-of-sample model for organic_daily_active_signers_3m at 6 months (naive),0.42179953,,,ratio,2 forecasts,model (c),model,Mean absolute log error (about a relative error).
+M,mc.best.organic_monthly_active_signers_3m,Best out-of-sample model for organic_monthly_active_signers_3m at 6 months (loglinear),0.51076415,,,ratio,2 forecasts,model (c),model,Mean absolute log error (about a relative error).
+M,mc.best.organic_txs_per_day_3m,Best out-of-sample model for organic_txs_per_day_3m at 6 months (logistic),0.84281964,,,ratio,2 forecasts,model (c),model,Mean absolute log error (about a relative error).
+M,mc.organic_das_trend,"Organic daily active signers, fitted trend per year (log-linear)",-0.38532425,,,ratio/yr,2025-01 to 2026-09,model (c),model,""
 M,md.real_staker_yield,"Real staker yield (share of float), last 365 days, 5% commission",0.02505881,,,ratio/yr,last 365 days,model (d),model,""
 M,md.non_staker,"Non-staker real yield (dilution of float), last 365 days",-0.02055110,,,ratio/yr,last 365 days,model (d),model,""
