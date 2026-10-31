@@ -273,7 +273,8 @@ def falsifier_status(*, org, ic, led, dev, sm, mm, ym, iq, inp, census, daily) -
             if grew:
                 status = "not met"
             elif big.height < 2:
-                status = "met on the activity leg; retention leg not assessable"
+                # the falsifier is a conjunction: with one leg not assessable it is half met at most, as in Q4
+                status = "half met (activity leg); retention leg not assessable"
             else:
                 status = "met" if not improving else "not met"
             months = (int(lq["quarter"][:4]) - int(p["quarter"][:4])) * 12 + 3 * (int(lq["quarter"][-1]) - int(p["quarter"][-1]))

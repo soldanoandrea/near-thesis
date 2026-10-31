@@ -120,8 +120,10 @@ def tiles(R: numbers.Registry) -> str:
     T = [
         ("Q1", "Organic share of transactions, 2026-Q3", R.fmt("q1b.organic_tx_share"), f"90% CI {R.fmt('q1b.organic_tx_share', 'ci')}"),
         ("Q1", "Organic daily active signers, 2026-Q3", R.fmt("q1b.organic_das"),
-         f"{R.fmt('q1b.organic_das_first_full_quarter')} in 2025-Q1; CI {R.fmt('q1b.organic_das', 'ci')}"),
-        ("Q1", "Real signers / NearBlocks active accounts", R.fmt("q1b.das_to_nearblocks", "x"), "relayed transactions hide the real signer"),
+         f"CI {R.fmt('q1b.organic_das', 'ci')}; {R.fmt('oq.from2025q3.das_organic_min')} to "
+         f"{R.fmt('oq.from2025q3.das_organic_max')} per quarter since 2025-Q3"),
+        ("Q1", "Real signers / NearBlocks active accounts", R.fmt("om.das_to_nearblocks.last6", "x"),
+         f"last six months ({R.fmt('q1b.das_to_nearblocks', 'x')} 12-month median); relayers hide the real signer"),
         ("Q2", "Intents on-chain volume / DefiLlama", R.fmt("q2b.ratio_sample_median", "p0"),
          f"each swap once; both legs: {R.fmt('q2b.ratio_two_sided_median', 'p0')}"),
         ("Q4", "Intents revenue rebuilt on-chain / DefiLlama", R.fmt("q4b.revenue_onchain_to_defillama", "p1"), "last six months"),
@@ -235,9 +237,10 @@ def dashboard_html(R: numbers.Registry, charts: list[dict], processed: Path, the
     body.append(
         '<section id="hero">'
         "<h1>NEAR on the evidence: the dashboard</h1>"
-        f'<p class="lede">Snapshot as-of {E(R.fmt("in.as_of"))}. Organic use is a small share of NEAR\'s transactions, with '
-        "falling point estimates; NEAR Intents is real and its captured revenue reconciles with on-chain flows within a few "
-        "percent, but its reported volume looks two-sided; issuance still outruns burn plus buybacks. Every chart says what it "
+        f'<p class="lede">Snapshot as-of {E(R.fmt("in.as_of"))}. Organic use is a small share of NEAR\'s transactions and has '
+        "not grown since mid-2025; NEAR Intents is real and its captured revenue reconciles with on-chain flows within a few "
+        "percent, but only about half of its reported volume is visible as public swaps; issuance still outruns burn plus "
+        "buybacks. Every chart says what it "
         "shows and what it does not, "
         f'with the table behind it. The argument is in the <a href="index.html">thesis</a>.</p>'
         f"{tiles(R)}</section>\n")

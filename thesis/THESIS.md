@@ -9,18 +9,23 @@ Written by an AI agent team with no NEAR position. Not financial advice.*
 ## Verdict
 
 On the evidence at 2026-10-29, NEAR is two businesses of very different quality. The chain's own activity is mostly
-not people: organic, human-like signers sent 2.17% of all transactions in 2026-Q3 (90% interval
+reward programs, bots and relays: organic, human-like signers sent 2.17% of all transactions in 2026-Q3 (90% interval
 0.86% to 3.70%), and organic daily active signers averaged 6,437 (1,935 to 12,045),
-against a point estimate of 23,402 in 2025-Q1; the fitted trend, -37.83% a
-year, forecasts only slightly better than a random walk. NEAR Intents, the cross-chain swap layer that settles on NEAR,
+against a point estimate of 23,402 in 2025-Q1 that rests on 2 organic draws.
+Since 2025-Q3 every quarter has stayed between 6,437 and 9,633, so
+organic use is small and not growing; the fitted trend of -37.83% a year leans on early 2025 and forecasts
+only slightly better than a random walk. NEAR Intents, the cross-chain swap layer that settles on NEAR,
 is real, and its captured revenue checks out: rebuilt from public wallet flows it is 98.68%
-of what DefiLlama reports. Its reported volume does not check out one to one: public on-chain swaps, each counted
-once, add up to 46.04% of DefiLlama's figure, so the headline volume looks two-sided. Value accrual
+of what DefiLlama reports, and since 2026-04 99.7% of it has come straight from the
+Intents contract. Its reported volume does not check out one to one: public on-chain swaps, each counted
+once, add up to 46.04% of DefiLlama's figure, so the headline volume either counts both sides of each swap
+or includes flow that public events cannot see. Value accrual
 does not yet cover issuance: after burn and buybacks the float grows 2.12% a year at the
 current 2.5% cap, and offsetting that would take 8.1x today's Intents revenue
 (5.1x if HSP-029 cuts issuance to 1.6%). Our long-term case is therefore conditional, not
 bullish: it needs Intents revenue to grow several-fold while organic use stops shrinking. Under our stated priors the
-probability that burn plus buybacks cover issuance within 5 years is 0.30. The
+probability that burn plus buybacks cover issuance within 5 years is 0.30; that is simply the
+weight we gave the +60%-a-year revenue path, the only one that gets there, not a measurement. The
 7 dated predictions at the end, hashed and tagged before their outcomes exist, say when we will find out.
 
 ## How to read this
@@ -92,7 +97,7 @@ not used because they need accounts or keys.
 
 ### Q1. Is the activity real?
 
-Headline activity has collapsed and most of what remains is not people. NearBlocks counts 745,246
+Headline activity has collapsed, and most of what remains is not organic use. NearBlocks counts 745,246
 transactions a day over the last 30 days, down 83.64% on a year earlier. In 2026-Q3 the
 transactions split by signer class as follows (90% intervals in the
 [chart](../site/dashboard.html#card-classes)):
@@ -111,15 +116,19 @@ of the "untracked" traffic that looked organic in aggregate turned out, signer b
 reward programs we had not listed.
 
 Counting accounts gives a second surprise. All real signers averaged 149,876 a day in 2026-Q3
-(130,310 to 171,084), which is 5.2x what NearBlocks reports as active accounts (median of the last
-12 months). The gap has the opposite sign to our prior: relayed meta-transactions are signed on the outside by a relayer,
-and NearBlocks appears to count the relayer, not the user. Its "active accounts" undercount accounts and say nothing
-about their quality.
+(130,310 to 171,084), which is 1.9x what NearBlocks reports as active accounts in the last six
+complete months (2026-04 to 2026-09; the 12-month median is 5.2x, because
+reward-program traffic was much larger before 2026-04). The gap has the opposite sign to our prior: relayed
+meta-transactions are signed on the outside by a relayer, and NearBlocks appears to count the relayer, not the user. Its
+"active accounts" undercount accounts and say nothing about their quality: most of the missing signers are
+reward-program accounts, not organic users.
 
 Organic daily active signers were 6,437 in 2026-Q3 against 23,402 in
 2025-Q1, the first quarter with the full sample design. The point estimates fell 72.49%, but the
 2025-Q1 interval (0 to 55,725) reaches zero, so the sample does not resolve the size of the
-decline. The log-linear trend over 2025-01 to 2026-09 is -37.83% a year. Out of sample it barely beats
+decline: the 2025-Q1 estimate rests on 2 organic draws out of 600 (2026-Q3: 13).
+From 2025-Q3 on, the quarterly estimates stay between 6,437 and
+9,633 with overlapping intervals, so most of the fitted decline comes from early 2025. The log-linear trend over 2025-01 to 2026-09 is -37.83% a year. Out of sample it barely beats
 a random walk: mean absolute log error 0.404 against 0.422 at six months
 (2 forecasts) and 0.315 against 0.363 at three months
 (5 forecasts). We read it as a description, not a forecast; extrapolated, it puts organic daily
@@ -134,7 +143,8 @@ DefiLlama reports $32.79B of NEAR Intents volume over the last 365 days, $9.79B 
 rebuild on 6 sampled days finds public swaps, each counted once, worth 46.04% of
 DefiLlama's daily figure at the median (from 22.86% to 64.76% by day). Counting both legs of every
 swap gives 92.08%, and 100% sits inside the 90% interval on 4 of
-the 6 days. Since no swap escaped our frame, two readings remain: DefiLlama's volume counts roughly both sides
+the 6 days; on the other 2 even the two-sided equivalent stays below DefiLlama's figure. Since
+no swap escaped our frame, two readings remain, and they can both be true: DefiLlama's volume counts roughly both sides
 of each swap, or about half of the volume settles where public events cannot see it (confidential intents). Either way
 the swaps are real and settle on NEAR, and the reported series is best read as an upper bound. Our prior gave 0.45 to
 a ratio below 0.8; that branch happened.
@@ -159,7 +169,12 @@ minted. 45.30% of the supply is staked.
 **Revenue and buybacks.** Captured Intents revenue rebuilt on-chain is 98.68% of
 DefiLlama's figure over the last six months, and between 90.17% and 111.10% in each of the
 12 months with revenue ([chart](../site/dashboard.html#card-revenue)). It is the most trustworthy Intents
-number we have. Since buybacks started on 2026-02-23 the revenue wallets captured 3.11M NEAR;
+number we have, with one caveat on what it verifies: the check applies DefiLlama's own rule (any NEAR the revenue wallets
+receive from outside the set) to the same wallets, so it confirms the arithmetic and the source accounts, not that every
+inflow was a swap fee. From 2025-11 to 2026-03 only 19% of the captured value came from
+`intents.near`, and in 4 of those months most of it came from one account, `auroraliqsupport.near`
+(see `data/raw/fastnear_tx/wallet_flows.csv`), which chain data do not label. Since 2026-04,
+99.7% has come straight from `intents.near`. Since buybacks started on 2026-02-23 the revenue wallets captured 3.11M NEAR;
 the buyback wallet sent only 12,025 NEAR onward. The NEAR is bought back and held, not burned, so it shrinks the
 float, not the supply. At the last six months' pace that is 4.59M NEAR a year, or
 0.35% of supply.
@@ -251,13 +266,14 @@ Each claim names the prediction that will test it ([falsifiers.md](falsifiers.md
 
 The same weight, the same tests: each claim names the prediction whose failure would confirm it.
 
-1. **Organic usage is small and its point estimates are falling.** 2.17% of transactions,
-   6,437 organic daily active signers, trend -37.83% a year. Confirmed if P1 fails:
+1. **Organic usage is small and not growing.** 2.17% of transactions,
+   6,437 organic daily active signers, between 6,437 and 9,633 in every
+   quarter since 2025-Q3. Confirmed if P1 fails:
    organic daily active signers in 2027-Q3 below 1,935 (the lower end of today's interval), checked
    2027-10-31. P1 is lenient by design; a pass near the threshold would still be a decline.
 2. **The headline metrics overstate the economy.** Incentivized programs and bots sent
    55.83% and 21.83% of 2026-Q3 transactions; NearBlocks' active accounts
-   miss real signers by 5.2x; DefiLlama's Intents volume is about twice the public one-sided
+   miss real signers by 1.9x (last six months); DefiLlama's Intents volume is about twice the public one-sided
    volume. No prediction tests a definition; the [Q2 falsifier](../site/dashboard.html#scorecard) on reconstruction is
    already met.
 3. **Intents is concentrated.** One asset, USDT, makes up 47.93% of sold volume. A stablecoin-route
@@ -269,8 +285,8 @@ The same weight, the same tests: each claim names the prediction whose failure w
    of 379x, and NEAR captures only 27.20% of Intents fees. Confirmed
    if P7 fails at 2027-04-30.
 6. **Developers are leaving in absolute terms**: down 36.24% in a year. Confirmed if P6 fails at 2027-10-31.
-7. **The treasury is opaque.** 30.17M NEAR left `treasury.near` in two months, much of it to
-   accounts with no public label. No prediction covers it; a governance disclosure of the recipients would settle it.
+7. **The treasury's 2026 outflows are unattributed.** 30.17M NEAR left `treasury.near` in two
+   months, much of it to accounts with no public label. No prediction covers it; a governance disclosure of the recipients would settle it.
 
 ## Valuation: ranges and priors, not a price target
 
@@ -314,15 +330,21 @@ the snapshot, not chosen by hand, and frozen in [predictions.csv](predictions.cs
 `a926c6a50937ad55d4e5b9e00cf66aa33d86fda8a9c906b1c37fdf2a30b60c94`, recorded in the annotated git tag `predictions-2026-10-31`. A prediction that fails will be reported,
 not removed. Re-check any of them with `make refresh && make reproduce` after its date.
 
-| ID | Claim | Holds if | Check on |
-|---|---|---|---|
-| P1 | Organic usage stops shrinking | organic daily active signers in 2027-Q3 >= 1,935 | 2027-10-31 |
-| P2 | Intents volume keeps growing | 90-day volume to 2027-04-30 >= $11.30B | 2027-04-30 |
-| P3 | Chain Signatures usage grows | v1.signer transactions in 2027-09 >= 1,304,107 | 2027-10-31 |
-| P4 | More revenue reaches the buyback wallets | captured revenue 2026-11 to 2027-04 >= $4.46M | 2027-04-30 |
-| P5 | Fees are not competed away | captured take rate, 90 days to 2027-04-30 >= 3.28 bp | 2027-04-30 |
-| P6 | Developer base holds relative to peers | NEAR / peer-chain developers in 2027-Q3 >= 3.38% | 2027-10-31 |
-| P7 | Counting Intents, NEAR stays cheaper than the median peer | market cap / (chain + Intents fees) <= peer median (today 379x) | 2027-04-30 |
+| ID | Claim | Holds if | Today | Check on |
+|---|---|---|---:|---|
+| P1 | Organic usage stops shrinking | organic daily active signers in 2027-Q3 >= 1,935 | 6,437 | 2027-10-31 |
+| P2 | Intents volume keeps growing | 90-day volume to 2027-04-30 >= $11.30B | $11.30B | 2027-04-30 |
+| P3 | Chain Signatures usage grows | v1.signer transactions in 2027-09 >= 1,304,107 | 1,304,107 | 2027-10-31 |
+| P4 | More revenue reaches the buyback wallets | captured revenue 2026-11 to 2027-04 >= $4.46M | $4.46M (2026-04 to 2026-09) | 2027-04-30 |
+| P5 | Fees are not competed away | captured take rate, 90 days to 2027-04-30 >= 3.28 bp | 4.10 bp (90 days) | 2027-04-30 |
+| P6 | Developer base holds relative to peers | NEAR / peer-chain developers in 2027-Q3 >= 3.38% | 4.19% | 2027-10-31 |
+| P7 | Counting Intents, NEAR stays cheaper than the median peer | market cap / (chain + Intents fees) <= peer median (today 379x) | 80.0x | 2027-04-30 |
+
+The seven are not equally demanding. P2, P3 and P5 ask for little or no decline from today. P1 (the bottom of today's
+interval), P6 (the lowest of the last four quarters), P4 ($4.46M in six months, while captured revenue ran at
+$18.80M a year over the last 90 days) and P7 (80.0x today against a ceiling of
+379x) leave wide margins: their passing would be weak evidence for the bull case, their failing strong
+evidence against it.
 
 Decision rule, stated now: if P1, P2 and P4 all hold, we upgrade the case from conditional to supported on usage and
 value capture; if P1 and P4 both fail, the long-term case as stated here is falsified. Before those dates, three things
@@ -337,6 +359,17 @@ missing half is double counting or confidential flow); and a public account of t
 - **A rule-based classifier.** No labelled data exists for NEAR signers. A human using a batching app can look like a
   bot, and a slow bot can look human. The sensitivity range (1.17% to
   5.17%) is the honest error bar on the label, beyond the sampling interval.
+- **Labels refined after a first look.** The list of reward programs was extended after we inspected the receivers of
+  draws labelled organic in pilot months (PlayEmber, Harvest Moon, HOT claim namespaces; see `config/sources.toml`).
+  Each addition moved draws out of organic, so the organic share depends on those choices; the share under the
+  original list is not reported.
+- **Asymmetric multiples.** The Intents-inclusive multiples add the fees of NEAR's largest application to NEAR, but no
+  application fees to the peers, whose chain fees exclude their DEX and app fees. That flatters NEAR; the captured-revenue
+  basis (220x against 1,784x) is the
+  fairer comparison.
+- **Changes from the plan.** PIANO.md planned prediction thresholds from the models' 80% intervals, a cross-sectional
+  valuation regression (Q7) and lead-lag tests (Q2); the thresholds instead use today's values, interval bounds and
+  recent minima, and the regression and the lead-lag tests were not run.
 - **Single-sourced aggregates.** Intents volume and gross fees come from a NEAR-uploaded dataset via DefiLlama; we
   verified captured revenue, not gross fees. Market caps are CoinGecko's, and the keyless API gives only 365 days.
 - **One snapshot.** Every number is as of 2026-10-29. A refresh can move them, and the peer set (five chains with a
@@ -345,8 +378,8 @@ missing half is double counting or confidential flow); and a public account of t
   forecasts are extrapolations and are labelled as such.
 - **Priors partly reconstructed.** The Q1 and Q2 priors were committed before those data were analysed; the Q4, Q6 and
   model priors were written after those results were seen and are marked as reconstructions in priors.md.
-- **Who judges.** This was written for a NEAR-sponsored hackathon, and judges may prefer good news about NEAR. We gave
-  the bear case the same space and the same tests, pre-registered the falsifiers in PIANO.md, and hashed the predictions
+- **Incentives.** This was written for a NEAR-sponsored hackathon, a setting that rewards good news about NEAR. To
+  counter that pull we gave the bear case the same space and the same tests, pre-registered the falsifiers in PIANO.md, and hashed the predictions
   before their outcomes exist.
 - **Who wrote it.** An AI agent team (Claude models in Claude Code) with no NEAR position, directed by one human.
   AI-written code can be wrong in confident ways: every number here is computed by tested code from committed data and

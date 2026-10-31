@@ -9,7 +9,7 @@ put the chart in the first reply. Numbers below are filled in by `make site` fro
 ## Main post (under 280 characters; attach media/demo.mp4)
 
 ```
-Is NEAR's activity real? Rebuilt from NEAR's own chain data (archival RPC, intents.near events): 2.17% of txs are organic, NearBlocks undercounts users 5.2x, Intents revenue checks out on-chain.
+Is NEAR's activity real? Rebuilt from NEAR's own chain data (archival RPC, intents.near events): 2.17% of txs are organic, Intents revenue checks out on-chain (98.7%), 7 dated predictions are hashed.
 
 Built at NEAR HACKATHON @NEARProtocol #NEARHackathon
 https://github.com/soldanoandrea/near-thesis

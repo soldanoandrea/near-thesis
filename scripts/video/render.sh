@@ -26,9 +26,9 @@ make -C "$REPO" site >/dev/null
 # name, seconds, capture hash (the note is a heading for the frame; numbers stay in the cards themselves)
 cat > "$WORK/scenes.txt" <<'SCENES'
 00_title 7 capture=hero&note=NEAR%20HACKATHON%202026%20%C2%B7%20track%20thesis%20%C2%B7%20judged%20on%20the%20evidence
-02_classes 14 capture=classes&note=1%2F6%20%C2%B7%20Organic%20collapse%3A%20who%20actually%20sends%20NEAR's%20transactions
-03_signers 13 capture=signers&note=1%2F6%20%C2%B7%20Organic%20collapse%3A%20daily%20active%20signers%2C%20and%20why%20NearBlocks%20undercounts%20them
-04_intents 15 capture=intents&note=2%2F6%20%C2%B7%20NEAR%20Intents%3A%20real%2C%20but%20the%20reported%20volume%20looks%20two-sided
+02_classes 14 capture=classes&note=1%2F6%20%C2%B7%20Organic%20use%3A%20who%20actually%20sends%20NEAR's%20transactions
+03_signers 13 capture=signers&note=1%2F6%20%C2%B7%20Organic%20use%3A%20small%20and%20not%20growing%2C%20and%20why%20NearBlocks%20undercounts%20signers
+04_intents 15 capture=intents&note=2%2F6%20%C2%B7%20NEAR%20Intents%3A%20real%2C%20but%20only%20half%20the%20reported%20volume%20is%20visible%20on-chain
 05_revenue 12 capture=revenue&note=3%2F6%20%C2%B7%20Revenue%20verified%3A%20DefiLlama's%20captured%20revenue%2C%20rebuilt%20from%20on-chain%20flows
 06_treasury 15 capture=treasury&note=4%2F6%20%C2%B7%20The%20treasury%20trail%3A%20where%20the%20April-May%202026%20outflows%20went
 07_supply 12 capture=supply&note=5%2F6%20%C2%B7%20Dilution%3A%202.5%25%20issuance%20vs%20HSP-029%2C%20after%20burn%20and%20buybacks

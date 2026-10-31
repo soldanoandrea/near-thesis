@@ -8,7 +8,7 @@ put the chart in the first reply. Numbers below are filled in by `make site` fro
 ## Main post (under 280 characters; attach media/demo.mp4)
 
 ```
-Is NEAR's activity real? Rebuilt from NEAR's own chain data (archival RPC, intents.near events): {{q1b.organic_tx_share}} of txs are organic, NearBlocks undercounts users {{q1b.das_to_nearblocks:x}}, Intents revenue checks out on-chain.
+Is NEAR's activity real? Rebuilt from NEAR's own chain data (archival RPC, intents.near events): {{q1b.organic_tx_share}} of txs are organic, Intents revenue checks out on-chain ({{q4b.revenue_onchain_to_defillama:p1}}), {{pred.count:int}} dated predictions are hashed.
 
 Built at NEAR HACKATHON @NEARProtocol #NEARHackathon
 https://github.com/soldanoandrea/near-thesis

@@ -17,7 +17,7 @@ from pathlib import Path
 
 import polars as pl
 
-from .. import io
+from .. import accounts, io
 from ..report import fmt
 
 TOKEN = re.compile(r"\{\{([A-Za-z0-9_./%+-]+)(?::([a-z0-9]+))?\}\}")
@@ -144,6 +144,28 @@ def build(processed: Path, thesis_dir: Path, manifest: dict) -> Registry:
                   r[f"tx_share_{c}_p95"])
         R.add(f"oq.{tag}.das_all", r["das_all"], "count", P("organic_quarterly.csv", f"quarter = {q}, das_all"),
               r["das_all_p05"], r["das_all_p95"])
+    for r in oq.iter_rows(named=True):
+        tag = r["quarter"].replace("-", "").lower()
+        R.add(f"oq.{tag}.das_organic", r["das_organic"], "count", P("organic_quarterly.csv", f"quarter = {r['quarter']}, das_organic"),
+              r["das_organic_p05"], r["das_organic_p95"])
+    since = oq.filter(pl.col("quarter") >= "2025-Q3")
+    R.add("oq.from2025q3.das_organic_min", since["das_organic"].min(), "count",
+          P("organic_quarterly.csv", "min das_organic over the full quarters from 2025-Q3"))
+    R.add("oq.from2025q3.das_organic_max", since["das_organic"].max(), "count",
+          P("organic_quarterly.csv", "max das_organic over the full quarters from 2025-Q3"))
+    dr = _csv(processed, "organic_draws.csv")
+    for q, months in (("2025-Q1", ["2025-01", "2025-02", "2025-03"]), ("2026-Q3", ["2026-07", "2026-08", "2026-09"])):
+        x = dr.filter(pl.col("month").is_in(months))
+        tag = q.replace("-", "").lower()
+        R.add(f"draws.{tag}.all", x.height, "count", P("organic_draws.csv", f"rows, {months[0]} to {months[-1]}"))
+        R.add(f"draws.{tag}.organic", x.filter(pl.col("account_label") == "organic").height, "count",
+              P("organic_draws.csv", f"account_label = organic, {months[0]} to {months[-1]}"))
+    om = _csv(processed, "organic_monthly.csv").filter(pl.col("is_partial_month").cast(pl.Utf8).str.to_lowercase() == "false"
+                                                       ).sort("month").tail(6)
+    R.add("om.das_to_nearblocks.last6", om["das_all_to_nearblocks"].median(), "multiple",
+          P("organic_monthly.csv", "median das_all_to_nearblocks, last six complete months"))
+    R.add("om.last6.first_month", om["month"][0], "text", P("organic_monthly.csv", "first of the last six complete months"))
+    R.add("om.last6.last_month", om["month"][-1], "text", P("organic_monthly.csv", "last complete month"))
     am = _csv(processed, "activity_monthly.csv")
     q3 = am.filter(pl.col("month").is_in(["2026-07", "2026-08", "2026-09"]))
     R.add("act.2026q3.chain_signatures_share", q3["census_v1_signer"].sum() / q3["nb_txns"].sum(), "ratio",
@@ -169,6 +191,8 @@ def build(processed: Path, thesis_dir: Path, manifest: dict) -> Registry:
     R.add("ic.days_two_sided_ci_has_100", d.filter((pl.col("ratio_two_sided_to_defillama_p05") <= 1)
                                                    & (pl.col("ratio_two_sided_to_defillama_p95") >= 1)).height, "count",
           P("intents_check_days.csv", "days whose two-sided 90% CI contains 100%"))
+    R.add("ic.days_two_sided_below_100", d.filter(pl.col("ratio_two_sided_to_defillama_p95") < 1).height, "count",
+          P("intents_check_days.csv", "days whose two-sided 90% CI lies wholly below 100%"))
     R.add("ic.sampled_txs", d["sampled_txs"].sum(), "count", P("intents_check_days.csv", "sum(sampled_txs)"))
     R.add("ic.netting_median", d["netting_ratio"].median(), "ratio", P("intents_check_days.csv", "median netting_ratio"))
     iq = _csv(processed, "intents_quarterly.csv")
@@ -191,6 +215,22 @@ def build(processed: Path, thesis_dir: Path, manifest: dict) -> Registry:
     R.add("rev.last_month", rr["month"][-1], "text", P("ledger_revenue_reconciliation.csv", "last month (partial: to the fetch day)"))
     R.add("rev.usd_onchain_total", rr["usd_onchain"].sum(), "USD", P("ledger_revenue_reconciliation.csv", "sum usd_onchain"))
     R.add("rev.usd_defillama_total", rr["usd_defillama"].sum(), "USD", P("ledger_revenue_reconciliation.csv", "sum usd_defillama"))
+    lm = (_csv(processed, "ledger_monthly.csv")
+          .filter(pl.col("wallet").is_in(accounts.REVENUE_WALLETS) & (pl.col("direction") == "in")
+                  & (pl.col("flow_type") == "transfer") & (pl.col("asset_group") == "NEAR")
+                  & (pl.col("counterparty_class") != "revenue_wallet"))
+          .with_columns((pl.col("counterparty_class") == "intents").alias("from_intents")))
+    src = "ledger_monthly.csv"
+    for tag, a, b in (("early", rr["month"][0], "2026-03"), ("recent", "2026-04", rr["month"][-1])):
+        w = lm.filter((pl.col("month") >= a) & (pl.col("month") <= b))
+        R.add(f"rev.src_intents_share.{tag}", w.filter(pl.col("from_intents"))["usd"].sum() / w["usd"].sum(), "ratio",
+              P(src, f"USD share of revenue-rule NEAR inflows from intents.near, {a} to {b}"))
+        R.add(f"rev.src.{tag}.first_month", a, "text", P(src, f"first month of the {tag} window"))
+        R.add(f"rev.src.{tag}.last_month", b, "text", P(src, f"last month of the {tag} window"))
+    per = (lm.filter(pl.col("month").is_in(rr["month"].to_list())).group_by("month")
+           .agg((pl.col("usd") * pl.col("from_intents")).sum().alias("i"), pl.col("usd").sum().alias("t")))
+    R.add("rev.months_mostly_other", per.filter(pl.col("i") < 0.5 * pl.col("t")).height, "count",
+          P(src, "months with DefiLlama revenue > $1k in which under half of the captured NEAR came from intents.near"))
     bb = _csv(processed, "ledger_buyback_summary.csv").row(0, named=True)
     R.add("bb.sent_out", bb["buyback_wallet_near_transfers_out_since_start"], "NEAR",
           P("ledger_buyback_summary.csv", "buyback_wallet_near_transfers_out_since_start"))

@@ -167,13 +167,17 @@ def signers(processed: Path, R: Registry) -> dict:
              f"{r['nb_active']:,.0f}"] for r in q.iter_rows(named=True)]
     return {
         "id": "signers", "q": "Q1", "title": "Daily active signers: all, organic, and what NearBlocks reports",
-        "caption": (f"Shows organic daily active signers falling from {R.fmt('q1b.organic_das_first_full_quarter')} (2025-Q1) to "
-                    f"{R.fmt('q1b.organic_das')} (2026-Q3, 90% CI {R.fmt('q1b.organic_das', 'ci')}) while all real signers "
-                    f"are {R.fmt('q1b.das_to_nearblocks', 'x')} what NearBlocks calls active accounts (median, last 12 months); it does not "
+        "caption": (f"Shows organic daily active signers at {R.fmt('q1b.organic_das')} in 2026-Q3 (90% CI "
+                    f"{R.fmt('q1b.organic_das', 'ci')}) and between {R.fmt('oq.from2025q3.das_organic_min')} and "
+                    f"{R.fmt('oq.from2025q3.das_organic_max')} in every quarter since 2025-Q3, after a 2025-Q1 estimate of "
+                    f"{R.fmt('q1b.organic_das_first_full_quarter')} from {R.fmt('draws.2025q1.organic', 'int')} organic draws, while all "
+                    f"real signers are {R.fmt('om.das_to_nearblocks.last6', 'x')} what NearBlocks calls active accounts over the last six "
+                    f"months ({R.fmt('q1b.das_to_nearblocks', 'x')} at the 12-month median); it does not "
                     f"resolve the size of the organic decline, because the 2025-Q1 interval reaches 0 (lower bounds are "
                     f"drawn at {floor:,.0f} on the log axis, and a quarter with no organic draw ({', '.join(zero_q) or 'none'}) estimates 0 and "
                     "is left as a gap; the table has the exact intervals)."),
-        "sources": ["data/processed/organic_quarterly.csv", "data/processed/activity_monthly.csv"],
+        "sources": ["data/processed/organic_quarterly.csv", "data/processed/organic_monthly.csv",
+                    "data/processed/organic_draws.csv", "data/processed/activity_monthly.csv"],
         "traces": traces, "layout": layout, "height": 420,
         "table": {"headers": ["Quarter", "All real signers / day (90% CI)", "Organic signers / day (90% CI)",
                               "NearBlocks active accounts / day"], "rows": rows},
@@ -243,9 +247,12 @@ def revenue(processed: Path, R: Registry) -> dict:
         "id": "revenue", "q": "Q4", "title": "NEAR Intents captured revenue: DefiLlama vs rebuilt from on-chain flows",
         "caption": (f"Shows that the NEAR and wNEAR received by the three revenue wallets match DefiLlama's captured revenue "
                     f"month by month ({R.fmt('rev.ratio_min')} to {R.fmt('rev.ratio_max')}; {R.fmt('q4b.revenue_onchain_to_defillama')} "
-                    f"over the last six months, the last one partial); it does not verify DefiLlama's gross fees or volume, "
-                    "which come from a NEAR-uploaded dataset."),
-        "sources": ["data/processed/ledger_revenue_reconciliation.csv"],
+                    f"over the last six months, the last one partial), with {R.fmt('rev.src_intents_share.recent', 'p1')} of the value "
+                    f"since {R.fmt('rev.src.recent.first_month')} coming straight from intents.near; it does not verify DefiLlama's "
+                    f"gross fees or volume, which come from a NEAR-uploaded dataset, nor that every inflow was a swap fee "
+                    f"(from {R.fmt('rev.src.early.first_month')} to {R.fmt('rev.src.early.last_month')} only "
+                    f"{R.fmt('rev.src_intents_share.early', 'p0')} came from intents.near, most of the rest from auroraliqsupport.near)."),
+        "sources": ["data/processed/ledger_revenue_reconciliation.csv", "data/processed/ledger_monthly.csv"],
         "traces": traces, "layout": layout, "height": 400,
         "table": {"headers": ["Month", "DefiLlama", "On-chain (USD at daily price)", "On-chain (NEAR)", "On-chain / DefiLlama"],
                   "rows": rows},
