@@ -2,6 +2,7 @@
 
 refresh  re-downloads every keyless source into data/raw/ (+ MANIFEST.json). Network. About 2 h, rate limited.
 build    rebuilds data/processed/ and reports/metrics_summary.md from data/raw/ only. Offline, seconds.
+site     renders thesis/THESIS.md and the static dashboard in site/ from data/processed/. Offline, seconds.
 verify   checks data/raw/ against MANIFEST.json (sha256, row counts).
 """
 
@@ -69,6 +70,9 @@ def main(argv: list[str] | None = None) -> None:
     b.add_argument("--out", default=None, help="output root (default: repo root); used by the determinism test")
     b.add_argument("--quiet", action="store_true")
     sub.add_parser("verify", help="check data/raw against MANIFEST.json")
+    st = sub.add_parser("site", help="offline: data/processed -> thesis/THESIS.md + site/ (static dashboard)")
+    st.add_argument("--out", default=None, help="output root (default: repo root); used by the site test")
+    st.add_argument("--quiet", action="store_true")
     args = ap.parse_args(argv)
 
     if args.cmd == "refresh":
@@ -76,6 +80,9 @@ def main(argv: list[str] | None = None) -> None:
     elif args.cmd == "build":
         from .pipeline import build
         build(out_root=args.out, quiet=args.quiet)
+    elif args.cmd == "site":
+        from .web.build import build_site
+        build_site(out_root=args.out, quiet=args.quiet)
     elif args.cmd == "verify":
         from .verify import verify_raw
         problems = verify_raw()
