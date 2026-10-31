@@ -11,6 +11,10 @@ and sentence that quotes a number. Not financial advice.
   falsifier scorecard, data provenance) straight from disk, no server needed
 - **Predictions**: [`thesis/predictions.csv`](thesis/predictions.csv), frozen on 2026-10-31, sha256 in the annotated git
   tag `predictions-2026-10-31`; how each is checked in [`thesis/falsifiers.md`](thesis/falsifiers.md)
+- **Video** (under 3 minutes, silent, headings on screen): [`docs/media/demo.mp4`](docs/media/demo.mp4), storyline in
+  [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md); dashboard screenshots in [`docs/media/screens/`](docs/media/screens)
+
+![Dashboard card: share of NEAR transactions by class of signer, with 90% intervals](docs/media/screens/classes.png)
 
 ## What the thesis finds
 
