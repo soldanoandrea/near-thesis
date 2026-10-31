@@ -70,6 +70,7 @@ def main(argv: list[str] | None = None) -> None:
     b.add_argument("--out", default=None, help="output root (default: repo root); used by the determinism test")
     b.add_argument("--quiet", action="store_true")
     sub.add_parser("verify", help="check data/raw against MANIFEST.json")
+    sub.add_parser("freeze-predictions", help="copy data/processed/predictions.csv to thesis/predictions.csv once")
     st = sub.add_parser("site", help="offline: data/processed -> thesis/THESIS.md + site/ (static dashboard)")
     st.add_argument("--out", default=None, help="output root (default: repo root); used by the site test")
     st.add_argument("--quiet", action="store_true")
@@ -83,6 +84,11 @@ def main(argv: list[str] | None = None) -> None:
     elif args.cmd == "site":
         from .web.build import build_site
         build_site(out_root=args.out, quiet=args.quiet)
+    elif args.cmd == "freeze-predictions":
+        from . import paths
+        from .predictions import freeze
+        p, sha, created = freeze(paths.PROCESSED, paths.ROOT / "thesis")
+        print(f"[predictions] {'froze' if created else 'already frozen, left unchanged:'} {p} sha256 {sha}")
     elif args.cmd == "verify":
         from .verify import verify_raw
         problems = verify_raw()

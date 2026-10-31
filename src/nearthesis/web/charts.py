@@ -437,7 +437,7 @@ def multiples(processed: Path, R: Registry) -> dict:
         "caption": (f"Shows NEAR's market cap at {R.fmt('mb.chain_fees', 'x')} its annualized chain fees (peer median "
                     f"{R.fmt('mv.chain_fees.30d_annualized.peer_median')}) but {R.fmt('mb.fees_plus_intents_fees', 'x')} once NEAR Intents fees are "
                     f"counted, and {R.fmt('mb.revenue_plus_intents_revenue', 'x')} on captured revenue; it does not say which basis the market "
-                    "should use: most Intents fees go to integrators and solvers, not to NEAR holders."),
+                    "should use, and most Intents fees never reach NEAR's revenue wallets."),
         "sources": ["data/processed/model_multiples.csv", "data/processed/model_multiples_near_vs_peers.csv"],
         "traces": traces, "layout": _merge(base, wide), "layout_narrow": narrow, "height": 380, "height_narrow": 700,
         "table": {"headers": ["Basis", "Chain", "Multiple"], "rows": rows},

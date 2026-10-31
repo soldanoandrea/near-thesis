@@ -1,0 +1,23 @@
+# Subjective weights over the supply / value-accrual scenarios of model (a) (reports/models_summary.md).
+# Recorded 2026-10-31, after the data in reports/ had been seen; they weight paths of the next five years, which
+# nobody has observed yet, so they are forward-looking priors, not fits. THESIS.md quotes them and the
+# probability-weighted outcome that `make site` computes from data/processed/model_supply_scenarios.csv.
+# These numbers are opinions. Change them here and run `make site` to see the effect.
+recorded = "2026-10-31"
+horizon_years = 5
+
+# Issuance policy over the horizon. HSP-029 (cap 2.5% -> 1.6% over 24 months) was in "Voting" at the snapshot and
+# needs validator adoption after ratification. We have no data on the vote, so passage gets 0.6, split between a
+# prompt (3 months) and a slow (9 months) activation.
+[policy]
+status_quo = 0.4
+hsp029_act3m = 0.4
+hsp029_act9m = 0.2
+
+# NEAR Intents captured revenue growth in NEAR terms, per year (config/sources.toml [models].revenue_growth:
+# low 0.7x, base 1.0x, high 1.6x). Symmetric because the adoption backtest finds that a random walk forecasts
+# monthly Intents volume better than any trend model (model (c)): we do not know the direction.
+[revenue_path]
+low = 0.3
+base = 0.4
+high = 0.3

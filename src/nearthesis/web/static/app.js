@@ -47,7 +47,7 @@
 
   function setupCapture() {
     if (!capture) return;
-    var target = document.getElementById(capture === "hero" || capture === "scorecard" ? capture : "card-" + capture);
+    var target = document.getElementById("card-" + capture) || document.getElementById(capture);
     if (!target) return;
     document.body.classList.add("capture");
     target.classList.add("capture-target");

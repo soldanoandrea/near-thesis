@@ -869,7 +869,11 @@ def render_falsifiers(pred: pl.DataFrame, sha: str, as_of: str) -> str:
          "with this repository (`make refresh`, then the file named), a threshold computed from the data (never typed "
          "by hand; the basis is stated), and a date. A prediction that fails at its date counts against the thesis "
          "and will be reported, not removed.", "",
-         f"sha256 of `data/processed/predictions.csv`: `{sha}`", ""]
+         f"sha256 of `data/processed/predictions.csv`: `{sha}`", "",
+         "The registered version is `thesis/predictions.csv`, a frozen copy of this table taken on 2026-10-31 "
+         "(`python -m nearthesis freeze-predictions`; its sha256 is quoted in `thesis/THESIS.md` and in the annotated git "
+         "tag `predictions-2026-10-31`). After `make refresh` the table below is re-measured from new data and its "
+         "thresholds can move; the frozen file does not.", ""]
     L.append(table(["ID", "Question", "Bullish claim", "Metric", "Test", "Threshold", "Check on", "Current value",
                     "Threshold basis", "How to check"],
                    [[r["id"], r["question"], r["bullish_claim"], r["metric"], r["comparator"],

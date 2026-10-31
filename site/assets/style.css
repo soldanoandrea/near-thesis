@@ -90,6 +90,7 @@ table { border-collapse: collapse; width: 100%; font-size: 0.86em; }
 th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
 th { color: var(--text-secondary); font-weight: 600; background: var(--surface-2); }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.nowrap { white-space: nowrap; }
 td.hash { font-family: var(--mono); font-size: 0.85em; overflow-wrap: anywhere; min-width: 18ch; }
 
 .status { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; font-weight: 600; font-size: 0.92em; }
@@ -137,5 +138,8 @@ body.capture .capture-target details, body.capture .capture-target .noplot { dis
 body.capture .capture-target h3 { font-size: 1.35rem; }
 body.capture .capture-target .caption { font-size: 1.05rem; }
 body.capture #hero.capture-target { justify-content: center; padding: 40px 56px; }
+body.capture .capture-target .col-wide { display: none; }
+body.capture #predictions.capture-target table { font-size: 1rem; }
+code.hash { overflow-wrap: anywhere; }
 body.capture #hero.capture-target h1 { font-size: 2.3rem; }
 body.capture #hero.capture-target .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }

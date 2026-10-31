@@ -4,7 +4,7 @@ The registry is filled from data/processed only (plus the frozen thesis/predicti
 thesis/valuation_priors.toml, both committed files): every metric of metrics_first_pass.csv and metrics_phase2.csv
 under its metric_id, plus named values read from other processed tables. thesis/THESIS.in.md refers to them as
 `{{key}}` (value), `{{key:ci}}` (90% interval), `{{key:abs}}` (absolute value), `{{key:p1}}` / `{{key:p0}}` (percent
-with 1 / 0 decimals) or `{{key:x}}` (multiple); `make site` substitutes them, so no number in THESIS.md is typed.
+with 1 / 0 decimals), `{{key:sp0}}` (signed percent) or `{{key:x}}` (multiple); `make site` substitutes them, so no number in THESIS.md is typed.
 """
 
 from __future__ import annotations
@@ -48,6 +48,8 @@ def show(n: Num, mod: str | None = None) -> str:
         return show(Num(n.key, abs(float(v)), unit, n.source))
     if mod in ("p1", "p0"):
         return f"{float(v) * 100:.{1 if mod == 'p1' else 0}f}%"
+    if mod == "sp0":
+        return f"{float(v) * 100:+.0f}%"
     if mod == "x" or unit == "multiple":
         x = float(v)
         return f"{x:,.0f}x" if abs(x) >= 100 else f"{x:.1f}x"
@@ -123,6 +125,13 @@ def build(processed: Path, thesis_dir: Path, manifest: dict) -> Registry:
                     ("buyback_near_per_year_onchain", "NEAR"), ("supply0", "NEAR"), ("staking_ratio", "ratio"),
                     ("hsp029_status", "text"), ("hsp029_snapshot_utc", "text"), ("as_of", "text")):
         R.add(f"in.{k}", inp[k], unit, P("model_inputs.csv", f"parameter = {k}"))
+
+    R.add("in.capture_share", float(inp["intents_revenue_annualized_90d"]) / float(inp["intents_fees_annualized_90d"]), "ratio",
+          P("model_inputs.csv", "intents_revenue_annualized_90d / intents_fees_annualized_90d"))
+    trl = _csv(processed, "ledger_trails.csv")
+    R.add("tr.exchange_like_stops", trl.filter(pl.col("stop_reason").str.starts_with("busy_account")
+                                               | (pl.col("out_counterparty_class") == "intents")).height, "count",
+          P("ledger_trails.csv", "rows whose trail stops at an exchange-like account (busy_account) or goes into NEAR Intents"))
 
     # --- Q1: class shares and signers ----------------------------------------------------------------------------
     oq = _csv(processed, "organic_quarterly.csv").filter(pl.col("months") == 3)
@@ -204,6 +213,8 @@ def build(processed: Path, thesis_dir: Path, manifest: dict) -> Registry:
     R.add("tr.nfendowment03_sent", nf.filter(pl.col("out_asset") == "NEAR")["out_near"].sum(), "NEAR",
           P("ledger_trails.csv", "account = nfendowment03.near, sum out_near"))
     R.add("tr.accounts_followed", tl["account"].n_unique(), "count", P("ledger_trails.csv", "distinct accounts followed"))
+    R.add("tr.nfendowment03_recipients", nf.filter(pl.col("out_asset") == "NEAR")["out_counterparty"].n_unique(), "count",
+          P("ledger_trails.csv", "account = nfendowment03.near, distinct NEAR counterparties"))
 
     # --- models -----------------------------------------------------------------------------------------------------
     sc = _csv(processed, "model_supply_scenarios.csv")
@@ -213,6 +224,11 @@ def build(processed: Path, thesis_dir: Path, manifest: dict) -> Registry:
               f"scenario = {s['scenario']}, horizon_years = {s['horizon_years']}, float_growth_cagr"))
         R.add(f"{base}.supply_cagr", s["supply_growth_cagr"], "ratio", P("model_supply_scenarios.csv",
               f"scenario = {s['scenario']}, horizon_years = {s['horizon_years']}, supply_growth_cagr"))
+    spar = _csv(processed, "model_supply_parameters.csv")
+    for lvl in ("low", "base", "high"):
+        r = spar.filter(pl.col("scenario") == f"status_quo/{lvl}").row(0, named=True)
+        R.add(f"par.revenue_change.{lvl}", r["revenue_growth"] - 1, "ratio",
+              P("model_supply_parameters.csv", f"scenario = status_quo/{lvl}, revenue_growth - 1 (per year)"))
     grid = _csv(processed, "model_net_zero_grid.csv")
     price = float(inp["price"])
     g = grid.filter(((pl.col("price_usd") - price).abs() < 1e-6) & ((pl.col("take_rate") - float(inp["take_rate_90d"])).abs() < 1e-9))
