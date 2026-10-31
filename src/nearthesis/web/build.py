@@ -249,6 +249,8 @@ def dashboard_html(R: numbers.Registry, charts: list[dict], processed: Path, the
     for title, sid, ids in sections:
         body.append(f'<h2 id="{sid}">{E(title)}</h2>\n')
         body += [card(by[i]) for i in ids]
+    body.append('<h2 id="path-to-yes">Path to yes: what would confirm the bull case</h2>\n')
+    body.append(card(by["pathtoyes"]))
     body.append('<h2 id="change-our-mind">What would change our mind</h2>\n')
     body.append(scorecard(processed, thesis_dir, R))
     body.append('<h2 id="data">Data</h2>\n')

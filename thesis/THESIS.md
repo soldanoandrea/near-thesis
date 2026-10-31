@@ -6,6 +6,25 @@ Every number in this essay is filled in by `make site` from the tables in `data/
 [NUMBERS.md](NUMBERS.md) names the table and row behind each one. Charts: [the dashboard](../site/dashboard.html).
 Written by an AI agent team with no NEAR position. Not financial advice.*
 
+## Summary for non-quant readers
+
+1. Only about 2% of NEAR's transactions come from people using apps on their own; the rest come from
+   reward programs, automated accounts and background services, and the number of such people active on a typical day,
+   about 6,437, has not grown since mid-2025 ([chart](../site/dashboard.html#card-signers)).
+2. NEAR Intents, a service that lets people swap tokens between blockchains and settles the swaps on NEAR, is real: the
+   fees it says NEAR keeps really arrive in NEAR's wallets, about $18.80M a year at the
+   recent pace ([chart](../site/dashboard.html#card-revenue)).
+3. Only about 46% of the trading reported for NEAR Intents shows up as public swaps; the rest is
+   either counted twice or happens out of public view, and the public data cannot tell which
+   ([chart](../site/dashboard.html#card-intents)).
+4. New NEAR tokens are still created faster than fees take them off the market, so a holder who does not stake loses
+   about 2.06% of their share each year; the fees NEAR keeps would have to be about 8.1x
+   larger to stop that (4.0x to 16.6x, depending on the token
+   price and the period measured) ([chart](../site/dashboard.html#card-supply)).
+5. We will know by late 2027 whether the long-term case holds: one chart shows, with targets set in advance, how many
+   active people, how much revenue and how little new-token creation would confirm it
+   ([chart](../site/dashboard.html#card-pathtoyes)).
+
 ## Verdict
 
 On the evidence at 2026-10-29, NEAR is two businesses of very different quality. The chain's own activity is mostly
@@ -31,9 +50,7 @@ weight we gave the +60%-a-year revenue path, the only one that gets there, not a
 
 ## How to read this
 
-- The questions are the seven of [PIANO.md](../PIANO.md), written before the data were fetched: Q1 is the activity
-  real, Q2 is NEAR Intents volume real, Q3 does the AI-agent story show up on-chain, Q4 supply and value accrual, Q5
-  fees and take rate, Q6 developers, Q7 comparables.
+- The questions Q1 to Q7 are those of [PIANO.md](../PIANO.md), written before the data were fetched.
 - Evidence grades: **A** means re-runnable from chain data (archival RPC, the FastNear indexer); **B** means an
   aggregator snapshot (DefiLlama, NearBlocks, CoinGecko, Electric Capital). Where we sampled, intervals are 90%
   bootstrap intervals over sampled blocks.
@@ -351,7 +368,7 @@ $18.80M a year over the last 90 days) and P7 (80.0x today against a ceiling of
 379x) leave wide margins: their passing would be weak evidence for the bull case, their failing strong
 evidence against it.
 
-Decision rule, stated now: if P1, P2 and P4 all hold, we upgrade the case from conditional to supported on usage and
+Decision rule, stated now ([path to yes](../site/dashboard.html#card-pathtoyes)): if P1, P2 and P4 all hold, we upgrade the case from conditional to supported on usage and
 value capture; if P1 and P4 both fail, the long-term case as stated here is falsified. Before those dates, three things
 would move us: the HSP-029 result (a pass lowers the offset bar from 8.1x, 4.0x to 16.6x by price and window, to
 5.1x); a published definition of DefiLlama's Intents volume (it would tell us whether the
@@ -392,15 +409,12 @@ missing half is double counting or confidential flow); and a public account of t
 
 ## Reproduce it
 
-Two commands on macOS or Linux with `make` and [uv](https://docs.astral.sh/uv/) installed; no account, no key, and no
-network access beyond uv installing Python 3.12 and the locked packages:
+Two commands on macOS or Linux with `make` and [uv](https://docs.astral.sh/uv/); no account or key:
 
 ```
 git clone https://github.com/soldanoandrea/near-thesis && cd near-thesis
 make reproduce
 ```
 
-`make reproduce` rebuilds `data/processed/`, the three reports, this essay and the dashboard from the committed raw
-snapshots, then runs the tests; `git status` shows nothing modified afterwards. Open `site/index.html` for this essay
-and `site/dashboard.html` for the charts. `make refresh` re-downloads every snapshot from the public APIs (several
-hours, rate limited) when you want to check a prediction.
+It rebuilds every table, report, this essay and the dashboard offline and tests that nothing changed; `make refresh`
+re-downloads the snapshots (several hours) to check a prediction.

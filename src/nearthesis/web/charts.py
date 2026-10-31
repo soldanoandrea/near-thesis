@@ -488,6 +488,148 @@ def developers(processed: Path, R: Registry) -> dict:
     }
 
 
+# ------------------------------------------------------------------------------------------------- path to yes
+def _add_months(month: str, k: int) -> str:
+    y, m = map(int, month.split("-"))
+    m0 = y * 12 + m - 1 + k
+    return f"{m0 // 12:04d}-{m0 % 12 + 1:02d}"
+
+
+def _qmid(quarter: str) -> str:
+    y, n = quarter.split("-Q")
+    return f"{y}-{3 * int(n) - 1:02d}-15"
+
+
+def path_to_yes(processed: Path, R: Registry) -> dict:
+    """What the bull case needs by late 2027, drawn from the frozen thresholds (P1, P4; P2 in the table) and PIANO.md's
+    Q4 falsifier line (float dilution 2% a year), against history and the supply model's monthly paths."""
+    snap = str(R.get("in.as_of").value)[:7]
+    first = _add_months(snap, 1)                    # model month 1 = the first month after the snapshot
+    end = "2027-11"
+    val = lambda k: float(R.get(k).value)  # noqa: E731
+    traces, ann = [], []
+
+    # panel 1: organic daily active signers per quarter, and P1's floor for 2027-Q3
+    q = _csv(processed, "organic_quarterly.csv").filter((pl.col("months") == 3) & (pl.col("quarter") >= QUARTERS_FROM)).sort("quarter")
+    x1, floor = [_qmid(v) for v in q["quarter"].to_list()], 800.0
+    traces += _band(x1, [max(v, floor) for v in q["das_organic_p05"].to_list()],
+                    [max(v, floor) for v in q["das_organic_p95"].to_list()], "@s2", "x", "y")
+    traces.append({"type": "scatter", "x": x1, "y": [r6(v) if v > 0 else None for v in q["das_organic"].to_list()],
+                   "mode": "lines+markers", "name": "Organic daily active signers", "line": {"color": "@s2", "width": 2},
+                   "marker": {"size": 7, "color": "@s2"}, "xaxis": "x", "yaxis": "y", "showlegend": False,
+                   "hovertemplate": "Organic daily active signers<br>%{x|%Y-%m}: %{y:,.0f}<extra></extra>"})
+    p1 = val("pred.P1.threshold")
+    traces.append({"type": "scatter", "x": [f"{first}-01", "2027-09-30"], "y": [r6(p1), r6(p1)], "mode": "lines",
+                   "line": {"color": "@ink", "width": 2, "dash": "dash"}, "xaxis": "x", "yaxis": "y", "showlegend": False,
+                   "hovertemplate": f"P1: at least {R.fmt('pred.P1.threshold')} a day in 2027-Q3<extra></extra>"})
+    ann.append({"text": f"needed in 2027-Q3: at least {R.fmt('pred.P1.threshold')}", "x": "2027-09-30", "y": math.log10(p1),
+                "xref": "x", "yref": "y", "xanchor": "right", "yanchor": "top", "showarrow": False,
+                "font": {"size": 11, "color": "@ink"}})
+
+    # panel 2: captured revenue per month (on-chain), P4's six-month total as a monthly average, and the full offset
+    rr = _csv(processed, "ledger_revenue_reconciliation.csv").filter(pl.col("usd_defillama") > 1000).sort("month")
+    rr = rr.filter(pl.col("month") < snap)          # complete months only
+    traces.append({"type": "scatter", "x": [f"{m}-15" for m in rr["month"].to_list()], "y": [r6(v) for v in rr["usd_onchain"].to_list()],
+                   "mode": "lines+markers", "name": "Captured revenue (on-chain)", "line": {"color": "@s1", "width": 2},
+                   "marker": {"size": 7, "color": "@s1"}, "xaxis": "x2", "yaxis": "y2", "showlegend": False,
+                   "hovertemplate": "Captured revenue, rebuilt on-chain<br>%{x|%Y-%m}: $%{y:,.3s}<extra></extra>"})
+    p4m = val("pred.P4.threshold") / 6
+    # (value, from, to, dash, colour, label, label above the line?)
+    lines2 = [(p4m, f"{first}-01", "2027-04-30", "dash", "@ink",
+               f"needed, {first} to 2027-04: at least {fmt(p4m, 'USD')} a month on average", False),
+              (val("nz.hsp.required_revenue") / 12, f"{first}-01", f"{end}-30", "dot", "@s4",
+               f"covers issuance under HSP-029: {fmt(val('nz.hsp.required_revenue') / 12, 'USD')} a month", False),
+              (val("nz.sq.required_revenue") / 12, f"{first}-01", f"{end}-30", "dot", "@s3",
+               f"covers issuance at the 2.5% cap: {fmt(val('nz.sq.required_revenue') / 12, 'USD')} a month", True)]
+    for y, a, b, dash, color, text, above in lines2:
+        traces.append({"type": "scatter", "x": [a, b], "y": [r6(y), r6(y)], "mode": "lines", "xaxis": "x2", "yaxis": "y2",
+                       "line": {"color": color, "width": 2, "dash": dash}, "showlegend": False,
+                       "hovertemplate": f"{text}<extra></extra>"})
+        ann.append({"text": text, "x": a, "y": math.log10(y), "xref": "x2", "yref": "y2", "xanchor": "left",
+                    "yanchor": "bottom" if above else "top", "showarrow": False, "font": {"size": 11, "color": color}})
+
+    # panel 3: float dilution after burn and buybacks, model paths by month, and the Q4 falsifier's 2% line
+    paths = _csv(processed, "model_supply_paths.csv")
+    s0 = val("in.supply0")
+    horizon = (int(end[:4]) - int(snap[:4])) * 12 + int(end[5:]) - int(snap[5:])
+    hi = R.fmt("par.revenue_change.high", "sp0")
+    hi_abs = R.fmt("par.revenue_change.high", "p0")
+    cross = {}
+    for sc, label, color, dash in (("status_quo/base", "2.5% cap, revenue flat", "@s1", "solid"),
+                                   ("status_quo/high", f"2.5% cap, revenue {hi} a year", "@s1", "dot"),
+                                   ("hsp029_act3m/base", "HSP-029 active after 3 months, revenue flat", "@s4", "dash")):
+        t = paths.filter((pl.col("scenario") == sc) & (pl.col("month") <= horizon)).sort("month")
+        f = [s0] + t["float_supply"].to_list()
+        rate = [(f[i] / f[i - 1]) ** 12 - 1 for i in range(1, len(f))]
+        months = [_add_months(snap, int(m)) for m in t["month"].to_list()]
+        cross[sc] = next((m for m, v in zip(months, rate) if v < 0.02), None)
+        traces.append({"type": "scatter", "x": [f"{m}-15" for m in months], "y": [r6(v) for v in rate], "mode": "lines",
+                       "name": label, "line": {"color": color, "width": 2, "dash": dash}, "xaxis": "x3", "yaxis": "y3",
+                       "hovertemplate": f"{label}<br>%{{x|%Y-%m}}: %{{y:.2%}} a year<extra></extra>"})
+    traces.append({"type": "scatter", "x": [f"{snap}-15"], "y": [r6(val("sc.status_quo/base.1y.float_cagr"))], "mode": "markers",
+                   "marker": {"size": 9, "color": "@ink"}, "xaxis": "x3", "yaxis": "y3", "showlegend": False,
+                   "hovertemplate": "today: %{y:.2%} a year<extra></extra>"})
+    traces.append({"type": "scatter", "x": [f"{snap}-01", f"{end}-30"], "y": [0.02, 0.02], "mode": "lines",
+                   "line": {"color": "@ink", "width": 2, "dash": "dash"}, "xaxis": "x3", "yaxis": "y3", "showlegend": False,
+                   "hovertemplate": "needed: below 2% a year (PIANO.md Q4)<extra></extra>"})
+    ann.append({"text": "needed: below 2% a year", "x": f"{first}-01", "y": 0.02, "xref": "x3", "yref": "y3", "xanchor": "left",
+                "yanchor": "top", "showarrow": False, "font": {"size": 11, "color": "@ink"}})
+
+    rng = ["2025-01-01", f"{end}-30"]
+    ann += [_panel_title("Organic daily active signers (90% interval), and P1's floor", 1),
+            _panel_title("NEAR Intents revenue captured by NEAR, per month, and what P4 and a full offset need", 2),
+            _panel_title("Float dilution after burn and buybacks (% a year), model paths, and PIANO.md's Q4 line", 3)]
+    layout = {
+        "xaxis": {**_axis(""), "type": "date", "range": rng, "anchor": "y", "matches": "x3", "showticklabels": False},
+        "yaxis": {**_axis("Per day (log)"), "domain": [0.74, 0.96], "type": "log", "range": [math.log10(floor), math.log10(80000)],
+                  "tickvals": [1e3, 3e3, 1e4, 3e4], "ticktext": ["1k", "3k", "10k", "30k"]},
+        "xaxis2": {**_axis(""), "type": "date", "range": rng, "anchor": "y2", "matches": "x3", "showticklabels": False},
+        "yaxis2": {**_axis("USD a month (log)"), "domain": [0.40, 0.64], "type": "log",
+                   "range": [math.log10(1e5), math.log10(3e7)], "tickvals": [1e5, 3e5, 1e6, 3e6, 1e7],
+                   "ticktext": ["$100k", "$300k", "$1M", "$3M", "$10M"]},
+        "xaxis3": {**_axis(""), "type": "date", "range": rng, "anchor": "y3", "tickformat": "%Y-%m"},
+        "yaxis3": {**_axis("% a year"), "domain": [0.0, 0.30], "tickformat": ".1%", "range": [0.014, 0.024]},
+        "shapes": [{"type": "line", "xref": "x3", "yref": "paper", "x0": f"{snap}-29", "x1": f"{snap}-29", "y0": 0, "y1": 0.98,
+                    "line": {"color": "@muted", "width": 1, "dash": "dot"}}],
+        "annotations": ann + [{"text": "snapshot", "x": f"{snap}-29", "y": 0.99, "xref": "x3", "yref": "paper",
+                               "xanchor": "center", "yanchor": "bottom", "showarrow": False,
+                               "font": {"size": 10, "color": "@muted"}}],
+        "legend": {"orientation": "h", "y": -0.1, "x": 0, "traceorder": "normal"},
+        "margin": {"l": 70, "r": 10, "t": 30, "b": 60}, "hovermode": "closest"}
+    last = rr.row(-1, named=True)
+    sq_cross, hsp_cross = cross.get("status_quo/high"), cross.get("hsp029_act3m/base")
+    rows = [
+        ["Organic daily active signers (P1)", f"{R.fmt('pred.P1.current')} (2026-Q3)", f"at least {R.fmt('pred.P1.threshold')} in 2027-Q3",
+         R.fmt("pred.P1.date")],
+        ["Captured Intents revenue, rebuilt on-chain (P4)", f"{R.fmt('pred.P4.current')} (2026-04 to 2026-09)",
+         f"at least {R.fmt('pred.P4.threshold')} over {first} to 2027-04", R.fmt("pred.P4.date")],
+        ["NEAR Intents volume, 90 days (P2)", R.fmt("pred.P2.current"), f"at least {R.fmt('pred.P2.threshold')} in the 90 days to 2027-04-30",
+         R.fmt("pred.P2.date")],
+        ["Float dilution after burn and buybacks (PIANO.md Q4)", f"{R.fmt('sc.status_quo/base.1y.float_cagr')} a year",
+         f"below 2% a year (model: {hsp_cross or 'not by ' + end} with HSP-029 after 3 months, {sq_cross or 'not by ' + end} at the 2.5% cap with revenue up {hi_abs} a year)",
+         "every refresh"],
+        ["Burn plus buybacks cover issuance (full offset)", f"{R.fmt('in.intents_revenue_annualized_90d')} revenue a year",
+         f"{R.fmt('nz.sq.required_revenue')} a year at the 2.5% cap, {R.fmt('nz.hsp.required_revenue')} under HSP-029", "not dated"],
+    ]
+    return {
+        "id": "pathtoyes", "q": "P1-P4", "title": "Path to yes: what would confirm the bull case by late 2027",
+        "caption": (f"Shows what the bull case needs by late 2027, from the frozen thresholds: organic daily active signers of "
+                    f"at least {R.fmt('pred.P1.threshold')} in 2027-Q3 (today {R.fmt('pred.P1.current')}), captured Intents "
+                    f"revenue of at least {R.fmt('pred.P4.threshold')} over {first} to 2027-04 (about {fmt(p4m, 'USD')} a month, "
+                    f"against {fmt(last['usd_onchain'], 'USD')} in {last['month']}), and float dilution below 2% a year (today "
+                    f"{R.fmt('sc.status_quo/base.1y.float_cagr')}), which the model reaches in {hsp_cross or 'no month to ' + end} if "
+                    f"HSP-029 activates after three months and in {sq_cross or 'no month to ' + end} at the 2.5% cap only if revenue "
+                    f"rises {hi_abs} a year; it does not say any of this will happen, and covering issuance in full needs far more "
+                    f"revenue ({fmt(val('nz.sq.required_revenue') / 12, 'USD')} a month at the 2.5% cap, dotted)."),
+        "sources": ["thesis/predictions.csv", "data/processed/organic_quarterly.csv",
+                    "data/processed/ledger_revenue_reconciliation.csv", "data/processed/model_supply_paths.csv",
+                    "data/processed/model_net_zero_grid.csv"],
+        "traces": traces, "layout": layout, "height": 760,
+        "table": {"headers": ["What the bull case needs", "Today", "Needed", "Checked on"], "rows": rows},
+    }
+
+
 def all_charts(processed: Path, R: Registry) -> list[dict]:
     return [classes(processed, R), signers(processed, R), intents(processed, R), revenue(processed, R),
-            treasury(processed, R), supply(processed, R), multiples(processed, R), developers(processed, R)]
+            treasury(processed, R), supply(processed, R), multiples(processed, R), developers(processed, R),
+            path_to_yes(processed, R)]
