@@ -10,7 +10,10 @@ and sentence that quotes a number. Not financial advice.
   https://soldanoandrea.github.io/near-thesis/dashboard.html (charts), rebuilt by GitHub Pages on every push; locally, open [`site/index.html`](site/index.html) (the thesis) and [`site/dashboard.html`](site/dashboard.html) (charts,
   falsifier scorecard, data provenance) straight from disk, no server needed
 - **Predictions**: [`thesis/predictions.csv`](thesis/predictions.csv), frozen on 2026-10-31, sha256 in the annotated git
-  tag `predictions-2026-10-31`; how each is checked in [`thesis/falsifiers.md`](thesis/falsifiers.md)
+  tag `predictions-2026-10-31`, and timestamped outside GitHub with OpenTimestamps
+  ([`thesis/predictions.csv.ots`](thesis/predictions.csv.ots), submitted 2026-11-01, anchored in Bitcoin; check it with
+  `ots verify thesis/predictions.csv.ots`, opentimestamps-client 0.7.2); how each is checked in
+  [`thesis/falsifiers.md`](thesis/falsifiers.md)
 - **Video** (under 3 minutes, silent, headings on screen): [`docs/media/demo.mp4`](docs/media/demo.mp4), storyline in
   [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md); dashboard screenshots in [`docs/media/screens/`](docs/media/screens)
 
