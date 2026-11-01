@@ -146,7 +146,9 @@ Organic daily active signers were 6,437 in 2026-Q3 against 23,402 in
 2025-Q1 interval (0 to 55,725) reaches zero, so the sample does not resolve the size of the
 decline: the 2025-Q1 estimate rests on 2 organic draws out of 600 (2026-Q3: 13).
 From 2025-Q3 on, the quarterly estimates stay between 6,437 and
-9,633 with overlapping intervals, so most of the fitted decline comes from early 2025. The log-linear trend over 2025-01 to 2026-09 is -38.53% a year. Out of sample it is no better
+9,633 with overlapping intervals, so most of the fitted decline comes from early 2025. The log-linear trend over the whole series is -38.53% a year, but the start month decides it: fits
+starting 2025-01 to 2025-10 give -38.53% (from 2025-01) to
+31.42% (from 2025-07). Out of sample it is no better
 than a random walk: mean absolute log error 0.435 against 0.422 for the random walk at six months
 (2 forecasts) and 0.344 against 0.363 at three months
 (5 forecasts). We read it as a description, not a forecast; extrapolated, it puts organic daily

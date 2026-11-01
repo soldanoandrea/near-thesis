@@ -6,8 +6,8 @@ and sentence that quotes a number. Not financial advice.
 
 - **Thesis**: [`thesis/THESIS.md`](thesis/THESIS.md) (every number is filled in from `data/processed/` by the build;
   the table behind each one is in [`thesis/NUMBERS.md`](thesis/NUMBERS.md))
-- **Dashboard**: https://soldanoandrea.github.io/near-thesis/ once GitHub Pages is enabled for the public repository;
-  locally, open [`site/index.html`](site/index.html) (the thesis) and [`site/dashboard.html`](site/dashboard.html) (charts,
+- **Dashboard**: https://soldanoandrea.github.io/near-thesis/ (the essay) and
+  https://soldanoandrea.github.io/near-thesis/dashboard.html (charts), rebuilt by GitHub Pages on every push; locally, open [`site/index.html`](site/index.html) (the thesis) and [`site/dashboard.html`](site/dashboard.html) (charts,
   falsifier scorecard, data provenance) straight from disk, no server needed
 - **Predictions**: [`thesis/predictions.csv`](thesis/predictions.csv), frozen on 2026-10-31, sha256 in the annotated git
   tag `predictions-2026-10-31`; how each is checked in [`thesis/falsifiers.md`](thesis/falsifiers.md)
@@ -93,8 +93,10 @@ only commits before it would be a baseline. This repository has no baseline: **e
 later** (the first, `440cb6e`, on 2026-10-30), the plan in `PIANO.md` was written on 2026-10-30, and the repository
 contains no pre-existing code; the only code not written for this project is the public libraries listed under
 [Disclosure](#disclosure). Check it with `git log --reverse --format='%ad %h %s' --date=short | head -3`. The hackathon
-work is therefore the whole history ([commits](https://github.com/soldanoandrea/near-thesis/commits/main)); the final
-submitted commit will carry the tag `hackathon-submission`.
+work is therefore the whole history ([commits](https://github.com/soldanoandrea/near-thesis/commits/main)). The project
+was submitted on 2026-11-01 at the tag `hackathon-submission` (`8e5fd12`, snapshot as-of 2026-10-29). Development
+continues inside the window (it ends 2026-11-14T23:59Z), against what `PIANO.md` planned (no pushes after the tag): the
+changes since then are `git log hackathon-submission..main`, and the frozen predictions are untouched.
 
 ## Disclosure
 

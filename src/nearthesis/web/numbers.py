@@ -293,6 +293,19 @@ def build(processed: Path, thesis_dir: Path, manifest: dict) -> Registry:
               P("model_adoption_backtest.csv", f"organic_daily_active_signers_3m, {r['model']}, horizon {r['horizon']}"))
         R.add(f"bt.das.{r['model']}.{r['horizon']}m.n", r["forecasts"], "count",
               P("model_adoption_backtest.csv", f"organic_daily_active_signers_3m, {r['model']}, horizon {r['horizon']}, forecasts"))
+    sens = _csv(processed, "model_adoption_start_sensitivity.csv").sort("first_month")
+    src = "model_adoption_start_sensitivity.csv"
+    lo, hi = sens.sort("growth_per_year").row(0, named=True), sens.sort("growth_per_year").row(-1, named=True)
+    R.add("sens.das.first_start", sens["first_month"][0], "text", P(src, "first_month, first row"))
+    R.add("sens.das.last_start", sens["first_month"][-1], "text", P(src, "first_month, last row"))
+    R.add("sens.das.min", lo["growth_per_year"], "ratio/yr", P(src, "growth_per_year, minimum"))
+    R.add("sens.das.min_start", lo["first_month"], "text", P(src, "first_month of the minimum"))
+    R.add("sens.das.max", hi["growth_per_year"], "ratio/yr", P(src, "growth_per_year, maximum"))
+    R.add("sens.das.max_start", hi["first_month"], "text", P(src, "first_month of the maximum"))
+    r = sens.filter(pl.col("first_month") >= "2025-07").row(0, named=True)
+    R.add("sens.das.from_2025h2", r["growth_per_year"], "ratio/yr", P(src, f"growth_per_year from {r['first_month']}"))
+    R.add("sens.das.from_2025h2_start", r["first_month"], "text", P(src, "first first_month >= 2025-07"))
+    R.add("sens.das.last_month", sens["last_month"][0], "text", P(src, "last_month"))
     bti = _csv(processed, "model_adoption_backtest.csv").filter(pl.col("series") == "intents_monthly_volume_usd")
     for r in bti.iter_rows(named=True):
         R.add(f"bt.iv.{r['model']}.{r['horizon']}m", r["mean_abs_log_error"], "count",

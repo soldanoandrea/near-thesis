@@ -13,8 +13,10 @@ Timeline (git history is the record):
    samples (Q2) were analysed.** The fetches were still running; no organic share, cohort retention or on-chain
    Intents volume had been computed.
 4. Posterior: filled in the next commits, from `reports/analysis_summary.md` and `reports/models_summary.md`. Numbers
-   below are quoted as "`metric_id` = value" exactly as `make reproduce` prints them; `tests/test_thesis_docs.py`
-   fails if a quote and the generated value disagree.
+   below are quoted as "`metric_id` = value" exactly as `make reproduce` printed them on the 2026-10-29 snapshot, the
+   one the priors were updated from; `tests/test_thesis_docs.py` fails if a quote and the value generated from that
+   snapshot disagree. Later snapshots move the numbers in the essay and the dashboard, not here: a posterior is a
+   record of what we saw then.
 
 ## Q1. Is the activity real? (recorded before the per-signer data)
 

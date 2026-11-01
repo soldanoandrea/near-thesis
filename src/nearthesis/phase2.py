@@ -9,6 +9,7 @@ config/sources.toml ([models] ranges), and both are printed in the report.
 from __future__ import annotations
 
 import datetime as dt
+import math
 from pathlib import Path
 
 import numpy as np
@@ -144,7 +145,7 @@ def run_multiples(daily: pl.DataFrame, peers: pl.DataFrame) -> dict[str, pl.Data
 
 
 def run_adoption(org: dict, daily: pl.DataFrame, as_of: str, mcfg: dict) -> dict[str, pl.DataFrame]:
-    out_fit, out_bt, out_fc, out_series = [], [], [], []
+    out_fit, out_bt, out_fc, out_series, out_sens = [], [], [], [], []
     series_list = []
     if org:
         first = config.load()["signers"]["recent_first_month"]  # months with the full 200-draw design
@@ -181,6 +182,13 @@ def run_adoption(org: dict, daily: pl.DataFrame, as_of: str, mcfg: dict) -> dict
                             "points": len(y), "growth_per_month": p.get("b"), "K": p.get("K"), "r": p.get("r"),
                             "t0": p.get("t0"), "sigma_log": p.get("sigma"),
                             "K_at_grid_edge": p.get("K_at_grid_edge")})
+        if name == "organic_daily_active_signers_3m":
+            # how much the log-linear trend depends on where the fit starts: refit from every start month that leaves
+            # at least adoption_min_train points
+            for i in range(0, len(y) - int(mcfg["adoption_min_train"]) + 1):
+                p = adoption.fit("loglinear", t[i:] - t[i], y[i:])
+                out_sens.append({"series": name, "first_month": months[i], "last_month": months[-1], "points": len(y) - i,
+                                 "growth_per_month": p["b"], "growth_per_year": math.exp(12 * p["b"]) - 1})
         bt = adoption.backtest(t, y, horizons=tuple(mcfg["adoption_backtest_horizons"]),
                                min_train=int(mcfg["adoption_min_train"]))
         out_bt.append(adoption.backtest_summary(bt).with_columns(pl.lit(name).alias("series")))
@@ -194,6 +202,8 @@ def run_adoption(org: dict, daily: pl.DataFrame, as_of: str, mcfg: dict) -> dict
         res["model_adoption_backtest"] = pl.concat(out_bt).select("series", pl.exclude("series"))
         res["model_adoption_forecasts"] = pl.concat(out_fc).select("series", pl.exclude("series"))
         res["model_adoption_series"] = pl.concat(out_series)
+    if out_sens:
+        res["model_adoption_start_sensitivity"] = pl.DataFrame(out_sens)
     return res
 
 

@@ -145,7 +145,9 @@ Organic daily active signers were {{q1b.organic_das}} in 2026-Q3 against {{q1b.o
 2025-Q1 interval ({{q1b.organic_das_first_full_quarter:ci}}) reaches zero, so the sample does not resolve the size of the
 decline: the 2025-Q1 estimate rests on {{draws.2025q1.organic:int}} organic draws out of {{draws.2025q1.all:int}} (2026-Q3: {{draws.2026q3.organic:int}}).
 From 2025-Q3 on, the quarterly estimates stay between {{oq.from2025q3.das_organic_min}} and
-{{oq.from2025q3.das_organic_max}} with overlapping intervals, so most of the fitted decline comes from early 2025. The log-linear trend over 2025-01 to 2026-09 is {{mc.organic_das_trend}} a year. Out of sample it is no better
+{{oq.from2025q3.das_organic_max}} with overlapping intervals, so most of the fitted decline comes from early 2025. The log-linear trend over the whole series is {{mc.organic_das_trend}} a year, but the start month decides it: fits
+starting {{sens.das.first_start}} to {{sens.das.last_start}} give {{sens.das.min}} (from {{sens.das.min_start}}) to
+{{sens.das.max}} (from {{sens.das.max_start}}). Out of sample it is no better
 than a random walk: mean absolute log error {{bt.das.loglinear.6m}} against {{bt.das.naive.6m}} for the random walk at six months
 ({{bt.das.loglinear.6m.n}} forecasts) and {{bt.das.loglinear.3m}} against {{bt.das.naive.3m}} at three months
 ({{bt.das.loglinear.3m.n}} forecasts). We read it as a description, not a forecast; extrapolated, it puts organic daily

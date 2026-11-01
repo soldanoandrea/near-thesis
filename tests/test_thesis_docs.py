@@ -4,9 +4,13 @@ must equal the formatted value in data/processed/metrics_phase2.csv or metrics_f
 import re
 
 import polars as pl
+import pytest
 
-from nearthesis import paths
+from nearthesis import manifest, paths
+from nearthesis.pipeline import compute_as_of
 from nearthesis.report import fmt
+
+PRIORS_AS_OF = "2026-10-29"   # snapshot the posterior quotes in priors.md were taken from
 
 QUOTE = re.compile(r"`([a-z0-9]+\.[A-Za-z0-9_.]+)`\s+=\s+(-?\d[\d,]*(?:\.\d+)?(?:%|M NEAR| NEAR)?)")  # quotes may wrap
 
@@ -21,6 +25,8 @@ def _metrics() -> dict[str, str]:
 
 
 def test_priors_quotes_match_generated_metrics():
+    if compute_as_of(manifest.load()) != PRIORS_AS_OF:
+        pytest.skip(f"priors.md quotes the {PRIORS_AS_OF} snapshot; the data is a later one")
     text = (paths.ROOT / "thesis" / "priors.md").read_text()
     quotes = QUOTE.findall(text)
     assert quotes, "priors.md should quote the metrics it relies on"
