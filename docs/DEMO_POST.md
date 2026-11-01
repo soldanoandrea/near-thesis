@@ -9,12 +9,12 @@ numbers can differ from the published post.
 Original note: The rules ask for a public X post that says the project was built at NEAR HACKATHON, tags @NEARProtocol and
 #NEARHackathon, explains NEAR's concrete role and attaches the demo video (screenshots alone are not enough). An X post
 carries either one video or up to four images, not both: attach [media/demo.mp4](media/demo.mp4) to the main post and
-put the chart in the first reply. Numbers below are filled in by `make site` from the snapshot as-of 2026-10-29.
+put the chart in the first reply. Numbers below are filled in by `make site` from the snapshot as-of 2026-10-31.
 
 ## Main post (under 280 characters; attach media/demo.mp4)
 
 ```
-Is NEAR's activity real? Rebuilt from NEAR's own chain data (archival RPC, intents.near events): 2.17% of txs are organic, Intents revenue checks out on-chain (98.7%), 7 dated predictions are hashed.
+Is NEAR's activity real? Rebuilt from NEAR's own chain data (archival RPC, intents.near events): 2.17% of txs are organic, Intents revenue checks out on-chain (98.0%), 7 dated predictions are hashed.
 
 Built at NEAR HACKATHON @NEARProtocol #NEARHackathon
 https://github.com/soldanoandrea/near-thesis
@@ -31,7 +31,7 @@ Who sends NEAR's transactions, 2026-Q3, signer by signer: organic 2.17% (0.86% t
 Reply 2:
 
 ```
-NEAR Intents swaps are real, but counted once they are 46% of DefiLlama's volume (92% two-sided). Captured revenue rebuilt from the revenue wallets: 98.7%. 3.11M NEAR bought back, float still +2.12%/yr.
+NEAR Intents swaps are real, but counted once they are 46% of DefiLlama's volume (92% two-sided). Captured revenue rebuilt from the revenue wallets: 98.0%. 3.11M NEAR bought back, float still +2.12%/yr.
 ```
 
 Reply 3:

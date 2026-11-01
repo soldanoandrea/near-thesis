@@ -31,8 +31,8 @@ reward programs, bots and relays: organic, human-like signers sent {{q1b.organic
 {{q1b.organic_tx_share:ci}}), and organic daily active signers averaged {{q1b.organic_das}} ({{q1b.organic_das:ci}}),
 against a point estimate of {{q1b.organic_das_first_full_quarter}} in 2025-Q1 that rests on {{draws.2025q1.organic:int}} organic draws.
 Since 2025-Q3 every quarter has stayed between {{oq.from2025q3.das_organic_min}} and {{oq.from2025q3.das_organic_max}}, so
-organic use is small and not growing; the fitted trend of {{mc.organic_das_trend}} a year leans on early 2025 and forecasts
-no better than a random walk. NEAR Intents, the cross-chain swap layer that settles on NEAR,
+organic use is small with no clear trend: the fitted {{mc.organic_das_trend}} a year leans on early 2025 (from
+{{sens.das.from_2025h2_start}}: {{sens.das.from_2025h2}}) and forecasts like a random walk. NEAR Intents, the cross-chain swap layer that settles on NEAR,
 is real, and its captured revenue checks out: rebuilt from public wallet flows it is {{q4b.revenue_onchain_to_defillama}}
 of what DefiLlama reports, and since {{rev.src.recent.first_month}} {{rev.src_intents_share.recent:p1}} of it has come straight from the
 Intents contract. Its reported volume does not check out one to one: public on-chain swaps, each counted
@@ -288,7 +288,7 @@ Each claim names the prediction that will test it ([falsifiers.md](falsifiers.md
 
 The same weight, the same tests: each claim names the prediction whose failure would confirm it.
 
-1. **Organic usage is small and not growing.** {{q1b.organic_tx_share}} of transactions,
+1. **Organic usage is small and not taking off.** {{q1b.organic_tx_share}} of transactions,
    {{q1b.organic_das}} organic daily active signers, between {{oq.from2025q3.das_organic_min}} and {{oq.from2025q3.das_organic_max}} in every
    quarter since 2025-Q3. Confirmed if P1 fails:
    organic daily active signers in 2027-Q3 below {{pred.P1.threshold}} (the lower end of today's interval), checked

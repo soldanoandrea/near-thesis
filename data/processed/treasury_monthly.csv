@@ -33,7 +33,7 @@ date,account_id,exists,liquid_near,locked_near
 2026-08-01,1csfundsadmin.sputnik-dao.near,true,502798.93852600,0.00000000
 2026-09-01,1csfundsadmin.sputnik-dao.near,true,502799.25058727,0.00000000
 2026-10-01,1csfundsadmin.sputnik-dao.near,true,270.87589141,0.00000000
-2026-10-30,1csfundsadmin.sputnik-dao.near,true,270.87589141,0.00000000
+2026-11-01,1csfundsadmin.sputnik-dao.near,true,270.87589141,0.00000000
 2024-01-01,buybacks.multisignature.near,false,,
 2024-02-01,buybacks.multisignature.near,false,,
 2024-03-01,buybacks.multisignature.near,false,,
@@ -68,7 +68,7 @@ date,account_id,exists,liquid_near,locked_near
 2026-08-01,buybacks.multisignature.near,true,662716.12859104,0.00000000
 2026-09-01,buybacks.multisignature.near,true,940841.33526660,0.00000000
 2026-10-01,buybacks.multisignature.near,true,1847719.66964792,0.00000000
-2026-10-30,buybacks.multisignature.near,true,2124102.21076015,0.00000000
+2026-11-01,buybacks.multisignature.near,true,2144976.64983549,0.00000000
 2024-01-01,fefundsadmin.sputnik-dao.near,false,,
 2024-02-01,fefundsadmin.sputnik-dao.near,false,,
 2024-03-01,fefundsadmin.sputnik-dao.near,false,,
@@ -103,7 +103,7 @@ date,account_id,exists,liquid_near,locked_near
 2026-08-01,fefundsadmin.sputnik-dao.near,true,1522523.28829845,0.00000000
 2026-09-01,fefundsadmin.sputnik-dao.near,true,1649784.40078747,0.00000000
 2026-10-01,fefundsadmin.sputnik-dao.near,true,1809615.33344556,0.00000000
-2026-10-30,fefundsadmin.sputnik-dao.near,true,1956588.03989733,0.00000000
+2026-11-01,fefundsadmin.sputnik-dao.near,true,1963841.86359350,0.00000000
 2024-01-01,treasury.near,true,17255332.25262616,0.00000000
 2024-02-01,treasury.near,true,17747637.84517503,0.00000000
 2024-03-01,treasury.near,true,18222220.81145772,0.00000000
@@ -138,4 +138,4 @@ date,account_id,exists,liquid_near,locked_near
 2026-08-01,treasury.near,true,703494.55553578,0.00000000
 2026-09-01,treasury.near,true,979989.25390872,0.00000000
 2026-10-01,treasury.near,true,1249137.60824373,0.00000000
-2026-10-30,treasury.near,true,1510598.93260838,0.00000000
+2026-11-01,treasury.near,true,1526304.18738362,0.00000000

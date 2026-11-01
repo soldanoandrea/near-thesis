@@ -130,11 +130,24 @@ def fetch(client: PoliteClient) -> None:
         print("  reusing committed month_boundaries.csv (same boundaries)", file=sys.stderr)
         fresh = False
     else:
+        # Reuse the committed month starts (immutable); search only the ones that are new, such as the boundary of a
+        # month that has ended since the last refresh and the new fetch day. The old last row (a fetch day, not a
+        # month start) is not reused.
+        known = {}
+        if prev.exists():
+            old_rows = list(io.read_csv(prev).iter_rows())[:-1]
+            known = {b: (int(h), int(t)) for b, h, t in old_rows}
         genesis_h = int(cfg["archival_epochs"]["genesis_height"])
         lo = api.first_at_or_after(genesis_h)
         hi = api.latest()
         boundaries = []
         for d in bounds_t:
+            key = d.strftime("%Y-%m-%dT%H:%M:%SZ")
+            if key in known:
+                h, t = known[key]
+                boundaries.append((key, h, t))
+                lo = (h, t)
+                continue
             h, t = api.height_at(_ns(d), lo, hi)
             boundaries.append((d.strftime("%Y-%m-%dT%H:%M:%SZ"), h, t))
             lo = (h, t)  # t < next boundary, so it is a valid lower anchor for the next search

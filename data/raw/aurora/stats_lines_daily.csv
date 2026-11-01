@@ -2493,7 +2493,9 @@ date,metric,value,is_approximate
 2026-10-27,activeAccounts,150,false
 2026-10-28,activeAccounts,127,false
 2026-10-29,activeAccounts,287,false
-2026-10-30,activeAccounts,88,true
+2026-10-30,activeAccounts,237,false
+2026-10-31,activeAccounts,101,false
+2026-11-01,activeAccounts,30,true
 2020-01-01,newAccounts,0,false
 2020-01-02,newAccounts,0,false
 2020-01-03,newAccounts,0,false
@@ -4988,7 +4990,9 @@ date,metric,value,is_approximate
 2026-10-27,newAccounts,59,false
 2026-10-28,newAccounts,21,false
 2026-10-29,newAccounts,150,false
-2026-10-30,newAccounts,34,true
+2026-10-30,newAccounts,113,false
+2026-10-31,newAccounts,29,false
+2026-11-01,newAccounts,1,true
 2020-01-01,newTxns,0,false
 2020-01-02,newTxns,0,false
 2020-01-03,newTxns,0,false
@@ -7483,7 +7487,9 @@ date,metric,value,is_approximate
 2026-10-27,newTxns,2619,false
 2026-10-28,newTxns,3328,false
 2026-10-29,newTxns,6594,false
-2026-10-30,newTxns,6570,true
+2026-10-30,newTxns,7761,false
+2026-10-31,newTxns,4918,false
+2026-11-01,newTxns,2358,true
 2020-01-01,txnsFee,0,false
 2020-01-02,txnsFee,0,false
 2020-01-03,txnsFee,0,false
@@ -9978,4 +9984,6 @@ date,metric,value,is_approximate
 2026-10-27,txnsFee,0.024652906860924174,false
 2026-10-28,txnsFee,0.029239968417063368,false
 2026-10-29,txnsFee,0.03754140734054594,false
-2026-10-30,txnsFee,0.013920655332651105,true
+2026-10-30,txnsFee,0.04384475489014827,false
+2026-10-31,txnsFee,0.026993980654838053,false
+2026-11-01,txnsFee,0.004028550319554563,true

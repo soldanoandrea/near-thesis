@@ -39,7 +39,7 @@ buybacks.multisignature.near,2026-09,transfer,in,implicit_near,NEAR,5,3702.72045
 buybacks.multisignature.near,2026-09,transfer,in,intents,NEAR,892,396785.61393132,1225357.82222380
 buybacks.multisignature.near,2026-09,transfer,in,named_other,NEAR,2,3597.00000000,8530.30601463
 buybacks.multisignature.near,2026-09,transfer,in,revenue_wallet,NEAR,1,502793.00000000,1166674.43139374
-buybacks.multisignature.near,2026-10,transfer,in,intents,NEAR,868,288890.96813146,1362301.42805886
+buybacks.multisignature.near,2026-10,transfer,in,intents,NEAR,868,288890.96813146,1412980.49379302
 fefundsadmin.sputnik-dao.near,2025-09,custody,in,intents,stable,9,9528.92326900,9528.92326900
 fefundsadmin.sputnik-dao.near,2025-09,transfer,in,named_other,NEAR,1,6.00000000,18.84000000
 fefundsadmin.sputnik-dao.near,2025-10,custody,in,intents,stable,236,292792.05127400,292792.05127400
@@ -85,7 +85,7 @@ fefundsadmin.sputnik-dao.near,2026-06,transfer,in,intents,NEAR,103,68795.5487789
 fefundsadmin.sputnik-dao.near,2026-07,transfer,in,intents,NEAR,129,79348.79086911,150184.71691537
 fefundsadmin.sputnik-dao.near,2026-08,transfer,in,intents,NEAR,173,127261.11248902,222423.75231242
 fefundsadmin.sputnik-dao.near,2026-09,transfer,in,intents,NEAR,393,159830.93265809,509805.16358304
-fefundsadmin.sputnik-dao.near,2026-10,transfer,in,intents,NEAR,406,151350.80911006,726776.78368803
+fefundsadmin.sputnik-dao.near,2026-10,transfer,in,intents,NEAR,406,151350.80911006,744515.07740549
 treasury.near,2020-10,transfer,in,named_other,NEAR,1,30.00000000,35.51620080
 treasury.near,2020-10,transfer,out,named_other,NEAR,1,1.00000000,1.12521618
 treasury.near,2021-10,transfer,in,named_other,NEAR,1,0.00100000,0.00811036

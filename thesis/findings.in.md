@@ -1,4 +1,4 @@
-- **Organic use is about 2% of NEAR's transactions, and not growing.** Human-like signers sent {{q1b.organic_tx_share}} of
+- **Organic use is about 2% of NEAR's transactions, with no clear trend since mid-2025.** Human-like signers sent {{q1b.organic_tx_share}} of
   transactions in 2026-Q3 (90% interval {{q1b.organic_tx_share:ci}}); organic daily active signers were {{q1b.organic_das}}
   ({{q1b.organic_das:ci}}) and have stayed between {{oq.from2025q3.das_organic_min}} and {{oq.from2025q3.das_organic_max}} in every
   quarter since 2025-Q3 (the fitted {{mc.organic_das_trend}} a year leans on early-2025 estimates built from
