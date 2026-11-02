@@ -18,8 +18,14 @@ buyback_yield_defillama,0.00341653,""
 buyback_near_per_year_onchain,4593820.24252842,""
 buyback_yield_onchain,0.00350526,""
 buyback_yield,0.00350526,""
-hsp029_status,,Voting
-hsp029_snapshot_utc,,2026-11-01T17:15:52Z
+hsp029_status,,Succeeded
+hsp029_snapshot_utc,,2026-11-02T18:21:15Z
 hsp029_url,,https://gov.near.org/t/42644
+hsp029_vote_status,,Timelock
+hsp029_vote_end_utc,,2026-11-02T16:48:08Z
+hsp029_timelock_end_utc,,2026-11-16T16:48:08Z
+hsp029_voters,36.00000000,""
+hsp029_for_share,0.99967448,""
+hsp029_turnout,0.62349917,""
 intents_onchain_one_sided_to_defillama,0.46042176,""
 buyback_yield_source,,on-chain buyback ledger

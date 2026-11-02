@@ -87,6 +87,15 @@ def model_inputs(raw: Path, daily: pl.DataFrame, epochs: pl.DataFrame, as_of: st
         inp["hsp029_status"] = g["status"]
         inp["hsp029_snapshot_utc"] = _m.load()["files"]["governance/hsp029_status.csv"]["fetched_at_utc"]
         inp["hsp029_url"] = g["topic_url"]
+    vp = raw / "governance" / "hsp029_onchain.csv"
+    if vp.exists():
+        v = io.read_csv(vp).row(0, named=True)
+        inp["hsp029_vote_status"] = v["status"]
+        inp["hsp029_vote_end_utc"] = v["voting_end_utc"]
+        inp["hsp029_timelock_end_utc"] = v["timelock_end_utc"]
+        inp["hsp029_voters"] = float(v["voters"])
+        inp["hsp029_for_share"] = float(v["venear_for"]) / float(v["venear_voted"])
+        inp["hsp029_turnout"] = float(v["venear_voted"]) / float(v["venear_snapshot_total"])
     d = ic.get("days") if ic else None
     inp["intents_onchain_one_sided_to_defillama"] = (float(d["ratio_sample_to_defillama"].median())
                                                      if d is not None and d.height else None)

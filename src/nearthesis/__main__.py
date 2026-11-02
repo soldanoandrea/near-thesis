@@ -14,7 +14,7 @@ import time
 
 STEPS = ["nearblocks", "defillama", "coingecko", "aurora", "onchain", "epochs", "activity", "treasury",
          # phase 2a (analysis layer)
-         "signer_blocks", "signers", "trails", "github", "opendevdata", "intents_check", "governance"]
+         "signer_blocks", "signers", "trails", "github", "opendevdata", "intents_check", "governance", "governance_onchain"]
 
 
 def refresh(only: list[str] | None, skip: list[str] | None) -> None:
@@ -38,6 +38,7 @@ def refresh(only: list[str] | None, skip: list[str] | None) -> None:
         "opendevdata": devdata.fetch_opendevdata,
         "intents_check": intents_check.fetch,
         "governance": governance.fetch,
+        "governance_onchain": governance.fetch_onchain,
     }
     steps = [s for s in STEPS if (not only or s in only) and (not skip or s not in skip)]
     client = PoliteClient()

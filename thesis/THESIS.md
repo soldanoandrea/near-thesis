@@ -63,7 +63,7 @@ weight we gave the +60%-a-year revenue path, the only one that gets there, not a
 
 **Data.** Only keyless public APIs: NearBlocks, DefiLlama, CoinGecko, NEAR RPC and archival RPC, the FastNear
 transactions indexer, Blockscout for Aurora, GitHub, Electric Capital Open Dev Data and the NEAR governance forum.
-50 raw files (311,438 rows) were fetched between 2026-11-01T16:39:35Z and 2026-11-01T17:15:52Z and
+51 raw files (311,439 rows) were fetched between 2026-11-01T16:39:35Z and 2026-11-02T18:23:22Z and
 committed with their URL, parameters, fetch time and sha256 in `data/raw/MANIFEST.json`. `make reproduce` rebuilds every
 processed table, report, this essay and the dashboard offline, and the tests check that the committed outputs are
 byte-identical to what the code produces.
@@ -108,7 +108,7 @@ on-chain by design. DefiLlama's Intents volume comes from a NEAR-uploaded Dune t
 No account carries an entity label, so implicit accounts in the treasury trail are unattributed. Only
 1 new-signer cohort has enough draws to measure retention. The lead-lag test of the starter
 hypothesis (does Intents volume lead usage better than price?) was not run. Agent activity is measured only through the
-Chain Signatures proxy. The HSP-029 vote had not closed at the snapshot. BigQuery, Dune and the Intents Explorer were
+Chain Signatures proxy. BigQuery, Dune and the Intents Explorer were
 not used because they need accounts or keys.
 
 ## The evidence, question by question
@@ -207,8 +207,9 @@ price and with the revenue window: at half today's NEAR price it is 3.6x, becaus
 as much; measured against the last 365 days of revenue ($9.29M) instead of the last 90 days
 annualized it is 14.8x, and on that basis the second leg of PIANO.md's Q4 falsifier (more than 10x) would be met too.
 HSP-029, which phases the cap down to 1.6% over 24 months, lowers the bar to $87.24M
-(4.5x); it was in status "Voting" at our snapshot (2026-11-01T17:15:52Z),
-with the vote reported to close on 2026-11-02 ([chart](../site/dashboard.html#card-supply)).
+(4.5x). It passed: `vote.dao` shows 99.97% in favour, turnout
+62.35%, veto window to 2026-11-16T16:48:08Z; it applies a quarter after ratification,
+with validator adoption ([chart](../site/dashboard.html#card-supply)).
 
 **The treasury.** `treasury.near` receives its share of protocol rewards as the protocol says it should:
 99.93% of the expected amount (median of the last six months). Its outflows are another matter.
@@ -276,7 +277,7 @@ Each claim names the prediction that will test it ([falsifiers.md](falsifiers.md
    (today 379x) on 2027-04-30.
 3. **Supply discipline is real and may tighten.** Issuance halved in the data, buybacks take about
    0.35% of supply a year off the market into a held balance, and HSP-029 would lower the offset bar to
-   4.5x. First check: the HSP-029 vote, reported to close on 2026-11-02; then the
+   4.5x. First check passed (the vote); next, no veto and validator adoption; then the
    structural Q4 falsifier (float dilution above 2% a year), re-measured by every `make refresh`.
 4. **NEAR's developer base is holding up relative to its peers** (3.07% to 4.28%).
    Tested by P6: at least 3.38% of the peer-chain developer count in 2027-Q3, checked 2027-10-31.
@@ -335,14 +336,14 @@ revenue changing +60% a year). Our weights, recorded in
 
 | Branch | Prior weight | Why |
 |---|---:|---|
-| Policy: status quo (2.5% cap) | 0.40 | HSP-029 was still in voting; no data on the outcome |
-| Policy: HSP-029 active after 3 months | 0.40 | one quarter after ratification, as the proposal states |
-| Policy: HSP-029 active after 9 months | 0.20 | slower validator adoption |
+| Policy: status quo (2.5% cap) | 0.10 | HSP-029 passed; only a veto or no validator adoption keeps 2.5% (was 0.4) |
+| Policy: HSP-029 active after 3 months | 0.60 | one quarter after ratification, as the proposal states |
+| Policy: HSP-029 active after 9 months | 0.30 | slower validator adoption |
 | Revenue path: -30% a year | 0.30 | the random walk beats every trend in the backtest, so the direction is unknown |
 | Revenue path: flat (+0%) | 0.40 | as above |
 | Revenue path: +60% a year | 0.30 | as above |
 
-Weighted, the float grows 1.46% a year over 5 years (the branches range from
+Weighted, the float grows 1.26% a year over 5 years (the branches range from
 0.29% to 2.34%), and the probability that burn plus buybacks cover issuance in year 5 is
 0.30: only the high-revenue path gets there, under every policy. These weights are the least
 evidence-based numbers in this document; change them in the file and `make site` recomputes the result.
@@ -372,7 +373,7 @@ evidence against it.
 
 Decision rule, stated now ([path to yes](../site/dashboard.html#card-pathtoyes)): if P1, P2 and P4 all hold, we upgrade the case from conditional to supported on usage and
 value capture; if P1 and P4 both fail, the long-term case as stated here is falsified. Before those dates, three things
-would move us: the HSP-029 result (a pass lowers the offset bar from 7.2x, 3.6x to 14.8x by price and window, to
+would move us: HSP-029 taking effect (it passed the vote; activation lowers the offset bar from 7.2x, 3.6x to 14.8x by price and window, to
 4.5x); a published definition of DefiLlama's Intents volume (it would tell us whether the
 missing half is double counting or confidential flow); and a public account of the April-May treasury transfers.
 

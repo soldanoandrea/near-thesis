@@ -107,7 +107,7 @@ on-chain by design. DefiLlama's Intents volume comes from a NEAR-uploaded Dune t
 No account carries an entity label, so implicit accounts in the treasury trail are unattributed. Only
 {{coh.informative_cohorts}} new-signer cohort has enough draws to measure retention. The lead-lag test of the starter
 hypothesis (does Intents volume lead usage better than price?) was not run. Agent activity is measured only through the
-Chain Signatures proxy. The HSP-029 vote had not closed at the snapshot. BigQuery, Dune and the Intents Explorer were
+Chain Signatures proxy. BigQuery, Dune and the Intents Explorer were
 not used because they need accounts or keys.
 
 ## The evidence, question by question
@@ -206,8 +206,9 @@ price and with the revenue window: at half today's NEAR price it is {{ma.net_zer
 as much; measured against the last 365 days of revenue ({{q2.intents_revenue_usd_365d}}) instead of the last 90 days
 annualized it is {{ma.net_zero_multiple_365d.0.0249:x}}, and on that basis the second leg of PIANO.md's Q4 falsifier (more than 10x) would be met too.
 HSP-029, which phases the cap down to 1.6% over 24 months, lowers the bar to {{nz.hsp.required_revenue}}
-({{ma.net_zero_multiple.0.0159:x}}); it was in status "{{in.hsp029_status}}" at our snapshot ({{in.hsp029_snapshot_utc}}),
-with the vote reported to close on 2026-11-02 ([chart](../site/dashboard.html#card-supply)).
+({{ma.net_zero_multiple.0.0159:x}}). It passed: `vote.dao` shows {{in.hsp029_for_share}} in favour, turnout
+{{in.hsp029_turnout}}, veto window to {{in.hsp029_timelock_end_utc}}; it applies a quarter after ratification,
+with validator adoption ([chart](../site/dashboard.html#card-supply)).
 
 **The treasury.** `treasury.near` receives its share of protocol rewards as the protocol says it should:
 {{q4b.treasury_rewards_check}} of the expected amount (median of the last six months). Its outflows are another matter.
@@ -275,7 +276,7 @@ Each claim names the prediction that will test it ([falsifiers.md](falsifiers.md
    (today {{pred.P7.threshold}}) on {{pred.P7.date}}.
 3. **Supply discipline is real and may tighten.** Issuance halved in the data, buybacks take about
    {{in.buyback_yield_onchain}} of supply a year off the market into a held balance, and HSP-029 would lower the offset bar to
-   {{ma.net_zero_multiple.0.0159:x}}. First check: the HSP-029 vote, reported to close on 2026-11-02; then the
+   {{ma.net_zero_multiple.0.0159:x}}. First check passed (the vote); next, no veto and validator adoption; then the
    structural Q4 falsifier (float dilution above 2% a year), re-measured by every `make refresh`.
 4. **NEAR's developer base is holding up relative to its peers** ({{dev.2025q3.to_peers}} to {{dev.2026q3.to_peers}}).
    Tested by P6: at least {{pred.P6.threshold}} of the peer-chain developer count in 2027-Q3, checked {{pred.P6.date}}.
@@ -334,7 +335,7 @@ revenue changing {{par.revenue_change.high:sp0}} a year). Our weights, recorded 
 
 | Branch | Prior weight | Why |
 |---|---:|---|
-| Policy: status quo (2.5% cap) | {{vp.policy.status_quo}} | HSP-029 was still in voting; no data on the outcome |
+| Policy: status quo (2.5% cap) | {{vp.policy.status_quo}} | HSP-029 passed; only a veto or no validator adoption keeps 2.5% (was 0.4) |
 | Policy: HSP-029 active after 3 months | {{vp.policy.hsp029_act3m}} | one quarter after ratification, as the proposal states |
 | Policy: HSP-029 active after 9 months | {{vp.policy.hsp029_act9m}} | slower validator adoption |
 | Revenue path: {{par.revenue_change.low:sp0}} a year | {{vp.revenue.low}} | the random walk beats every trend in the backtest, so the direction is unknown |
@@ -371,7 +372,7 @@ evidence against it.
 
 Decision rule, stated now ([path to yes](../site/dashboard.html#card-pathtoyes)): if P1, P2 and P4 all hold, we upgrade the case from conditional to supported on usage and
 value capture; if P1 and P4 both fail, the long-term case as stated here is falsified. Before those dates, three things
-would move us: the HSP-029 result (a pass lowers the offset bar from {{ma.net_zero_multiple.0.0249:x}}, {{ma.net_zero_multiple_half_price.0.0249:x}} to {{ma.net_zero_multiple_365d.0.0249:x}} by price and window, to
+would move us: HSP-029 taking effect (it passed the vote; activation lowers the offset bar from {{ma.net_zero_multiple.0.0249:x}}, {{ma.net_zero_multiple_half_price.0.0249:x}} to {{ma.net_zero_multiple_365d.0.0249:x}} by price and window, to
 {{ma.net_zero_multiple.0.0159:x}}); a published definition of DefiLlama's Intents volume (it would tell us whether the
 missing half is double counting or confidential flow); and a public account of the April-May treasury transfers.
 

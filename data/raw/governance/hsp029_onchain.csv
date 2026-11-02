@@ -1,0 +1,2 @@
+contract,proposal_id,status,flow,voters,venear_for,venear_against,venear_abstain,venear_voted,venear_snapshot_total,snapshot_block_height,quorum_threshold_bps,approval_threshold_bps,voting_start_utc,voting_end_utc,timelock_end_utc
+vote.dao,29,Timelock,Classic,36,3287728.66225963,0.00001546,1070.57281605,3288799.23509113,5274745.15478324,220563095,3500,6667,2026-10-19T16:48:08Z,2026-11-02T16:48:08Z,2026-11-16T16:48:08Z

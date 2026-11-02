@@ -6,13 +6,15 @@
 recorded = "2026-10-31"
 horizon_years = 5
 
-# Issuance policy over the horizon. HSP-029 (cap 2.5% -> 1.6% over 24 months) was in "Voting" at the snapshot and
-# needs validator adoption after ratification. We have no data on the vote, so passage gets 0.6, split between a
-# prompt (3 months) and a slow (9 months) activation.
+# Issuance policy over the horizon. HSP-029 (cap 2.5% -> 1.6% over 24 months) needs ratification by House of Stake
+# and then validator adoption. Revised 2026-11-02, after the vote closed (vote.dao: passed, veto window open): the
+# 2026-10-31 weights were status_quo 0.4, hsp029_act3m 0.4, hsp029_act9m 0.2 ("no data on the vote"). Now the
+# status quo stands only if the Security Council vetoes or validators do not adopt the upgrade, so it keeps 0.1; the
+# rest is split between a prompt (3 months) and a slow (9 months) activation. These remain opinions.
 [policy]
-status_quo = 0.4
-hsp029_act3m = 0.4
-hsp029_act9m = 0.2
+status_quo = 0.1
+hsp029_act3m = 0.6
+hsp029_act9m = 0.3
 
 # NEAR Intents captured revenue growth in NEAR terms, per year (config/sources.toml [models].revenue_growth:
 # low 0.7x, base 1.0x, high 1.6x). Symmetric because the adoption backtest finds that a random walk forecasts

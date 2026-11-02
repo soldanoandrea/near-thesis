@@ -27,7 +27,7 @@ As-of date: 2026-10-31. Each model is a pure function in `src/nearthesis/models/
 
 ## (a) Supply and value-accrual scenarios: 2.5% vs HSP-029 (1.6%)
 
-**Assumptions.** Monthly recursion: issuance = supply x cap x realized/cap; burn = supply x burn rate, growing with fees; buybacks = supply x buyback yield, growing with Intents revenue relative to price (constant price here). Bought-back NEAR is held, not burned (DefiLlama adapter; HSP-029 text), so it reduces the float, not total supply. HSP-029 (https://gov.near.org/t/42644, status "Voting" at the 2026-11-01T17:15:52Z snapshot; the vote was reported to close 2026-11-02): cap(t) = 2.5% - 0.9% x min(t, 24)/24 after activation one full quarter after ratification, then validators must adopt the upgrade; we model activation at month 3 and 9.
+**Assumptions.** Monthly recursion: issuance = supply x cap x realized/cap; burn = supply x burn rate, growing with fees; buybacks = supply x buyback yield, growing with Intents revenue relative to price (constant price here). Bought-back NEAR is held, not burned (DefiLlama adapter; HSP-029 text), so it reduces the float, not total supply. HSP-029 (https://gov.near.org/t/42644, status "Succeeded" at the 2026-11-02T18:21:15Z snapshot; on-chain vote status "Timelock", 99.97% of veNEAR in favour, closed 2026-11-02T16:48:08Z): cap(t) = 2.5% - 0.9% x min(t, 24)/24 after activation one full quarter after ratification, then validators must adopt the upgrade; we model activation at month 3 and 9.
 
 **Ranges.** Fee growth per year: {'low': 0.8, 'base': 1.0, 'high': 1.5}; Intents revenue growth per year (NEAR terms): {'low': 0.7, 'base': 1.0, 'high': 1.6}; horizons [1, 2, 3, 4, 5] years.
 

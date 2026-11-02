@@ -123,7 +123,9 @@ def build(processed: Path, thesis_dir: Path, manifest: dict) -> Registry:
                     ("intents_volume_annualized_90d", "USD"), ("intents_fees_annualized_90d", "USD"),
                     ("take_rate_90d", "bp"), ("buyback_yield_onchain", "ratio"),
                     ("buyback_near_per_year_onchain", "NEAR"), ("supply0", "NEAR"), ("staking_ratio", "ratio"),
-                    ("hsp029_status", "text"), ("hsp029_snapshot_utc", "text"), ("as_of", "text")):
+                    ("hsp029_status", "text"), ("hsp029_snapshot_utc", "text"), ("as_of", "text"),
+                    ("hsp029_vote_status", "text"), ("hsp029_vote_end_utc", "text"), ("hsp029_timelock_end_utc", "text"),
+                    ("hsp029_voters", "count"), ("hsp029_for_share", "ratio"), ("hsp029_turnout", "ratio")):
         R.add(f"in.{k}", inp[k], unit, P("model_inputs.csv", f"parameter = {k}"))
 
     R.add("in.capture_share", float(inp["intents_revenue_annualized_90d"]) / float(inp["intents_fees_annualized_90d"]), "ratio",

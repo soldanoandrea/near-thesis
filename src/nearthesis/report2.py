@@ -721,7 +721,7 @@ def _model_a(inp, sm, mcfg) -> list[str]:
          "with fees; buybacks = supply x buyback yield, growing with Intents revenue relative to price (constant price "
          "here). Bought-back NEAR is held, not burned (DefiLlama adapter; HSP-029 text), so it reduces the float, not "
          f"total supply. HSP-029 ({inp.get('hsp029_url', 'gov.near.org/t/42644')}, status \"{inp.get('hsp029_status', 'n/a')}\" "
-         f"at the {inp.get('hsp029_snapshot_utc', 'n/a')} snapshot; the vote was reported to close 2026-11-02): cap(t) = 2.5% - 0.9% x min(t, 24)/24 after activation one full quarter after "
+         f"at the {inp.get('hsp029_snapshot_utc', 'n/a')} snapshot; on-chain vote status \"{inp.get('hsp029_vote_status', 'n/a')}\", {inp.get('hsp029_for_share', 0):.2%} of veNEAR in favour, closed {inp.get('hsp029_vote_end_utc', 'n/a')}): cap(t) = 2.5% - 0.9% x min(t, 24)/24 after activation one full quarter after "
          "ratification, then validators must adopt the upgrade; we model activation at month "
          f"{' and '.join(str(a) for a in mcfg['hsp029_activation_months'])}.", "",
          f"**Ranges.** Fee growth per year: {mcfg['fee_growth']}; Intents revenue growth per year (NEAR terms): "

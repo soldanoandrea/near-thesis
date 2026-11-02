@@ -12,8 +12,8 @@
 - **Holders are still diluted.** {{q4b.near_captured_since_buybacks}} has been bought back and held since 2026-02-23, yet
   the float grows {{sc.status_quo/base.1y.float_cagr}} a year at the 2.5% cap; offsetting that needs
   {{ma.net_zero_multiple.0.0249:x}} today's Intents revenue ({{ma.net_zero_multiple_half_price.0.0249:x}} at half today's price, {{ma.net_zero_multiple_365d.0.0249:x}} against the last 365 days of revenue;
-  {{ma.net_zero_multiple.0.0159:x}} under HSP-029, in vote at the
-  snapshot). Stakers gain {{md.real_staker_yield}} a year in share of the float; non-stakers lose {{md.non_staker:abs}}.
+  {{ma.net_zero_multiple.0.0159:x}} under HSP-029, which House of Stake passed with {{in.hsp029_for_share}} of the veNEAR cast,
+  read on-chain from `vote.dao`; it still needs the veto window to close ({{in.hsp029_timelock_end_utc}}) and validators to adopt it). Stakers gain {{md.real_staker_yield}} a year in share of the float; non-stakers lose {{md.non_staker:abs}}.
 - **The valuation depends on whether Intents counts.** NEAR's market cap is {{mb.chain_fees:x}} its annualized chain fees
   (peer median {{mv.chain_fees.30d_annualized.peer_median}}) but {{mb.fees_plus_intents_fees:x}} counting Intents fees.
   Developers fell {{q6.near_mad_yoy:abs}} in a year to {{q6.near_mad}} monthly actives, less than the peer chains did.

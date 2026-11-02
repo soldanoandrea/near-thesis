@@ -58,7 +58,7 @@ that `idea` is 20-2000 characters and that no `website` field is present.
 - [ ] Both READMEs name each other: this one names Allowance (https://github.com/soldanoandrea/allowance); Allowance's
       README names near-thesis.
 - [ ] HSP-029: the vote was reported to close on 2026-11-02, after the snapshot. The thesis states the status at the
-      snapshot ("Voting"); refreshing the governance snapshot would change committed data and is optional.
+      snapshot ("Succeeded"); refreshing the governance snapshot would change committed data and is optional.
 - [ ] Final JSON printed in full and approved by you; then sent once. Responses: 201 saved; 400 fix the listed fields and
       resend with the same `requestId`; 403 closed, do not retry; 409 repo/email limit reached, ask, do not change link
       or email; 413 shorten `idea`; 503 wait a minute and resend with the same `requestId`.

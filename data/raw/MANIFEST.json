@@ -1296,13 +1296,51 @@
       },
       "notes": "Repository metadata at fetch time. nearai repos = most-starred non-fork, non-archived repos pushed in the last 365 days."
     },
+    "governance/hsp029_onchain.csv": {
+      "source": "governance",
+      "urls": [
+        "https://free.rpc.fastnear.com call_function vote.dao get_proposal proposal_id=29 (finality final)"
+      ],
+      "params": null,
+      "fetched_at_utc": "2026-11-02T18:23:22Z",
+      "rows": 1,
+      "columns": [
+        "contract",
+        "proposal_id",
+        "status",
+        "flow",
+        "voters",
+        "venear_for",
+        "venear_against",
+        "venear_abstain",
+        "venear_voted",
+        "venear_snapshot_total",
+        "snapshot_block_height",
+        "quorum_threshold_bps",
+        "approval_threshold_bps",
+        "voting_start_utc",
+        "voting_end_utc",
+        "timelock_end_utc"
+      ],
+      "sha256": "7449c8bbbe82b7b4d0a59edc3b1b66c603fa4473980c843acdda292db58260e4",
+      "bytes": 422,
+      "http": {
+        "requests": 1,
+        "cache_hits": 0,
+        "retries": 0,
+        "rate_limited": 0,
+        "errors": 0,
+        "bytes": 117708
+      },
+      "notes": "House of Stake vote on HSP-029, read from the vote.dao contract. veNEAR in whole units; options in contract order For, Against, Abstain. Status 'Timelock' = vote passed, Security Council veto window open until timelock_end_utc, ratified automatically after it."
+    },
     "governance/hsp029_status.csv": {
       "source": "governance",
       "urls": [
         "https://gov.near.org/t/42644.json"
       ],
       "params": null,
-      "fetched_at_utc": "2026-11-01T17:15:52Z",
+      "fetched_at_utc": "2026-11-02T18:21:15Z",
       "rows": 1,
       "columns": [
         "topic_url",
@@ -1317,15 +1355,15 @@
         "spec_cap_formula",
         "activation"
       ],
-      "sha256": "924ee8bc829581f17e40f4b7f637710b1d39c00c01884d31fbf99082743b1fec",
-      "bytes": 522,
+      "sha256": "6a2dbadf705affcbfc7f63cca20e654714f6a02a4df4f5c6611f429ae725da91",
+      "bytes": 525,
       "http": {
         "requests": 1,
         "cache_hits": 0,
         "retries": 0,
         "rate_limited": 0,
         "errors": 0,
-        "bytes": 171222
+        "bytes": 171221
       },
       "notes": "HSP-029 proposal metadata from the NEAR governance forum at fetch time (status field of the proposal frontmatter, cap formula, activation rule)."
     },

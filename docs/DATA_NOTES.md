@@ -225,7 +225,8 @@ signers. A per-signer reconciliation needs per-account histories (phase 2).
 - Why the `validator_reward_paid_prev_epoch` map does not sum to the minted amount of any adjacent epoch.
 - Who controls the implicit accounts that received `treasury.near`'s April-May 2026 outflows: account ids carry no
   labels; trails stop at five hops or where no outflow is seen (phase 2a ledger).
-- The final HSP-029 vote and its validator adoption: the snapshot (2026-10-30 22:59 UTC) shows status "Voting".
+- HSP-029's validator adoption: the vote has passed (`governance/hsp029_onchain.csv`), but whether and when validators
+  adopt the upgrade is not observable before activation.
 - Electric Capital's classification of repositories into ecosystems (taken as published).
 - Market caps older than 365 days for peers (keyless CoinGecko limit).
 
@@ -317,7 +318,10 @@ what was fetched and how the sources behave.
   `num_commits` columns are 28-day rolling values, so month-end rows are used (the stored monthly sum of
   `num_commits` is not meaningful and is not used).
 
-### Governance (`governance/hsp029_status.csv`)
+### Governance (`governance/hsp029_status.csv`, `governance/hsp029_onchain.csv`)
 - HSP-029 text and status come from the Discourse JSON of `https://gov.near.org/t/42644` (frontmatter `Status:`).
-  The House of Stake page `houseofstake.org/proposals/29` renders client-side and returned only its title without a
-  browser, so the final vote result (reported to close 2026-11-02) is not in the snapshot.
+- The vote comes from NEAR itself: House of Stake proposals live in the `vote.dao` contract, and one keyless
+  `get_proposal` view (id 29, finality final) returns the status, veNEAR per option (For, Against, Abstain), the
+  snapshot's total veNEAR, quorum and approval thresholds and the timelock. Read on 2026-11-02 after the vote closed:
+  status `Timelock` (passed; Security Council veto window open, automatic ratification at its end). The page
+  `houseofstake.org/proposals/29` shows the same view, rendered client-side.

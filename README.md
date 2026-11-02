@@ -36,8 +36,8 @@ and sentence that quotes a number. Not financial advice.
 - **Holders are still diluted.** 3.11M NEAR has been bought back and held since 2026-02-23, yet
   the float grows 2.12% a year at the 2.5% cap; offsetting that needs
   7.2x today's Intents revenue (3.6x at half today's price, 14.8x against the last 365 days of revenue;
-  4.5x under HSP-029, in vote at the
-  snapshot). Stakers gain 2.51% a year in share of the float; non-stakers lose 2.06%.
+  4.5x under HSP-029, which House of Stake passed with 99.97% of the veNEAR cast,
+  read on-chain from `vote.dao`; it still needs the veto window to close (2026-11-16T16:48:08Z) and validators to adopt it). Stakers gain 2.51% a year in share of the float; non-stakers lose 2.06%.
 - **The valuation depends on whether Intents counts.** NEAR's market cap is 2,519x its annualized chain fees
   (peer median 359x) but 73.9x counting Intents fees.
   Developers fell 36.01% in a year to 565 monthly actives, less than the peer chains did.
@@ -78,7 +78,7 @@ step-by-step table for automated screeners is [below](#reproduce-for-automated-s
 
 A data project, not a contract: NEAR is both the subject and the main data source. The pipeline reads NEAR mainnet
 directly through RPC and archival RPC (per-epoch supply, mint and burn, validator stake, protocol config, treasury
-balances, `intents.near` view calls for the fee collector) and through the FastNear indexer (a stratified block sample,
+balances, `intents.near` view calls for the fee collector, the House of Stake vote on HSP-029 from `vote.dao`) and through the FastNear indexer (a stratified block sample,
 per-signer histories, wallet flows and DIP-4 `token_diff` settlement events on `intents.near`), plus the NEAR governance
 forum for HSP-029. Nothing is written to the chain, no contract is deployed, and no account or key is used. Other chains
 (Solana, Sui, Aptos, Base, Ethereum, Tron) appear only as aggregator snapshots for comparison; there is no pre-existing
