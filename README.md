@@ -11,7 +11,7 @@ and sentence that quotes a number. Not financial advice.
   falsifier scorecard, data provenance) straight from disk, no server needed
 - **Predictions**: [`thesis/predictions.csv`](thesis/predictions.csv), frozen on 2026-10-31, sha256 in the annotated git
   tag `predictions-2026-10-31`, and timestamped outside GitHub with OpenTimestamps
-  ([`thesis/predictions.csv.ots`](thesis/predictions.csv.ots), submitted 2026-11-01, anchored in Bitcoin; check it with
+  ([`thesis/predictions.csv.ots`](thesis/predictions.csv.ots): in Bitcoin block 974154, 2026-11-01T17:10:19Z; check it with
   `ots verify thesis/predictions.csv.ots`, opentimestamps-client 0.7.2); how each is checked in
   [`thesis/falsifiers.md`](thesis/falsifiers.md)
 - **Video** (under 3 minutes, silent, headings on screen): [`docs/media/demo.mp4`](docs/media/demo.mp4), storyline in
